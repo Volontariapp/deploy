@@ -1,0 +1,12 @@
+[submodule "ms-event"]
+	path = ms-event
+	url = git@github.com:Volontariapp/ms-event.git
+[submodule "ms-user"]
+	path = ms-user
+	url = git@github.com:Volontariapp/ms-user.git
+[submodule "ms-post"]
+	path = ms-post
+	url = git@github.com:Volontariapp/ms-post.git
+[submodule "api-gateway"]
+	path = api-gateway
+	url = git@github.com:Volontariapp/api-gateway.git
