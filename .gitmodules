@@ -10,3 +10,6 @@
 [submodule "api-gateway"]
 	path = api-gateway
 	url = git@github.com:Volontariapp/api-gateway.git
+[submodule "ms-social"]
+	path = ms-social
+	url = git@github.com:Volontariapp/ms-social.git
