@@ -13,3 +13,6 @@
 [submodule "ms-social"]
 	path = ms-social
 	url = git@github.com:Volontariapp/ms-social.git
+[submodule "outbox-runners"]
+	path = outbox-runners
+	url = git@github.com:Volontariapp/outbox-runners.git
