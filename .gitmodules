@@ -1,18 +1,18 @@
 [submodule "ms-event"]
-	path = ms-event
-	url = git@github.com:Volontariapp/ms-event.git
+	path = submodules/ms-event
+	url = ../ms-event.git
 [submodule "ms-user"]
-	path = ms-user
-	url = git@github.com:Volontariapp/ms-user.git
+	path = submodules/ms-user
+	url = ../ms-user.git
 [submodule "ms-post"]
-	path = ms-post
-	url = git@github.com:Volontariapp/ms-post.git
+	path = submodules/ms-post
+	url = ../ms-post.git
 [submodule "api-gateway"]
-	path = api-gateway
-	url = git@github.com:Volontariapp/api-gateway.git
+	path = submodules/api-gateway
+	url = ../api-gateway.git
 [submodule "ms-social"]
-	path = ms-social
-	url = git@github.com:Volontariapp/ms-social.git
+	path = submodules/ms-social
+	url = ../ms-social.git
 [submodule "outbox-runners"]
-	path = outbox-runners
-	url = git@github.com:Volontariapp/outbox-runners.git
+	path = submodules/outbox-runners
+	url = ../outbox-runners.git
