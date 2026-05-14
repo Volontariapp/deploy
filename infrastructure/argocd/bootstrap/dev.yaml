@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bootstrap-dev
+  namespace: argocd
+spec:
+  project: default # Le root-app reste dans le projet par défaut
+  source:
+    repoURL: git@github.com:Volontariapp/deploy.git
+    path: infrastructure/argocd/apps/dev
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

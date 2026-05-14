@@ -1,0 +1,129 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  # Microservice User Database
+  - name: postgresql
+    repo: https://charts.bitnami.com/bitnami
+    releaseName: ms-user-db
+    version: 15.5.30
+    valuesInline:
+      image:
+        registry: docker.io
+        repository: library/postgres
+        tag: 16-alpine
+      auth:
+        existingSecret: db-secrets
+        secretKeys:
+          adminPasswordKey: ms-user-password
+      primary:
+        persistence:
+          storageClass: local-path
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 128Mi
+
+  # Microservice Post Database
+  - name: postgresql
+    repo: https://charts.bitnami.com/bitnami
+    releaseName: ms-post-db
+    version: 15.5.30
+    valuesInline:
+      image:
+        registry: docker.io
+        repository: library/postgres
+        tag: 16-alpine
+      auth:
+        existingSecret: db-secrets
+        secretKeys:
+          adminPasswordKey: ms-post-password
+      primary:
+        persistence:
+          storageClass: local-path
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 128Mi
+
+  # Microservice Event Database (PostGIS)
+  - name: postgresql
+    repo: https://charts.bitnami.com/bitnami
+    releaseName: ms-event-db
+    version: 15.5.30
+    valuesInline:
+      image:
+        registry: docker.io
+        repository: postgis/postgis
+        tag: 16-3.4
+      auth:
+        existingSecret: db-secrets
+        secretKeys:
+          adminPasswordKey: ms-event-password
+      primary:
+        persistence:
+          storageClass: local-path
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 128Mi
+
+  # Microservice Social Database
+  - name: postgresql
+    repo: https://charts.bitnami.com/bitnami
+    releaseName: ms-social-db
+    version: 15.5.30
+    valuesInline:
+      image:
+        registry: docker.io
+        repository: library/postgres
+        tag: 16-alpine
+      auth:
+        existingSecret: db-secrets
+        secretKeys:
+          adminPasswordKey: ms-social-password
+      primary:
+        persistence:
+          storageClass: local-path
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 128Mi
+
+  # Global Redis Instance
+  - name: redis
+    repo: https://charts.bitnami.com/bitnami
+    releaseName: redis
+    version: 19.1.5
+    valuesInline:
+      image:
+        registry: docker.io
+        repository: library/redis
+        tag: 7-alpine
+      auth:
+        existingSecret: db-secrets
+      master:
+        persistence:
+          storageClass: local-path
+      replica:
+        replicaCount: 0 # Only one instance for dev
+
+  # Neo4j Instance (Official Helm Chart)
+  - name: neo4j
+    repo: https://neo4j.github.io/helm-charts
+    releaseName: neo4j
+    version: 5.12.0
+    valuesInline:
+      image:
+        registry: docker.io
+        repository: library/neo4j
+        tag: 5.20-community
+      neo4j:
+        passwordFromSecret: db-secrets
+      volumes:
+        data:
+          storageClassName: local-path

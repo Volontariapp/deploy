@@ -1,0 +1,28 @@
+name: "Lint & Security Scan"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Databases Overlays
+        run: |
+          kustomize build infrastructure/databases/overlays/dev --enable-helm > /dev/null
+          kustomize build infrastructure/databases/overlays/prod --enable-helm > /dev/null
+
+      - name: Validate Network Policies
+        run: |
+          kustomize build infrastructure/security/network-policies/overlays/dev --enable-helm > /dev/null
+          kustomize build infrastructure/security/network-policies/overlays/prod --enable-helm > /dev/null
+
+      - name: Kube-score Scan
+        run: |
+          # Scan des politiques réseau et des bases
+          docker run --rm -v $(pwd):/project zegl/kube-score:latest score infrastructure/security/network-policies/overlays/prod/*.yaml --ignore-test container-resources

@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-social-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: ms-social
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: api-gateway
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: ms-social-db
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: neo4j
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns

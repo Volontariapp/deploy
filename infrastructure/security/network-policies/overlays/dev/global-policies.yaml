@@ -1,0 +1,69 @@
+# Default Deny All (Ingress & Egress)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: dev
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+# Autoriser l'accès aux bases PostgreSQL uniquement par leurs microservices respectifs
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-access-policy
+  namespace: dev
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: ms-user
+    - podSelector:
+        matchLabels:
+          app: ms-post
+    - podSelector:
+        matchLabels:
+          app: ms-event
+    - podSelector:
+        matchLabels:
+          app: ms-social
+    - podSelector:
+        matchLabels:
+          app: outbox-runners
+    ports:
+    - protocol: TCP
+      port: 5432
+
+---
+# Autoriser Neo4j uniquement pour ms-social
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: neo4j-access-policy
+  namespace: dev
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: neo4j
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: ms-social
+    ports: 
+    - protocol: TCP
+      port: 7474
+    - protocol: TCP
+      port: 7687
