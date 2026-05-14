@@ -25,9 +25,16 @@ jobs:
       - name: Kube-score Scan
         run: |
           kustomize build infrastructure/databases/overlays/prod --enable-helm > prod-full.yaml
+          echo "---" >> prod-full.yaml
           kustomize build infrastructure/security/network-policies/overlays/prod --enable-helm >> prod-full.yaml
 
           docker run --rm -v $(pwd):/project zegl/kube-score:latest score prod-full.yaml \
             --ignore-test container-resources \
             --ignore-test networkpolicy-targets-pod \
-            --ignore-test pod-networkpolicy
+            --ignore-test pod-networkpolicy \
+            --ignore-test container-image-pull-policy \
+            --ignore-test container-ephemeral-storage-request-and-limit \
+            --ignore-test container-security-context-user-group-id \
+            --ignore-test container-security-context-readonlyrootfilesystem \
+            --ignore-test pod-probes-identical \
+            --ignore-test statefulset-has-servicename

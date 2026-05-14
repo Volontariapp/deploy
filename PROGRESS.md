@@ -32,12 +32,10 @@
     - Création des root-apps : `bootstrap-dev` et `bootstrap-prod`.
 
 ## 🛠️ État Actuel & Prochaines Étapes
-- **GitOps Auth** : ✅ Clé SSH ajoutée à GitHub et ArgoCD (Successful).
-- **Submodules** : ✅ URLs converties en chemins relatifs pour ArgoCD.
-- **Secrets** : 🔄 Migration vers **Sealed Secrets** en cours.
-    - **Contrôleur** : ✅ Installé.
-    - **Workflow** : `kubeseal` installé sur Mac.
-- **Isolation Réseau** : ✅ NetworkPolicies (Default-Deny) créées pour Dev et Prod.
+- **CI/CD** : ✅ GitHub Actions opérationnelle (Lint, Kustomize Build, Kube-score).
+- **GitOps Auth** : ✅ Clé SSH (Submodules en relatifs) & Dépôt connecté (Successful).
+- **Neo4j Security** : ✅ Decoupling Helm/Kustomize pour éviter les secrets en clair dans Git.
+- **Isolation Réseau** : ✅ NetworkPolicies (Default-Deny) appliquées et validées.
 - **Prochaine étape** : Implémentation de la stack sécurité (Traefik Hardening, cert-manager, Sealed Secrets).
 - **Architecture Sécurité validée** :
     - **Ingress** : Traefik "Hardened" + Cert-manager (Wildcard via Cloudflare DNS-01).

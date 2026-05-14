@@ -110,11 +110,16 @@ helmCharts:
         persistence:
           storageClass: local-path
       replica:
-        replicaCount: 0 # Only one instance for dev
+        replicaCount: 0
 
-  # Neo4j Instance (Official Helm Chart)
   - name: neo4j
     repo: https://neo4j.github.io/helm-charts
     releaseName: neo4j
     version: 5.20.0
     valuesFile: neo4j-values.yaml
+
+patches:
+  - path: neo4j-patch.yaml
+    target:
+      kind: StatefulSet
+      name: neo4j

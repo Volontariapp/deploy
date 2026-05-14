@@ -1,9 +1,8 @@
 neo4j:
   name: neo4j
-  edition: community
   acceptLicenseAgreement: "yes"
-  passwordFromSecret: db-secrets
+  password: "REPLACED_BY_KUSTOMIZE_PATCH"
+  edition: community
 volumes:
   data:
-    mode: volume
-    storageClassName: local-path
+    mode: defaultStorageClass
