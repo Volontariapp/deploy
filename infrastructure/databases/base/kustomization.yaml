@@ -113,8 +113,8 @@ helmCharts:
         replicaCount: 0 # Only one instance for dev
 
   # Neo4j Instance (Official Helm Chart)
-#  - name: neo4j
-#    repo: https://neo4j.github.io/helm-charts
-#    releaseName: neo4j
-#    version: 5.20.0
-#    valuesFile: neo4j-values.yaml
+  - name: neo4j
+    repo: https://neo4j.github.io/helm-charts
+    releaseName: neo4j
+    version: 5.20.0
+    valuesFile: neo4j-values.yaml

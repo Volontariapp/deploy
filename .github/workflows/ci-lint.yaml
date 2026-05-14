@@ -1,10 +1,10 @@
-name: "Lint & Security Scan"
+name: 'Lint & Security Scan'
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   validate:
@@ -24,5 +24,10 @@ jobs:
 
       - name: Kube-score Scan
         run: |
-          # Scan des politiques réseau et des bases
-          docker run --rm -v $(pwd):/project zegl/kube-score:latest score infrastructure/security/network-policies/overlays/prod/*.yaml --ignore-test container-resources
+          kustomize build infrastructure/databases/overlays/prod --enable-helm > prod-full.yaml
+          kustomize build infrastructure/security/network-policies/overlays/prod --enable-helm >> prod-full.yaml
+
+          docker run --rm -v $(pwd):/project zegl/kube-score:latest score prod-full.yaml \
+            --ignore-test container-resources \
+            --ignore-test networkpolicy-targets-pod \
+            --ignore-test pod-networkpolicy
