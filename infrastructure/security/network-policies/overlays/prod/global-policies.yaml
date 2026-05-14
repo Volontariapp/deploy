@@ -9,6 +9,16 @@ spec:
   policyTypes:
   - Ingress
   - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
 
 ---
 # Autoriser l'accès aux bases PostgreSQL uniquement par leurs microservices respectifs

@@ -36,14 +36,25 @@
 - **GitOps Auth** : ✅ Clé SSH (Submodules en relatifs) & Dépôt connecté (Successful).
 - **Neo4j Security** : ✅ Decoupling Helm/Kustomize pour éviter les secrets en clair dans Git.
 - **Isolation Réseau** : ✅ NetworkPolicies (Default-Deny) appliquées et validées.
-- **Prochaine étape** : Implémentation de la stack sécurité (Traefik Hardening, cert-manager, Sealed Secrets).
-- **Architecture Sécurité validée** :
-    - **Ingress** : Traefik "Hardened" + Cert-manager (Wildcard via Cloudflare DNS-01).
+- **Ingress Hardening** : ✅ Middlewares (HSTS, Headers) et TLSOptions (1.2+) configurés.
+- **SSL Automation** : ✅ ClusterIssuer Cloudflare et Certificate Wildcard (*.cyrus-ag.com) configurés.
+- **Security Stack** : ✅ Root-app `security-stack` créée pour un déploiement unifié.
+- **Resource Hardening** : ✅ ResourceQuotas implémentés pour protéger la RAM du mini-PC.
+- **DNS Security** : ✅ Egress DNS restreint au seul kube-dns pour éviter l'exfiltration.
+- **Microservices Deployment** : ✅ Dossier `/apps` structuré avec Overlays Dev/Prod pour les 4 services.
     - **Secrets** : Bitnami Sealed Secrets (GitOps-friendly, léger).
-    - **Isolation** : NetworkPolicies (Default-Deny) par microservice.
-    - **Hardening** : Pod Security Admissions (PSA) en mode `restricted`.
-    - **Audit** : Falco (DaemonSet light).
+
+## 🛡️ Roadmap Sécurité & Résilience (Validée)
+| Priorité | Action | État |
+| :--- | :--- | :--- |
+| **P0** | **Cloudflare Proxy** (WAF/DDoS) | 🔄 À activer côté DNS |
+| **P1** | **Gitleaks** (Scan secrets CI) | ✅ Implémenté |
+| **P1** | **Rate-Limiting** (Traefik) | ✅ Implémenté |
+| **P1** | **VictoriaMetrics** (Observabilité) | 🔄 À ajouter |
+| **P1** | **Pluto / Checkov** (Audit CI) | 🔄 À ajouter |
+| **P2** | **Pod Security Admission** (PSA) | ✅ Mode `restricted` actif |
 
 ## ⚠️ Contraintes & Règles
-- **Sécurité** : JAMAIS de mots de passe en clair dans ce repo. Utiliser des références à `db-secrets`.
-- **Ressources** : Limiter la RAM des bases de données en dev pour préserver les ressources du mini-PC (20Go RAM total).
+- **Sécurité** : JAMAIS de mots de passe en clair. Utiliser `Sealed Secrets`.
+- **Ressources** : RAM limitée sur les DB (i7 Mini-PC).
+- **Persistence** : local-path (No S3 Backups).

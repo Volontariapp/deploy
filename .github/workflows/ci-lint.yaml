@@ -10,6 +10,11 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+      - name: Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/checkout@v4
 
       - name: Validate Databases Overlays
@@ -17,10 +22,10 @@ jobs:
           kustomize build infrastructure/databases/overlays/dev --enable-helm > /dev/null
           kustomize build infrastructure/databases/overlays/prod --enable-helm > /dev/null
 
-      - name: Validate Network Policies
+      - name: Validate Apps Overlays
         run: |
-          kustomize build infrastructure/security/network-policies/overlays/dev --enable-helm > /dev/null
-          kustomize build infrastructure/security/network-policies/overlays/prod --enable-helm > /dev/null
+          kustomize build apps/overlays/dev --enable-helm > /dev/null
+          kustomize build apps/overlays/prod --enable-helm > /dev/null
 
       - name: Kube-score Scan
         run: |

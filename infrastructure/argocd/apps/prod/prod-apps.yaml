@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-microservices
+  namespace: argocd
+spec:
+  project: prod-project
+  source:
+    repoURL: git@github.com:Volontariapp/deploy.git
+    path: apps/overlays/prod
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

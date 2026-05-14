@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dev-microservices
+  namespace: argocd
+spec:
+  project: dev-project
+  source:
+    repoURL: git@github.com:Volontariapp/deploy.git
+    path: apps/overlays/dev
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

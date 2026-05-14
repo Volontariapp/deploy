@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: volontariapp-wildcard
+  namespace: traefik
+spec:
+  secretName: volontariapp-wildcard-tls
+  issuerRef:
+    name: cloudflare-issuer
+    kind: ClusterIssuer
+  commonName: "*.cyrus-ag.com"
+  dnsNames:
+    - "*.cyrus-ag.com"
+    - "cyrus-ag.com"

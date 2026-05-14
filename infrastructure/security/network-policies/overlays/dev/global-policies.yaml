@@ -1,4 +1,3 @@
-# Default Deny All (Ingress & Egress)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -7,11 +6,20 @@ metadata:
 spec:
   podSelector: {}
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
 
 ---
-# Autoriser l'accès aux bases PostgreSQL uniquement par leurs microservices respectifs
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -45,7 +53,6 @@ spec:
       port: 5432
 
 ---
-# Autoriser Neo4j uniquement pour ms-social
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
