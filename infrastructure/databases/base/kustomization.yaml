@@ -15,7 +15,7 @@ helmCharts:
       auth:
         existingSecret: db-secrets
         secretKeys:
-          adminPasswordKey: ms-user-password
+          passwordKey: ms-user-password
       primary:
         persistence:
           storageClass: local-path
@@ -27,9 +27,13 @@ helmCharts:
         extraVolumes:
           - name: postgresql-run
             emptyDir: {}
+          - name: tmp
+            emptyDir: {}
         extraVolumeMounts:
           - name: postgresql-run
             mountPath: /var/run/postgresql
+          - name: tmp
+            mountPath: /tmp
 
   # Microservice Post Database
   - name: postgresql
@@ -44,7 +48,7 @@ helmCharts:
       auth:
         existingSecret: db-secrets
         secretKeys:
-          adminPasswordKey: ms-post-password
+          passwordKey: ms-post-password
       primary:
         persistence:
           storageClass: local-path
@@ -56,9 +60,13 @@ helmCharts:
         extraVolumes:
           - name: postgresql-run
             emptyDir: {}
+          - name: tmp
+            emptyDir: {}
         extraVolumeMounts:
           - name: postgresql-run
             mountPath: /var/run/postgresql
+          - name: tmp
+            mountPath: /tmp
 
   # Microservice Event Database (PostGIS)
   - name: postgresql
@@ -73,7 +81,7 @@ helmCharts:
       auth:
         existingSecret: db-secrets
         secretKeys:
-          adminPasswordKey: ms-event-password
+          passwordKey: ms-event-password
       primary:
         persistence:
           storageClass: local-path
@@ -85,9 +93,13 @@ helmCharts:
         extraVolumes:
           - name: postgresql-run
             emptyDir: {}
+          - name: tmp
+            emptyDir: {}
         extraVolumeMounts:
           - name: postgresql-run
             mountPath: /var/run/postgresql
+          - name: tmp
+            mountPath: /tmp
 
   # Microservice Social Database
   - name: postgresql
@@ -102,7 +114,7 @@ helmCharts:
       auth:
         existingSecret: db-secrets
         secretKeys:
-          adminPasswordKey: ms-social-password
+          passwordKey: ms-social-password
       primary:
         persistence:
           storageClass: local-path
@@ -114,9 +126,13 @@ helmCharts:
         extraVolumes:
           - name: postgresql-run
             emptyDir: {}
+          - name: tmp
+            emptyDir: {}
         extraVolumeMounts:
           - name: postgresql-run
             mountPath: /var/run/postgresql
+          - name: tmp
+            mountPath: /tmp
 
   # Global Redis Instance
   - name: redis
