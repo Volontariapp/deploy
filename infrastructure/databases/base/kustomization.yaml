@@ -21,8 +21,10 @@ helmCharts:
           storageClass: local-path
         resources:
           limits:
+            cpu: 200m
             memory: 256Mi
           requests:
+            cpu: 100m
             memory: 128Mi
         extraVolumes:
           - name: postgresql-run
@@ -54,8 +56,10 @@ helmCharts:
           storageClass: local-path
         resources:
           limits:
+            cpu: 200m
             memory: 256Mi
           requests:
+            cpu: 100m
             memory: 128Mi
         extraVolumes:
           - name: postgresql-run
@@ -87,8 +91,10 @@ helmCharts:
           storageClass: local-path
         resources:
           limits:
+            cpu: 200m
             memory: 256Mi
           requests:
+            cpu: 100m
             memory: 128Mi
         extraVolumes:
           - name: postgresql-run
@@ -120,8 +126,10 @@ helmCharts:
           storageClass: local-path
         resources:
           limits:
+            cpu: 200m
             memory: 256Mi
           requests:
+            cpu: 100m
             memory: 128Mi
         extraVolumes:
           - name: postgresql-run

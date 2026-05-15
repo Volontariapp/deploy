@@ -8,11 +8,11 @@ resources:
 namespace: dev
 
 images:
-  - name: ms-user
+  - name: volontariapp/ms-user
     newName: ghcr.io/volontariapp/ms-user
-  - name: ms-post
+  - name: volontariapp/ms-post
     newName: ghcr.io/volontariapp/ms-post
-  - name: ms-event
+  - name: volontariapp/ms-event
     newName: ghcr.io/volontariapp/ms-event
-  - name: ms-social
+  - name: volontariapp/ms-social
     newName: ghcr.io/volontariapp/ms-social
