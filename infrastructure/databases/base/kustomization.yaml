@@ -24,6 +24,12 @@ helmCharts:
             memory: 256Mi
           requests:
             memory: 128Mi
+        extraVolumes:
+          - name: postgresql-run
+            emptyDir: {}
+        extraVolumeMounts:
+          - name: postgresql-run
+            mountPath: /var/run/postgresql
 
   # Microservice Post Database
   - name: postgresql
@@ -47,6 +53,12 @@ helmCharts:
             memory: 256Mi
           requests:
             memory: 128Mi
+        extraVolumes:
+          - name: postgresql-run
+            emptyDir: {}
+        extraVolumeMounts:
+          - name: postgresql-run
+            mountPath: /var/run/postgresql
 
   # Microservice Event Database (PostGIS)
   - name: postgresql
@@ -70,6 +82,12 @@ helmCharts:
             memory: 256Mi
           requests:
             memory: 128Mi
+        extraVolumes:
+          - name: postgresql-run
+            emptyDir: {}
+        extraVolumeMounts:
+          - name: postgresql-run
+            mountPath: /var/run/postgresql
 
   # Microservice Social Database
   - name: postgresql
@@ -93,6 +111,12 @@ helmCharts:
             memory: 256Mi
           requests:
             memory: 128Mi
+        extraVolumes:
+          - name: postgresql-run
+            emptyDir: {}
+        extraVolumeMounts:
+          - name: postgresql-run
+            mountPath: /var/run/postgresql
 
   # Global Redis Instance
   - name: redis
