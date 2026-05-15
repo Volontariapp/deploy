@@ -147,3 +147,7 @@ patches:
     target:
       kind: StatefulSet
       name: neo4j
+  - path: neo4j-service-patch.yaml
+    target:
+      kind: Service
+      name: neo4j-lb-neo4j
