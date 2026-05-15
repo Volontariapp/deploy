@@ -147,7 +147,12 @@ patches:
     target:
       kind: StatefulSet
       name: neo4j
-  - path: neo4j-service-patch.yaml
-    target:
+  - target:
       kind: Service
       name: neo4j-lb-neo4j
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: ClusterIP
+      - op: remove
+        path: /spec/externalTrafficPolicy
