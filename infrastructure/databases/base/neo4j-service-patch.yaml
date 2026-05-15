@@ -4,3 +4,5 @@ metadata:
   name: neo4j-lb-neo4j
 spec:
   type: ClusterIP
+  $patch: replace
+  externalTrafficPolicy: null
