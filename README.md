@@ -3,85 +3,101 @@
 > [!NOTE]
 > This repository serves as the central GitOps orchestrator for the Volontariapp ecosystem, managing multi-environment deployments on K3s through ArgoCD and Kustomize.
 
-## 🏗 Architecture Overview
+## Architecture Overview
 
 The infrastructure follows a declarative "App-of-Apps" pattern, ensuring that the cluster state remains synchronized with the Git repository.
 
 ```mermaid
 graph TD
-    subgraph "Git Repository (Single Source of Truth)"
+    subgraph "Git Source (SSOT)"
         A[Bootstrap Dev/Prod] --> B[Infrastructure Apps]
         A --> C[Microservices]
     end
 
-    subgraph "Kubernetes Cluster (K3s)"
+    subgraph "Control Plane (K3s)"
         D[ArgoCD Controller]
         E[Cert-Manager]
         F[Traefik Ingress]
-        G[Sealed Secrets Controller]
+        G[Sealed Secrets]
     end
 
     B --> D
     C --> D
-    D --> H[Namespaces: Dev/Prod]
-    H --> I[PostgreSQL/Redis/Neo4j]
-    H --> J[Microservices]
-
-    E --> K[Cloudflare DNS-01]
-    F --> L[HTTPS Traffic]
+    D --> H[Namespace: Dev]
+    D --> I[Namespace: Prod]
+    
+    H --> J[Databases: Postgres/Redis/Neo4j]
+    H --> K[Services: API/Web/Social]
+    
+    E --> L[Cloudflare DNS-01 Challenge]
+    F --> M[HTTPS Edge Termination]
 ```
+
+## Environment Matrix
+
+| Feature | Development (dev) | Production (prod) |
+| :--- | :--- | :--- |
+| **Namespace** | `dev` | `prod` |
+| **PSA Level** | `restricted` | `restricted` |
+| **Database Replicas** | 1 (Standalone) | 1 (Resource Optimized) |
+| **Ingress Domain** | `dev.cyrus-ag.com` | `cyrus-ag.com` |
+| **Sync Policy** | Automated (Auto-Heal) | Manual (Prune Propagated) |
 
 ## Security Framework
 
-The infrastructure implements a Zero-Trust security model with a focus on compliance and isolation.
+The infrastructure implements a layered Zero-Trust security model.
 
-| Component             | Implementation                                         | Security Level |
-| :-------------------- | :----------------------------------------------------- | :------------- |
-| **Secret Management** | Bitnami Sealed Secrets (RSA-4096)                      | [ENCRYPTED]    |
-| **Network Isolation** | Namespace-level NetworkPolicies (Default-Deny)         | [ISOLATED]     |
-| **Workload Security** | Pod Security Admission (PSA) - Restricted Mode         | [RESTRICTED]   |
-| **Ingress Security**  | Traefik Middlewares (HSTS, Secure Headers, Rate-Limit) | [PROTECTED]    |
-| **Identity / TLS**    | Cert-Manager with DNS-01 Cloudflare Challenge          | [VERIFIED]     |
+| Layer | Implementation | Description |
+| :--- | :--- | :--- |
+| **Secret Management** | Bitnami Sealed Secrets | RSA-4096 asymmetric encryption for GitOps. |
+| **Network Security** | Kubernetes NetworkPolicies | Default-deny egress/ingress between microservices. |
+| **Runtime Security** | Pod Security Admissions | Strict enforcement of non-root, no-privilege execution. |
+| **Identity / TLS** | Let's Encrypt Wildcard | Automated DNS-01 challenges via Cloudflare API. |
 
-## Repository Structure
+## Operational Guide
 
-```text
-.
-├── apps/                    # Application manifests (Base & Overlays)
-├── infrastructure/
-│   ├── argocd/              # AppProject & Bootstrap Application manifests
-│   ├── databases/           # Stateful sets and persistence (PostgreSQL, Redis, Neo4j)
-│   ├── security/            # Cert-Manager, NetworkPolicies, SealedSecrets
-│   └── namespaces/          # Namespace definitions and PSA labels
-├── submodules/              # Links to microservice source code
-└── PROGRESS.md              # Detailed implementation logs and roadmap
-```
-
-## Deployment Workflow
-
-### Prerequisites
-
-- K3s cluster with ArgoCD installed.
-- `kubeseal` CLI for secret management.
-- Access to GitHub Container Registry (GHCR).
-
-### Bootstrapping an Environment
-
-To initialize the development environment, apply the root bootstrap manifest:
+### Bootstrapping the Cluster
+To initialize a full environment from scratch:
 
 ```bash
 kubectl apply -f infrastructure/argocd/bootstrap/dev.yaml
 ```
 
-### Secret Management
-
-Secrets must never be stored in plain text. Use the following pattern to seal a secret:
+### Managing Secrets
+Secrets are encrypted using the public key of the cluster. To seal a new secret:
 
 ```bash
-kubectl create secret generic example-secret --from-literal=key=value --dry-run=client -o yaml | \
-kubeseal --controller-namespace kube-system --controller-name sealed-secrets --format=yaml > secret-sealed.yaml
+kubectl create secret generic <name> --from-literal=key=value -n <ns> --dry-run=client -o yaml | \
+kubeseal --controller-namespace kube-system --controller-name sealed-secrets --format=yaml > <name>-sealed.yaml
+```
+
+### Troubleshooting Common Issues
+
+#### 1. ArgoCD Sync Loops
+If an application is stuck in `Progressing`, check for attribute conflicts (e.g., `externalTrafficPolicy` on `ClusterIP` services). Use Kustomize JSON patches to prune invalid fields.
+
+#### 2. Cert-Manager Challenge Failures
+Check challenge status and logs:
+```bash
+kubectl describe challenge -n traefik
+kubectl logs -n cert-manager -l app.kubernetes.io/name=cert-manager
+```
+Common cause: ACME account cache mismatch. Solution: Delete the account key secret and restart the cert-manager deployment.
+
+## Repository Structure
+
+```text
+.
+├── apps/                    # Microservices manifests (Base & Overlays)
+├── infrastructure/
+│   ├── argocd/              # ArgoCD Projects & Root-Apps
+│   ├── databases/           # Persistence Layer (Bitnami & Custom)
+│   ├── security/            # Security Stack (Cert-Manager, NetPol, Secrets)
+│   └── namespaces/          # Cluster segmentation & PSA labels
+├── submodules/              # Git Submodules for service logic
+└── PROGRESS.md              # Historical logs and technical roadmap
 ```
 
 ---
 
-© 2026 Volontariapp Core Team
+© 2026 Volontariapp Engineering.
