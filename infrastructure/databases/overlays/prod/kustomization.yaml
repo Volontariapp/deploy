@@ -5,6 +5,7 @@ namespace: prod
 
 resources:
   - ../../base
+  - db-sealed-secret.yaml
 
 # Optionnel : On peut augmenter les ressources ici pour la prod si nécessaire
 # patches:

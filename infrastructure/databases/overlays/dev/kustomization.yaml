@@ -5,3 +5,4 @@ namespace: dev
 
 resources:
   - ../../base
+  - db-sealed-secret.yaml
