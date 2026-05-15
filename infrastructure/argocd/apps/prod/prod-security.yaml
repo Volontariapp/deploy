@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/Volontariapp/deploy.git
-    path: infrastructure/security
+    path: infrastructure/security/overlays/prod
     targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
