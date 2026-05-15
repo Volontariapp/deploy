@@ -18,22 +18,22 @@ spec:
         fsGroup: 1001
       containers:
         - name: ms-event
-          image: volontariapp/ms-event:latest # À écraser par SHA dans l'overlay
+          image: volontariapp/ms-event:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
               name: http
           env:
             - name: NODE_ENV
-              value: "production"
+              value: 'production'
             - name: DB_HOST
-              value: "ms-event-db-postgresql"
+              value: 'ms-event-db-postgresql'
             - name: DB_PORT
-              value: "5432"
+              value: '5432'
             - name: DB_NAME
-              value: "ms-event"
+              value: 'ms-event'
             - name: DB_USER
-              value: "ms-event"
+              value: 'ms-event'
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:

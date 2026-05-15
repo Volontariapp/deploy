@@ -10,7 +10,6 @@ resources:
 patches:
   - target:
       kind: Deployment
-      labelSelector: 'app in (ms-user, ms-post, ms-event, ms-social)'
     patch: |-
       - op: add
         path: /spec/template/spec/imagePullSecrets
