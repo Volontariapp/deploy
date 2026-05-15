@@ -6,3 +6,11 @@ neo4j:
 volumes:
   data:
     mode: defaultStorageClass
+
+services:
+  default:
+    enabled: true
+    type: ClusterIP
+  neo4j:
+    enabled: true
+    type: ClusterIP
