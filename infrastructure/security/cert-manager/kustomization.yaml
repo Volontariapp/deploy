@@ -5,3 +5,4 @@ resources:
   - cloudflare-issuer.yaml
   - wildcard-cert.yaml
   - cloudflare-sealed-secret.yaml
+  - cert-manager-app.yaml
