@@ -6,7 +6,7 @@ metadata:
 spec:
   project: prod-project
   source:
-    repoURL: git@github.com:Volontariapp/deploy.git
+    repoURL: https://github.com/Volontariapp/deploy.git
     path: apps/overlays/prod
     targetRevision: HEAD
   destination:
