@@ -8,3 +8,13 @@ resources:
   - ms-social/
 
 namespace: dev
+
+images:
+  - name: ms-user
+    newName: ghcr.io/volontariapp/ms-user
+  - name: ms-post
+    newName: ghcr.io/volontariapp/ms-post
+  - name: ms-event
+    newName: ghcr.io/volontariapp/ms-event
+  - name: ms-social
+    newName: ghcr.io/volontariapp/ms-social
