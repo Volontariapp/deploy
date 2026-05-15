@@ -4,57 +4,54 @@
 > Ce document sert de mémoire partagée pour Antigravity, Claude et tout autre agent IA travaillant sur ce projet. Consultez-le avant chaque tâche et mettez-le à jour après chaque modification majeure.
 
 ## 📌 Vue d'ensemble
+
 - **Dépôt** : `deploy` (ArgoCD GitOps)
 - **Cible** : K3s sur Ubuntu Server (Multi-Environnements)
 - **Environnements** : `dev`, `prod`
 - **Infrastructure** : ArgoCD, Kustomize (Pattern Base/Overlays).
 
-## ✅ Tâches Complétées
-1.  **Structure du Dépôt (Refactorisée)** :
-    - `/infrastructure/databases/base/` : Configuration commune des bases.
-    - `/infrastructure/databases/overlays/{dev,prod}/` : Spécificités par environnement.
-    - `/infrastructure/argocd/projects/` : Définition des `AppProject` (dev-project, prod-project).
-    - `/infrastructure/argocd/bootstrap/` : Applications-maîtresses (`bootstrap-dev`, `bootstrap-prod`).
-    - `/infrastructure/argocd/apps/{dev,prod}/` : Dossiers contenant les applications de chaque environnement.
-    - `/apps/base/` & `/apps/overlays/{dev,prod}/` : Manifestes pour les microservices.
-2.  **Configuration des Bases de Données** (`infrastructure/databases/kustomization.yaml`) :
-    - 4 instances PostgreSQL (`ms-user-db`, `ms-post-db`, `ms-event-db`, `ms-social-db`).
-    - 1 instance Redis.
-    - 1 instance Neo4j.
-    - **Images utilisées** (alignées sur `docker-compose.yml`) :
-        - Postgres : `postgres:16-alpine` (Standard)
-        - PostGIS : `postgis/postgis:16-3.4` (Pour `ms-event-db`)
-        - Redis : `redis:7-alpine`
-        - Neo4j : `neo4j:5.20-community`
-    - **Contraintes respectées** : 256Mi RAM pour Postgres, storageClass `local-path`.
-3.  **Bootstrap ArgoCD (App-of-Apps)** :
-    - Mise en place de `dev-project` et `prod-project` pour l'isolation.
-    - Création des root-apps : `bootstrap-dev` et `bootstrap-prod`.
+## ✅ Tâches Complétées & Stabilisation (Session 15/05/2026)
+
+### 1. 🚀 GitOps & ArgoCD Stabilization
+
+- **Migration HTTPS** : Abandon total du SSH pour les dépôts et submodules. Utilisation de `GIT_CONFIG_PARAMETERS` pour gérer les submodules sans credentials Git. ✅
+- **Helm Integration** : Activation forcée de `--enable-helm` via `ARGOCD_KUSTOMIZE_BUILD_OPTIONS` sur le `repo-server`. ✅
+- **Bootstrap Restoration** : Reconstruction propre des root-apps `bootstrap-dev` et `bootstrap-prod` après refactorisation. ✅
+
+### 2. 🗄️ Database Hardening & Fixes
+
+- **PostgreSQL (PSA Restricted)** : Résolution du blocage `Read-only file system` en injectant des volumes `emptyDir` pour les dossiers de lock (`/var/run/postgresql`). ✅
+- **Redis Compatibility** : Passage sur l'image officielle `library/redis:7.2` (Debian) pour garantir la présence de `/bin/bash` requis par les scripts d'initialisation Bitnami. ✅
+- **Neo4j ClusterIP Patch** : Utilisation d'un **JSON Patch (RFC 6902)** pour forcer le service Neo4j en `ClusterIP` et supprimer l'attribut `externalTrafficPolicy: Local` (incompatible), résolvant ainsi le Sync-Loop d'ArgoCD. ✅
+
+### 3. 🛡️ Security & Automation
+
+- **Namespaces masters** : Centralisation de la création des namespaces (`dev`, `prod`, `traefik`, `cert-manager`) avec labels PSA `restricted` actifs. ✅
+- **Secret Management** : Intégration de **Bitnami Sealed Secrets**. Le Token Cloudflare est désormais scellé dans le repo. ✅
+- **Cert-Manager / Cloudflare** :
+  - `ClusterIssuer` stabilisé (résolution du bug de cache ACME via rotation de clé de compte). ✅
+  - Challenge DNS-01 fonctionnel pour les domaines `cyrus-ag.com` et `*.cyrus-ag.com`. ✅
+- **Network Isolation** : Validation du modèle Zero-Trust (`default-deny-all`) avec politiques d'accès explicites pour les microservices. ✅
 
 ## 🛠️ État Actuel & Prochaines Étapes
-- **CI/CD** : ✅ GitHub Actions opérationnelle (Lint, Kustomize Build, Kube-score).
-- **GitOps Auth** : ✅ Clé SSH (Submodules en relatifs) & Dépôt connecté (Successful).
-- **Neo4j Security** : ✅ Decoupling Helm/Kustomize pour éviter les secrets en clair dans Git.
-- **Isolation Réseau** : ✅ NetworkPolicies (Default-Deny) appliquées et validées.
-- **Ingress Hardening** : ✅ Middlewares (HSTS, Headers) et TLSOptions (1.2+) configurés.
-- **SSL Automation** : ✅ ClusterIssuer Cloudflare et Certificate Wildcard (*.cyrus-ag.com) configurés.
-- **Security Stack** : ✅ Root-app `security-stack` créée pour un déploiement unifié.
-- **Resource Hardening** : ✅ ResourceQuotas implémentés pour protéger la RAM du mini-PC.
-- **DNS Security** : ✅ Egress DNS restreint au seul kube-dns pour éviter l'exfiltration.
-- **Microservices Deployment** : ✅ Dossier `/apps` structuré avec Overlays Dev/Prod pour les 4 services.
-    - **Secrets** : Bitnami Sealed Secrets (GitOps-friendly, léger).
 
-## 🛡️ Roadmap Sécurité & Résilience (Validée)
-| Priorité | Action | État |
-| :--- | :--- | :--- |
-| **P0** | **Cloudflare Proxy** (WAF/DDoS) | 🔄 À activer côté DNS |
-| **P1** | **Gitleaks** (Scan secrets CI) | ✅ Implémenté |
-| **P1** | **Rate-Limiting** (Traefik) | ✅ Implémenté |
-| **P1** | **VictoriaMetrics** (Observabilité) | 🔄 À ajouter |
-| **P1** | **Pluto / Checkov** (Audit CI) | 🔄 À ajouter |
-| **P2** | **Pod Security Admission** (PSA) | ✅ Mode `restricted` actif |
+- **Databases** : 🟢 **Healthy** (Dev & Prod).
+- **Security App** : 🟢 **Healthy** (Sync via `dev-security` et `prod-security`).
+- **Certificats** : 🔄 **En cours d'émission** (Challenge DNS propagé).
+- **Microservices** : 🔄 **En attente d'images** (`ImagePullBackOff`).
+  - _Action_ : Configurer les `ImagePullSecrets` pour GHCR dans chaque namespace.
 
-## ⚠️ Contraintes & Règles
-- **Sécurité** : JAMAIS de mots de passe en clair. Utiliser `Sealed Secrets`.
-- **Ressources** : RAM limitée sur les DB (i7 Mini-PC).
-- **Persistence** : local-path (No S3 Backups).
+## 🛡️ Roadmap Sécurité & Résilience
+
+| Priorité | Action                              | État         |
+| :------- | :---------------------------------- | :----------- |
+| **P0**   | **ImagePullSecrets** (GHCR)         | 🔄 À faire   |
+| **P1**   | **Cloudflare Proxy** (WAF)          | 🔄 À activer |
+| **P1**   | **Observabilité** (VictoriaMetrics) | 🔄 À ajouter |
+| **P1**   | **Audit CI** (Pluto / Checkov)      | 🔄 À ajouter |
+
+## ⚠️ Contraintes Techniques
+
+- **PSA Restricted** : Interdiction d'écriture sur le root filesystem (utiliser des volumes pour les locks/logs).
+- **K3s Local** : Pas de LoadBalancer externe (utiliser Traefik Ingress ou ClusterIP).
+- **GitOps** : Tout changement doit passer par un commit/push pour être effectif.

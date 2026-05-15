@@ -7,7 +7,7 @@ spec:
     email: victor@agahi.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: letsencrypt-cloudflare-account-key
+      name: letsencrypt-prod-account-v2
     solvers:
       - dns01:
           cloudflare:
