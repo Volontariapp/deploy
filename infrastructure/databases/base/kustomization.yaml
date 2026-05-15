@@ -126,8 +126,8 @@ helmCharts:
     valuesInline:
       image:
         registry: docker.io
-        repository: library/redis
-        tag: 7-alpine
+        repository: bitnami/redis
+        tag: 7.2.4-debian-12-r11
       auth:
         existingSecret: db-secrets
       master:
