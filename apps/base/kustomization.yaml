@@ -32,12 +32,12 @@ patches:
           runAsUser: 1001
           readOnlyRootFilesystem: true
       - op: add
-        path: /spec/template/spec/containers/0/volumeMounts/-
+        path: /spec/template/spec/containers/0/volumeMounts
         value:
-          name: tmp-volume
-          mountPath: /tmp
+          - name: tmp-volume
+            mountPath: /tmp
       - op: add
-        path: /spec/template/spec/volumes/-
+        path: /spec/template/spec/volumes
         value:
-          name: tmp-volume
-          emptyDir: {}
+          - name: tmp-volume
+            emptyDir: {}
