@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - cloudflare-issuer.yaml
   - wildcard-cert.yaml
+  - cloudflare-sealed-secret.yaml

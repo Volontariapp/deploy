@@ -4,14 +4,13 @@ metadata:
   name: cloudflare-issuer
 spec:
   acme:
-    email: admin@cyrus-ag.com # FAKE
+    email: victor@agahi.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-cloudflare-account-key
     solvers:
       - dns01:
           cloudflare:
-            email: admin@cyrus-ag.com # FAKE
             apiTokenSecretRef:
               name: cloudflare-api-token-secret
               key: api-token
