@@ -33,13 +33,9 @@ helmCharts:
         extraVolumes:
           - name: postgresql-run
             emptyDir: {}
-          - name: tmp
-            emptyDir: {}
         extraVolumeMounts:
           - name: postgresql-run
             mountPath: /var/run/postgresql
-          - name: tmp
-            mountPath: /tmp
   - name: neo4j
     repo: https://neo4j.github.io/helm-charts
     releaseName: neo4j

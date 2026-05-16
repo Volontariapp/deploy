@@ -33,10 +33,6 @@ helmCharts:
         extraVolumes:
           - name: postgresql-run
             emptyDir: {}
-          - name: tmp
-            emptyDir: {}
         extraVolumeMounts:
           - name: postgresql-run
             mountPath: /var/run/postgresql
-          - name: tmp
-            mountPath: /tmp
