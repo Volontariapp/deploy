@@ -51,7 +51,7 @@ spec:
             runAsUser: 1001
             readOnlyRootFilesystem: true
           ports:
-            - containerPort: 3000
+            - containerPort: 3002
               name: http
           env:
             - name: OTEL_SDK_DISABLED
@@ -59,7 +59,7 @@ spec:
             - name: NODE_ENV
               value: "production"
             - name: PORT
-              value: "3000"
+              value: "3002"
             - name: DB_HOST
               value: "ms-post-db-postgresql"
             - name: DB_PORT
