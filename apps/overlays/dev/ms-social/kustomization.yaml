@@ -3,41 +3,7 @@ kind: Kustomization
 
 resources:
   - ../../../base/ms-social
+  - ./db-postgres
+  - ./db-neo4j
 
 namespace: dev
-
-helmCharts:
-  - name: postgresql
-    repo: https://charts.bitnami.com/bitnami
-    releaseName: ms-social-db
-    version: 15.5.30
-    valuesInline:
-      image:
-        registry: docker.io
-        repository: library/postgres
-        tag: 16-alpine
-      auth:
-        existingSecret: db-secrets
-        secretKeys:
-          passwordKey: ms-social-password
-      primary:
-        persistence:
-          storageClass: local-path
-        resources:
-          limits:
-            cpu: 200m
-            memory: 256Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        extraVolumes:
-          - name: postgresql-run
-            emptyDir: {}
-        extraVolumeMounts:
-          - name: postgresql-run
-            mountPath: /var/run/postgresql
-  - name: neo4j
-    repo: https://neo4j.github.io/helm-charts
-    releaseName: neo4j
-    version: 5.20.0
-    valuesFile: neo4j-values.yaml
