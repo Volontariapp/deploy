@@ -61,7 +61,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: neo4j
+      app: neo4j
   policyTypes:
   - Ingress
   ingress:
