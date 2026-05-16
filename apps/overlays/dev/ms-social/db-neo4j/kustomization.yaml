@@ -41,3 +41,6 @@ helmCharts:
         requests:
           cpu: 200m
           memory: 512Mi
+
+patches:
+  - path: neo4j-security-patch.yaml
