@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ms-user
+  name: api-gateway
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ms-user
+      app: api-gateway
   template:
     metadata:
       labels:
-        app: ms-user
+        app: api-gateway
     spec:
       securityContext:
         runAsNonRoot: true
@@ -21,8 +21,8 @@ spec:
       imagePullSecrets:
         - name: ghcr-login
       containers:
-        - name: ms-user
-          image: volontariapp/ms-user:latest
+        - name: api-gateway
+          image: volontariapp/api-gateway:latest
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
@@ -37,19 +37,14 @@ spec:
           env:
             - name: NODE_ENV
               value: "production"
-            - name: DB_HOST
-              value: "ms-user-db-postgresql"
-            - name: DB_PORT
-              value: "5432"
-            - name: DB_NAME
-              value: "ms-user"
-            - name: DB_USER
-              value: "ms-user"
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-secrets
-                  key: ms-user-password
+            - name: MS_USER_URL
+              value: "http://ms-user:3000"
+            - name: MS_POST_URL
+              value: "http://ms-post:3000"
+            - name: MS_SOCIAL_URL
+              value: "http://ms-social:3000"
+            - name: MS_EVENT_URL
+              value: "http://ms-event:3000"
           livenessProbe:
             httpGet:
               path: /health

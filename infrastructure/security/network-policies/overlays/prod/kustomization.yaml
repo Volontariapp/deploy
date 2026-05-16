@@ -6,3 +6,4 @@ resources:
   - ms-post.yaml
   - ms-event.yaml
   - ms-social.yaml
+  - api-gateway.yaml

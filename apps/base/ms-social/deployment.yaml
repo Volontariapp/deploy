@@ -16,10 +16,21 @@ spec:
         runAsNonRoot: true
         runAsUser: 1001
         fsGroup: 1001
+      seccompProfile:
+        type: RuntimeDefault
+      imagePullSecrets:
+        - name: ghcr-login
       containers:
         - name: ms-social
-          image: volontariapp/ms-social:latest # À écraser par SHA dans l'overlay
+          image: volontariapp/ms-social:latest
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            readOnlyRootFilesystem: true
           ports:
             - containerPort: 3000
               name: http
@@ -52,3 +63,9 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}

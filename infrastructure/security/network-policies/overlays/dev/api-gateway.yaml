@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-gateway-policy
+  namespace: dev
+spec:
+  podSelector:
+    matchLabels:
+      app: api-gateway
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Autoriser Traefik
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik
+  egress:
+    # Autoriser vers les MS dev
+    - to:
+        - podSelector:
+            matchLabels:
+              app: ms-user
+        - podSelector:
+            matchLabels:
+              app: ms-post
+        - podSelector:
+            matchLabels:
+              app: ms-social
+        - podSelector:
+            matchLabels:
+              app: ms-event
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns

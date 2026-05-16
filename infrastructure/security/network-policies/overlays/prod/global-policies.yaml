@@ -7,8 +7,8 @@ metadata:
 spec:
   podSelector: {}
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   egress:
     - to:
         - namespaceSelector:
@@ -21,7 +21,6 @@ spec:
           port: 53
 
 ---
-# Autoriser l'accès aux bases PostgreSQL uniquement par leurs microservices respectifs
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -32,30 +31,29 @@ spec:
     matchLabels:
       app.kubernetes.io/name: postgresql
   policyTypes:
-  - Ingress
+    - Ingress
   ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: ms-user
-    - podSelector:
-        matchLabels:
-          app: ms-post
-    - podSelector:
-        matchLabels:
-          app: ms-event
-    - podSelector:
-        matchLabels:
-          app: ms-social
-    - podSelector:
-        matchLabels:
-          app: outbox-runners
-    ports:
-    - protocol: TCP
-      port: 5432
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ms-user
+        - podSelector:
+            matchLabels:
+              app: ms-post
+        - podSelector:
+            matchLabels:
+              app: ms-event
+        - podSelector:
+            matchLabels:
+              app: ms-social
+        - podSelector:
+            matchLabels:
+              app: outbox-runners
+      ports:
+        - protocol: TCP
+          port: 5432
 
 ---
-# Autoriser Neo4j uniquement pour ms-social
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -66,14 +64,14 @@ spec:
     matchLabels:
       app.kubernetes.io/name: neo4j
   policyTypes:
-  - Ingress
+    - Ingress
   ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: ms-social
-    ports: 
-    - protocol: TCP
-      port: 7474
-    - protocol: TCP
-      port: 7687
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ms-social
+      ports:
+        - protocol: TCP
+          port: 7474
+        - protocol: TCP
+          port: 7687
