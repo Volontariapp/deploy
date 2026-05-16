@@ -12,9 +12,11 @@ helmCharts:
         repository: library/postgres
         tag: 16-alpine
       auth:
+        database: ms-social
+        username: ms-social
         existingSecret: db-secrets
         secretKeys:
-          passwordKey: ms-social-password
+          userPasswordKey: ms-social-password
       primary:
         persistence:
           storageClass: local-path
