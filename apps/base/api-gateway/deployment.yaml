@@ -35,6 +35,8 @@ spec:
             - containerPort: 3000
               name: http
           env:
+            - name: OTEL_SDK_DISABLED
+              value: "true"
             - name: NODE_ENV
               value: "production"
             - name: MS_USER_URL
