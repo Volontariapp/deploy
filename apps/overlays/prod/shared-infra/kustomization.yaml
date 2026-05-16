@@ -3,30 +3,6 @@ kind: Kustomization
 
 resources:
   - db-sealed-secret.yaml
+  - ./redis
 
 namespace: prod
-
-helmCharts:
-  - name: redis
-    repo: https://charts.bitnami.com/bitnami
-    releaseName: redis
-    version: 19.1.5
-    valuesInline:
-      image:
-        registry: docker.io
-        repository: library/redis
-        tag: "7.2"
-      auth:
-        existingSecret: db-secrets
-      master:
-        persistence:
-          storageClass: local-path
-        resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
-          requests:
-            cpu: 200m
-            memory: 256Mi
-      replica:
-        replicaCount: 0

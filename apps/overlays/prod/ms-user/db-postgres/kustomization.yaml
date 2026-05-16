@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  - name: postgresql
+    repo: https://charts.bitnami.com/bitnami
+    releaseName: ms-user-db
+    version: 15.5.30
+    valuesInline:
+      image:
+        registry: docker.io
+        repository: library/postgres
+        tag: 16-alpine
+      auth:
+        existingSecret: db-secrets
+        secretKeys:
+          passwordKey: ms-user-password
+      primary:
+        persistence:
+          storageClass: local-path
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        extraVolumes:
+          - name: postgresql-run
+            emptyDir: {}
+        extraVolumeMounts:
+          - name: postgresql-run
+            mountPath: /var/run/postgresql
