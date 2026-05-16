@@ -19,10 +19,10 @@ spec:
   - to:
     - podSelector:
         matchLabels:
-          app: ms-social-db
+          app.kubernetes.io/instance: ms-social-db
     - podSelector:
         matchLabels:
-          app.kubernetes.io/name: neo4j
+          app.kubernetes.io/instance: ms-social-db-neo4j
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: kube-system

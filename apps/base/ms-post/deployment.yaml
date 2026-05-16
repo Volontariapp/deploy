@@ -43,7 +43,7 @@ spec:
               value: "5432"
             - name: DB_NAME
               value: "ms-post"
-            - name: DB_USER
+            - name: DB_USERNAME
               value: "ms-post"
             - name: DB_PASSWORD
               valueFrom:

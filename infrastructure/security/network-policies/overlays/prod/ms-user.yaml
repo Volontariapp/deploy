@@ -19,7 +19,10 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              app: ms-user-db
+              app.kubernetes.io/instance: ms-user-db
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: redis
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: kube-system

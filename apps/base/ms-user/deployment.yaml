@@ -43,7 +43,7 @@ spec:
               value: "5432"
             - name: DB_NAME
               value: "ms-user"
-            - name: DB_USER
+            - name: DB_USERNAME
               value: "ms-user"
             - name: DB_PASSWORD
               valueFrom:
