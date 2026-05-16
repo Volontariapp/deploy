@@ -22,7 +22,7 @@ spec:
         - name: ghcr-login
       containers:
         - name: ms-post
-          image: volontariapp/ms-post:latest
+          image: ghcr.io/volontariapp/ms-post:latest
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
