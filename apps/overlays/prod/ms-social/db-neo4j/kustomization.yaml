@@ -44,4 +44,7 @@ helmCharts:
           memory: 512Mi
 
 patches:
-  - path: neo4j-security-patch.yaml
+  - target:
+      kind: StatefulSet
+      name: neo4j
+    path: neo4j-security-patch.yaml
