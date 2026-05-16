@@ -6,3 +6,38 @@ resources:
   - ../../../../infrastructure/databases/ms-post
 
 namespace: prod
+
+helmCharts:
+  - name: postgresql
+    repo: https://charts.bitnami.com/bitnami
+    releaseName: ms-post-db
+    version: 15.5.30
+    valuesInline:
+      image:
+        registry: docker.io
+        repository: library/postgres
+        tag: 16-alpine
+      auth:
+        existingSecret: db-secrets
+        secretKeys:
+          passwordKey: ms-post-password
+      primary:
+        persistence:
+          storageClass: local-path
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        extraVolumes:
+          - name: postgresql-run
+            emptyDir: {}
+          - name: tmp
+            emptyDir: {}
+        extraVolumeMounts:
+          - name: postgresql-run
+            mountPath: /var/run/postgresql
+          - name: tmp
+            mountPath: /tmp
