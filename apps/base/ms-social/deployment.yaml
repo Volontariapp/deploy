@@ -24,9 +24,25 @@ spec:
         - name: wait-for-db
           image: busybox:1.28
           command: ['sh', '-c', "until nc -zv ms-social-db-postgresql 5432; do echo waiting for postgres; sleep 2; done"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
         - name: wait-for-neo4j
           image: busybox:1.28
           command: ['sh', '-c', "until nc -zv neo4j 7687; do echo waiting for neo4j; sleep 2; done"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
       containers:
         - name: ms-social
           image: ghcr.io/volontariapp/ms-social:latest
