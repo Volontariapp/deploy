@@ -3,6 +3,19 @@ neo4j:
   acceptLicenseAgreement: "yes"
   password: "REPLACED_BY_KUSTOMIZE_PATCH"
   edition: community
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 7474
+    fsGroup: 7474
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    runAsNonRoot: true
+    runAsUser: 7474
+    seccompProfile:
+      type: RuntimeDefault
+
 volumes:
   data:
     mode: defaultStorageClass
@@ -14,10 +27,11 @@ services:
   neo4j:
     enabled: true
     type: ClusterIP
+
 resources:
   limits:
-    cpu: 1
-    memory: 2Gi
-  requests:
     cpu: 500m
     memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
