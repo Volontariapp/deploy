@@ -20,6 +20,10 @@ spec:
           type: RuntimeDefault
       imagePullSecrets:
         - name: ghcr-login
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv ms-event-db-postgresql 5432; do echo waiting for postgres; sleep 2; done"]
       containers:
         - name: ms-event
           image: ghcr.io/volontariapp/ms-event:latest

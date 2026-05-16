@@ -20,6 +20,13 @@ spec:
           type: RuntimeDefault
       imagePullSecrets:
         - name: ghcr-login
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv ms-user-db-postgresql 5432; do echo waiting for postgres; sleep 2; done"]
+        - name: wait-for-redis
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv redis-master 6379; do echo waiting for redis; sleep 2; done"]
       containers:
         - name: ms-user
           image: ghcr.io/volontariapp/ms-user:latest

@@ -20,6 +20,13 @@ spec:
           type: RuntimeDefault
       imagePullSecrets:
         - name: ghcr-login
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv ms-social-db-postgresql 5432; do echo waiting for postgres; sleep 2; done"]
+        - name: wait-for-neo4j
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv neo4j 7687; do echo waiting for neo4j; sleep 2; done"]
       containers:
         - name: ms-social
           image: ghcr.io/volontariapp/ms-social:latest
