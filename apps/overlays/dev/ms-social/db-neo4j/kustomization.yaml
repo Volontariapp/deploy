@@ -6,4 +6,38 @@ helmCharts:
     repo: https://neo4j.github.io/helm-charts
     releaseName: neo4j
     version: 5.20.0
-    valuesFile: neo4j-values.yaml
+    valuesInline:
+      neo4j:
+        name: neo4j
+        acceptLicenseAgreement: "yes"
+        password: "password"
+        edition: community
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 7474
+          fsGroup: 7474
+        containerSecurityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          runAsUser: 7474
+          seccompProfile:
+            type: RuntimeDefault
+      volumes:
+        data:
+          mode: defaultStorageClass
+      services:
+        default:
+          enabled: true
+          type: ClusterIP
+        neo4j:
+          enabled: true
+          type: ClusterIP
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 200m
+          memory: 512Mi
