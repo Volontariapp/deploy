@@ -40,4 +40,4 @@ helmCharts:
     repo: https://neo4j.github.io/helm-charts
     releaseName: neo4j
     version: 5.20.0
-    valuesFile: ../../../../infrastructure/databases/neo4j/neo4j-values.yaml
+    valuesFile: neo4j-values.yaml

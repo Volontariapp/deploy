@@ -1,0 +1,23 @@
+neo4j:
+  name: neo4j
+  acceptLicenseAgreement: "yes"
+  password: "REPLACED_BY_KUSTOMIZE_PATCH"
+  edition: community
+volumes:
+  data:
+    mode: defaultStorageClass
+
+services:
+  default:
+    enabled: true
+    type: ClusterIP
+  neo4j:
+    enabled: true
+    type: ClusterIP
+resources:
+  limits:
+    cpu: 1
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
