@@ -104,10 +104,7 @@ spec:
             - name: NEO4J_USERNAME
               value: "neo4j"
             - name: NEO4J_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-secrets
-                  key: neo4j-password
+              value: "password"
           livenessProbe:
             tcpSocket:
               port: http
