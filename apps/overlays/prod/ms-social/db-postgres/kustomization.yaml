@@ -1,5 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+# Poke for ArgoCD cache invalidation: 2026-05-16T15:15:00Z
 
 helmCharts:
   - name: postgresql
