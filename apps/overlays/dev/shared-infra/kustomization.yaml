@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - db-sealed-secret.yaml
+  - ../../../ghcr-sealed-secret.yaml
   - ./redis
 
 namespace: dev
