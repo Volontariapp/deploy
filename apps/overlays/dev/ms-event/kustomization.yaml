@@ -3,7 +3,6 @@ kind: Kustomization
 
 resources:
   - ../../../base/ms-event
-  - ../../../../infrastructure/databases/ms-event
 
 namespace: dev
 

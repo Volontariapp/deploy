@@ -3,8 +3,6 @@ kind: Kustomization
 
 resources:
   - ../../../base/ms-social
-  - ../../../../infrastructure/databases/ms-social
-  - ../../../../infrastructure/databases/neo4j
 
 namespace: prod
 
