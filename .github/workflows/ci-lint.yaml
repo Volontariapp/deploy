@@ -16,9 +16,7 @@ jobs:
 
       - name: Gitleaks Scan
         run: |
-          docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect --source="/path" --verbose --redact \
-            --exclude-path submodules \
-            --exclude-path infrastructure/databases/base/charts
+          docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect --source="/path" --verbose --redact
 
       - name: Validate Databases Overlays
         run: |
