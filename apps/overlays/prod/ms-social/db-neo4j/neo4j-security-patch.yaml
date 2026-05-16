@@ -27,6 +27,8 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: neo4j-password
+            - name: NEO4J_AUTH_PATH
+              value: ""
           command:
             - "/bin/bash"
             - "-c"
