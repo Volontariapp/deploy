@@ -10,7 +10,6 @@ helmCharts:
       neo4j:
         name: neo4j
         acceptLicenseAgreement: 'yes'
-        password: 'password'
         edition: community
         securityContext:
           runAsNonRoot: true
