@@ -32,6 +32,13 @@ spec:
             runAsUser: 1001
             seccompProfile:
               type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
         - name: wait-for-neo4j
           image: busybox:1.28
           command: ['sh', '-c', "until nc -zv neo4j 7687; do echo waiting for neo4j; sleep 2; done"]
@@ -43,6 +50,13 @@ spec:
             runAsUser: 1001
             seccompProfile:
               type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
       containers:
         - name: ms-social
           image: ghcr.io/volontariapp/ms-social:latest
