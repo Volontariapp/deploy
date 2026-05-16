@@ -1,4 +1,2 @@
-# Ignorer le faux positif historique dans le commit spécifique
 c0beb171112963eca1118daba2941596a5d04b9c:infrastructure/security/cert-manager/cloudflare-sealed-secret.yaml:generic-api-key:9
-# Ignorer le faux positif de manière générique (pour les futurs commits)
 infrastructure/security/cert-manager/cloudflare-sealed-secret.yaml:generic-api-key:9
