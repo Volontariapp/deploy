@@ -48,8 +48,7 @@ spec:
             - name: MS_EVENT_URL
               value: "http://ms-event:3000"
           livenessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
