@@ -12,9 +12,11 @@ helmCharts:
         repository: postgis/postgis
         tag: 16-3.4
       auth:
+        database: ms-event
+        username: ms-event
         existingSecret: db-secrets
         secretKeys:
-          passwordKey: ms-event-password
+          userPasswordKey: ms-event-password
       primary:
         persistence:
           storageClass: local-path
