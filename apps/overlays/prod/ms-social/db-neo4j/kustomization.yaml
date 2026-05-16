@@ -10,8 +10,7 @@ helmCharts:
     valuesInline:
       neo4j:
         name: neo4j
-        acceptLicenseAgreement: "yes"
-        password: "password"
+        acceptLicenseAgreement: 'yes'
         edition: community
         securityContext:
           runAsNonRoot: true
@@ -20,7 +19,7 @@ helmCharts:
         containerSecurityContext:
           allowPrivilegeEscalation: false
           capabilities:
-            drop: ["ALL"]
+            drop: ['ALL']
           runAsNonRoot: true
           runAsUser: 7474
           seccompProfile:

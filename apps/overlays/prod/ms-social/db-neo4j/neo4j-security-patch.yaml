@@ -21,3 +21,13 @@ spec:
             runAsUser: 7474
             seccompProfile:
               type: RuntimeDefault
+          env:
+            - name: NEO4J_TEMP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: neo4j-password
+          command:
+            - "/bin/bash"
+            - "-c"
+            - "export NEO4J_AUTH=neo4j/$NEO4J_TEMP_PASSWORD && /startup/docker-entrypoint.sh neo4j"
