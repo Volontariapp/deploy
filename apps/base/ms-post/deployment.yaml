@@ -53,7 +53,7 @@ spec:
             - name: MS_USER_URL
               value: "ms-user:3000"
             - name: MS_POST_URL
-              value: "ms-post:3000"
+              value: "0.0.0.0:3000"
             - name: MS_EVENT_URL
               value: "ms-event:3000"
             - name: MS_SOCIAL_URL

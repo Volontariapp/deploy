@@ -57,7 +57,7 @@ spec:
             - name: MS_EVENT_URL
               value: "ms-event:3000"
             - name: MS_SOCIAL_URL
-              value: "ms-social:3000"
+              value: "0.0.0.0:3000"
             - name: NEO4J_HOST
               value: "neo4j"
             - name: NEO4J_PORT
