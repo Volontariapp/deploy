@@ -1,36 +1,19 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+# IngressRoute CRD gives direct Traefik control — avoids the phantom
+# "traefik-security-headers@kuberdns" middleware that Traefik was injecting
+# on standard Kubernetes Ingress resources.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
-  name: argocd-server-ingress
+  name: argocd-server
   namespace: argocd
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    # No serversscheme annotation: argocd-server --insecure listens on HTTP only
 spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`volontariapp-argocd.cyrus-ag.com`) || Host(`argo.cyrus-ag.com`)
+      kind: Rule
+      services:
+        - name: argocd-server
+          port: 80
   tls:
-    - hosts:
-        - argo.cyrus-ag.com
-        - volontariapp-argocd.cyrus-ag.com
-      # secretName omitted: Traefik uses its default cert.
-      # cloudflared has noTLSVerify=ON so this is fine.
-  rules:
-    - host: argo.cyrus-ag.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  number: 80   # Service port 80 → targetPort 8080 (HTTP)
-    - host: volontariapp-argocd.cyrus-ag.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  number: 80   # Service port 80 → targetPort 8080 (HTTP)
+    secretName: argocd-server-tls
