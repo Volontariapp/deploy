@@ -1,0 +1,70 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-gateway-ingress
+  namespace: prod
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: cyrus-ag.com
+      http:
+        paths:
+          # --- REGLES BLACKHOLE POUR BLOQUER SWAGGER ET LES DOCS EN PROD ---
+          - path: /swagger
+            pathType: Prefix
+            backend:
+              service:
+                name: ingress-blackhole
+                port:
+                  number: 80
+          - path: /api-docs
+            pathType: Prefix
+            backend:
+              service:
+                name: ingress-blackhole
+                port:
+                  number: 80
+          # --- REGLE GENERIQUE POUR REDIRIGER LE RESTE DE L'API ---
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+    - host: api.cyrus-ag.com
+      http:
+        paths:
+          - path: /swagger
+            pathType: Prefix
+            backend:
+              service:
+                name: ingress-blackhole
+                port:
+                  number: 80
+          - path: /api-docs
+            pathType: Prefix
+            backend:
+              service:
+                name: ingress-blackhole
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+---
+# Service Blackhole qui ne pointe vers aucun Pod (renvoie un 503/404 immédiat pour Swagger)
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-blackhole
+  namespace: prod
+spec:
+  ports:
+    - port: 80
+      targetPort: 9999

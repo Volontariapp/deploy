@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-gateway-ingress
+  namespace: dev
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: dev.cyrus-ag.com
+      http:
+        paths:
+          - path: /swagger
+            pathType: Prefix
+            backend:
+              service:
+                name: ingress-blackhole
+                port:
+                  number: 80
+          - path: /api-docs
+            pathType: Prefix
+            backend:
+              service:
+                name: ingress-blackhole
+                port:
+                  number: 80
+          - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-blackhole
+  namespace: dev
+spec:
+  ports:
+    - port: 80
+      targetPort: 9999
