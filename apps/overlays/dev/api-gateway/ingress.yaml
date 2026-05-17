@@ -10,7 +10,6 @@ spec:
     - host: dev.cyrus-ag.com
       http:
         paths:
-          # --- REGLE BLACKHOLE POUR BLOQUER TOUTE LA DOCUMENTATION /DOCS ---
           - path: /docs
             pathType: Prefix
             backend:
@@ -18,7 +17,6 @@ spec:
                 name: ingress-blackhole
                 port:
                   number: 80
-          # --- REGLE GENERIQUE POUR REDIRIGER LE RESTE DE L'API ---
           - path: /
             pathType: Prefix
             backend:
