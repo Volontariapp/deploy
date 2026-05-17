@@ -5,13 +5,21 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: traefik
-    # Si ArgoCD communique en HTTPS en interne (comportement par défaut)
     traefik.ingress.kubernetes.io/service.serversscheme: https
-    # Protection supplémentaire : HTTP Strict Transport Security
     traefik.ingress.kubernetes.io/router.middlewares: traefik-security-headers@kuberdns
 spec:
   rules:
     - host: argo.cyrus-ag.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 443
+    - host: volontariapp-argocd.cyrus-ag.com
       http:
         paths:
           - path: /
