@@ -10,21 +10,16 @@ spec:
     - host: dev.cyrus-ag.com
       http:
         paths:
-          - path: /swagger
-            pathType: Prefix
-            backend:
-              service:
-                name: ingress-blackhole
-                port:
-                  number: 80
-          - path: /api-docs
-            pathType: Prefix
-            backend:
-              service:
-                name: ingress-blackhole
-                port:
-                  number: 80
+          # --- REGLE BLACKHOLE POUR BLOQUER TOUTE LA DOCUMENTATION /DOCS ---
           - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: ingress-blackhole
+                port:
+                  number: 80
+          # --- REGLE GENERIQUE POUR REDIRIGER LE RESTE DE L'API ---
+          - path: /
             pathType: Prefix
             backend:
               service:
@@ -32,6 +27,7 @@ spec:
                 port:
                   number: 80
 ---
+# Service Blackhole qui ne pointe vers aucun Pod (renvoie un 503/404 immédiat)
 apiVersion: v1
 kind: Service
 metadata:
