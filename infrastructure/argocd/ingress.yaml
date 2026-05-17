@@ -5,6 +5,7 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/service.serversscheme: https
 spec:
   rules:
     - host: argo.cyrus-ag.com
@@ -16,7 +17,7 @@ spec:
               service:
                 name: argocd-server
                 port:
-                  number: 80
+                  number: 443
     - host: volontariapp-argocd.cyrus-ag.com
       http:
         paths:
@@ -26,4 +27,4 @@ spec:
               service:
                 name: argocd-server
                 port:
-                  number: 80
+                  number: 443
