@@ -5,7 +5,14 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: traefik
+    # No serversscheme annotation: argocd-server --insecure listens on HTTP only
 spec:
+  tls:
+    - hosts:
+        - argo.cyrus-ag.com
+        - volontariapp-argocd.cyrus-ag.com
+      # secretName omitted: Traefik uses its default cert.
+      # cloudflared has noTLSVerify=ON so this is fine.
   rules:
     - host: argo.cyrus-ag.com
       http:
@@ -16,7 +23,7 @@ spec:
               service:
                 name: argocd-server
                 port:
-                  number: 80
+                  number: 80   # Service port 80 → targetPort 8080 (HTTP)
     - host: volontariapp-argocd.cyrus-ag.com
       http:
         paths:
@@ -26,4 +33,4 @@ spec:
               service:
                 name: argocd-server
                 port:
-                  number: 80
+                  number: 80   # Service port 80 → targetPort 8080 (HTTP)
