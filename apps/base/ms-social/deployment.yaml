@@ -46,7 +46,7 @@ spec:
               memory: 32Mi
         - name: run-migrations
           image: ghcr.io/volontariapp/ms-social:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command:
             [
               'node',
@@ -110,7 +110,7 @@ spec:
       containers:
         - name: ms-social
           image: ghcr.io/volontariapp/ms-social:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

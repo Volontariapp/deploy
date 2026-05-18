@@ -41,7 +41,7 @@ spec:
               memory: 32Mi
         - name: run-migrations
           image: ghcr.io/volontariapp/ms-event:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command:
             [
               'node',
@@ -87,7 +87,7 @@ spec:
       containers:
         - name: ms-event
           image: ghcr.io/volontariapp/ms-event:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
