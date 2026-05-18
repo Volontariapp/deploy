@@ -18,6 +18,8 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
+      imagePullSecrets:
+        - name: ghcr-login
       initContainers:
         - name: wait-for-db
           image: busybox:1.28
