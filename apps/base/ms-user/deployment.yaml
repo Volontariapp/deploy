@@ -151,10 +151,10 @@ spec:
             periodSeconds: 10
           resources:
             requests:
-              cpu: 100m
+              cpu: 50m
               memory: 128Mi
             limits:
-              cpu: 500m
+              cpu: 200m
               memory: 256Mi
           volumeMounts:
             - name: tmp-volume
