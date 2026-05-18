@@ -6,3 +6,11 @@ resources:
   - service.yaml
   - deployment-outbox.yaml
   - deployment-worker.yaml
+
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/revisionHistoryLimit
+        value: 2
