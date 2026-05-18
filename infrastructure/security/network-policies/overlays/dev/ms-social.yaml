@@ -23,6 +23,9 @@ spec:
     - podSelector:
         matchLabels:
           app: neo4j
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: redis
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: kube-system

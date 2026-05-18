@@ -48,6 +48,19 @@ spec:
     - podSelector:
         matchLabels:
           app: outbox-runners
+    - podSelector:
+        matchExpressions:
+          - key: app
+            operator: In
+            values:
+              - outbox-user
+              - worker-user
+              - outbox-post
+              - worker-post
+              - outbox-event
+              - worker-event
+              - outbox-social
+              - worker-social
     ports:
     - protocol: TCP
       port: 5432

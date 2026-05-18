@@ -7,3 +7,4 @@ resources:
   - ms-event.yaml
   - ms-social.yaml
   - api-gateway.yaml
+  - runners-policies.yaml

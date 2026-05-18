@@ -5,7 +5,7 @@ metadata:
   namespace: dev
 spec:
   hard:
-    requests.memory: '4Gi'
-    limits.memory: '6Gi'
-    requests.cpu: '4'
-    limits.cpu: '6'
+    requests.memory: '8Gi'
+    limits.memory: '12Gi'
+    requests.cpu: '8'
+    limits.cpu: '12'

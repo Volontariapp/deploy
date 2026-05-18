@@ -98,11 +98,11 @@ spec:
                   key: redis-password
           resources:
             limits:
-              cpu: 200m
-              memory: 256Mi
-            requests:
               cpu: 50m
-              memory: 128Mi
+              memory: 96Mi
+            requests:
+              cpu: 10m
+              memory: 48Mi
           volumeMounts:
             - name: tmp-volume
               mountPath: /tmp
