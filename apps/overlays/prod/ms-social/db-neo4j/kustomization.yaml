@@ -50,7 +50,11 @@ patches:
   - target:
       kind: Service
       name: neo4j-lb-neo4j
-    patch: |-
-      - op: replace
-        path: /spec/type
-        value: ClusterIP
+    patch: |
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: neo4j-lb-neo4j
+      spec:
+        type: ClusterIP
+        externalTrafficPolicy: null
