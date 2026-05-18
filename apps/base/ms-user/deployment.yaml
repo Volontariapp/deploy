@@ -39,6 +39,51 @@ spec:
             requests:
               cpu: 10m
               memory: 32Mi
+        - name: run-migrations
+          image: ghcr.io/volontariapp/ms-user:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              'node',
+              'node_modules/typeorm/cli.js',
+              'migration:run',
+              '-d',
+              'dist/config/data-source.js',
+            ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: DB_HOST
+              value: "ms-user-db-postgresql"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "ms-user"
+            - name: DB_USERNAME
+              value: "ms-user"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: ms-user-password
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
         - name: wait-for-redis
           image: busybox:1.28
           command: ['sh', '-c', "until nc -zv redis-master 6379; do echo waiting for redis; sleep 2; done"]

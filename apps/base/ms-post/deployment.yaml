@@ -39,6 +39,51 @@ spec:
             requests:
               cpu: 10m
               memory: 32Mi
+        - name: run-migrations
+          image: ghcr.io/volontariapp/ms-post:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              'node',
+              'node_modules/typeorm/cli.js',
+              'migration:run',
+              '-d',
+              'dist/config/data-source.js',
+            ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: DB_HOST
+              value: "ms-post-db-postgresql"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "ms-post"
+            - name: DB_USERNAME
+              value: "ms-post"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: ms-post-password
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
       containers:
         - name: ms-post
           image: ghcr.io/volontariapp/ms-post:latest
