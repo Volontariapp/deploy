@@ -88,3 +88,46 @@ spec:
           port: 7474
         - protocol: TCP
           port: 7687
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-access-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ms-user
+        - podSelector:
+            matchLabels:
+              app: ms-post
+        - podSelector:
+            matchLabels:
+              app: ms-event
+        - podSelector:
+            matchLabels:
+              app: ms-social
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - outbox-user
+                  - worker-user
+                  - outbox-post
+                  - worker-post
+                  - outbox-event
+                  - worker-event
+                  - outbox-social
+                  - worker-social
+      ports:
+        - protocol: TCP
+          port: 6379
