@@ -19,3 +19,6 @@
 [submodule "submodules/workers-runners"]
 	path = submodules/workers-runners
 	url = ../workers-runners.git
+[submodule "submodules/post-processors-runner"]
+	path = submodules/post-processors-runner
+    url = ../post-processors-runner.git
