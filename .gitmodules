@@ -22,3 +22,6 @@
 [submodule "submodules/post-processors-runner"]
 	path = submodules/post-processors-runner
     url = ../post-processors-runner.git
+[submodule "submodules/ws-service"]
+	path = submodules/ws-service
+	url = ../ws-service.git
