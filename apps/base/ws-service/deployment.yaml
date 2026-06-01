@@ -39,6 +39,24 @@ spec:
             requests:
               cpu: 10m
               memory: 32Mi
+        - name: wait-for-global-redis
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv redis-master 6379; do echo waiting for global redis; sleep 2; done"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
       containers:
         - name: ws-service
           image: ghcr.io/volontariapp/ws-service:latest
