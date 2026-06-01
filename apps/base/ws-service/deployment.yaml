@@ -72,10 +72,20 @@ spec:
               value: "redis-master"
             - name: GLOBAL_REDIS_PORT
               value: "6379"
+            - name: GLOBAL_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: redis-password
             - name: REDIS_HOST
               value: "ws-service-redis"
             - name: REDIS_PORT
               value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: redis-password
           livenessProbe:
             tcpSocket:
               port: http
