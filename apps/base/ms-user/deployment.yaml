@@ -159,6 +159,12 @@ spec:
           volumeMounts:
             - name: tmp-volume
               mountPath: /tmp
+            - name: certs-volume
+              mountPath: /app/certs
+              readOnly: true
       volumes:
+        - name: certs-volume
+          secret:
+            secretName: auth-certs
         - name: tmp-volume
           emptyDir: {}
