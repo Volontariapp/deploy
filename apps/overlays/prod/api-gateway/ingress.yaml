@@ -6,6 +6,10 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
+  tls:
+    - hosts:
+        - api-volontariapp.cyrus-ag.com
+      secretName: volontariapp-wildcard-tls
   rules:
     - host: cyrus-ag.com
       http:
