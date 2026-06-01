@@ -32,13 +32,6 @@ spec:
             - containerPort: 6379
               name: redis
           command: ["redis-server"]
-          args: ["--requirepass", "$(REDIS_PASSWORD)"]
-          env:
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: redis-secrets
-                  key: redis-password
           resources:
             requests:
               cpu: 50m
