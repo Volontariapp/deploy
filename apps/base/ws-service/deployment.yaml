@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ws-service
+  template:
+    metadata:
+      labels:
+        app: ws-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullSecrets:
+        - name: ghcr-login
+      initContainers:
+        - name: wait-for-redis
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv ws-service-redis 6379; do echo waiting for redis; sleep 2; done"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+      containers:
+        - name: ws-service
+          image: ghcr.io/volontariapp/ws-service:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            readOnlyRootFilesystem: true
+          ports:
+            - containerPort: 3005
+              name: http
+          env:
+            - name: OTEL_SDK_DISABLED
+              value: "true"
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3005"
+            - name: MS_USER_URL
+              value: "ms-user:80"
+            - name: MS_POST_URL
+              value: "ms-post:80"
+            - name: MS_EVENT_URL
+              value: "ms-event:80"
+            - name: MS_SOCIAL_URL
+              value: "ms-social:80"
+            - name: GLOBAL_REDIS_HOST
+              value: "redis-master"
+            - name: GLOBAL_REDIS_PORT
+              value: "6379"
+            - name: GLOBAL_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secrets
+                  key: redis-password
+            - name: REDIS_HOST
+              value: "ws-service-redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secrets
+                  key: redis-password
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: certs-volume
+              mountPath: /app/certs
+              readOnly: true
+      volumes:
+        - name: certs-volume
+          secret:
+            secretName: auth-certs
+        - name: tmp-volume
+          emptyDir: {}

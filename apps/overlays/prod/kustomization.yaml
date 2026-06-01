@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../../base
   - ghcr-sealed-secret.yaml
+  - ws-service
 
 namespace: prod
 
@@ -15,4 +16,6 @@ images:
     newName: ghcr.io/volontariapp/ms-event
   - name: volontariapp/ms-social
     newName: ghcr.io/volontariapp/ms-social
+  - name: volontariapp/ws-service
+    newName: ghcr.io/volontariapp/ws-service
 
