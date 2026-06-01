@@ -116,6 +116,9 @@ spec:
             matchLabels:
               app: ms-social
         - podSelector:
+            matchLabels:
+              app: ws-service
+        - podSelector:
             matchExpressions:
               - key: app
                 operator: In
