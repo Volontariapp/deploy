@@ -62,6 +62,10 @@ spec:
                   - worker-event
                   - outbox-social
                   - worker-social
+                  - post-processor-user
+                  - post-processor-post
+                  - post-processor-event
+                  - post-processor-social
       ports:
         - protocol: TCP
           port: 5432
@@ -81,8 +85,12 @@ spec:
   ingress:
     - from:
         - podSelector:
-            matchLabels:
-              app: ms-social
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - ms-social
+                  - post-processor-social
       ports:
         - protocol: TCP
           port: 7474
@@ -131,6 +139,10 @@ spec:
                   - worker-event
                   - outbox-social
                   - worker-social
+                  - post-processor-user
+                  - post-processor-post
+                  - post-processor-event
+                  - post-processor-social
       ports:
         - protocol: TCP
           port: 6379
