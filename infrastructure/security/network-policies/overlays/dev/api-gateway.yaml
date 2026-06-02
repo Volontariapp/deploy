@@ -31,6 +31,9 @@ spec:
         - podSelector:
             matchLabels:
               app: ms-event
+        - podSelector:
+            matchLabels:
+              app: ws-service
     # DNS
     - to:
         - namespaceSelector:

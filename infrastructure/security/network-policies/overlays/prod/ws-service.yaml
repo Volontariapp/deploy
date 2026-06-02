@@ -18,6 +18,9 @@ spec:
         - podSelector:
             matchLabels:
               app: ws-service
+        - podSelector:
+            matchLabels:
+              app: api-gateway
   egress:
     - to:
         - podSelector:
