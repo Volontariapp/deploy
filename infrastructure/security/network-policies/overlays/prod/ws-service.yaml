@@ -21,7 +21,30 @@ spec:
         - podSelector:
             matchLabels:
               app: api-gateway
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - ms-event
+                  - ms-post
+                  - ms-social
+                  - ms-user
+                  - post-processor-event
+                  - post-processor-post
+                  - post-processor-social
+                  - post-processor-user
   egress:
+    - to:
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - ms-event
+                  - ms-post
+                  - ms-social
+                  - ms-user
     - to:
         - podSelector:
             matchLabels:

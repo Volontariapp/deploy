@@ -5,6 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - deployment-outbox.yaml
+  - deployment-post-processor.yaml
   - deployment-worker.yaml
 
 patches:

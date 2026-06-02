@@ -34,17 +34,18 @@ spec:
   ingress:
   - from:
     - podSelector:
-        matchLabels:
-          app: ms-user
-    - podSelector:
-        matchLabels:
-          app: ms-post
-    - podSelector:
-        matchLabels:
-          app: ms-event
-    - podSelector:
-        matchLabels:
-          app: ms-social
+        matchExpressions:
+          - key: app
+            operator: In
+            values:
+              - ms-user
+              - ms-post
+              - ms-event
+              - ms-social
+              - post-processor-user
+              - post-processor-post
+              - post-processor-event
+              - post-processor-social
     - podSelector:
         matchLabels:
           app: outbox-runners
@@ -80,8 +81,12 @@ spec:
   ingress:
   - from:
     - podSelector:
-        matchLabels:
-          app: ms-social
+        matchExpressions:
+          - key: app
+            operator: In
+            values:
+              - ms-social
+              - post-processor-social
     ports: 
     - protocol: TCP
       port: 7474
@@ -103,17 +108,18 @@ spec:
   ingress:
   - from:
     - podSelector:
-        matchLabels:
-          app: ms-user
-    - podSelector:
-        matchLabels:
-          app: ms-post
-    - podSelector:
-        matchLabels:
-          app: ms-event
-    - podSelector:
-        matchLabels:
-          app: ms-social
+        matchExpressions:
+          - key: app
+            operator: In
+            values:
+              - ms-user
+              - ms-post
+              - ms-event
+              - ms-social
+              - post-processor-user
+              - post-processor-post
+              - post-processor-event
+              - post-processor-social
     - podSelector:
         matchLabels:
           app: ws-service

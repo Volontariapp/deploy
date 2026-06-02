@@ -5,8 +5,12 @@ metadata:
   namespace: dev
 spec:
   podSelector:
-    matchLabels:
-      app: ms-user
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - ms-user
+          - post-processor-user
   policyTypes:
     - Ingress
     - Egress
