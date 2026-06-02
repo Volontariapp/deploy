@@ -7,9 +7,6 @@ resources:
   - deployment-redis.yaml
   - service-redis.yaml
 
-commonLabels:
-  app: ws-service
-
 patches:
   - target:
       kind: Deployment
