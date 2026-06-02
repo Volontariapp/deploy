@@ -22,14 +22,7 @@ spec:
                 name: ingress-blackhole
                 port:
                   number: 80
-          # --- REGLE POUR WEBSOCKETS ---
-          - path: /api/v1/socket.io
-            pathType: Prefix
-            backend:
-              service:
-                name: ws-service
-                port:
-                  number: 80
+
           # --- REGLE GENERIQUE POUR REDIRIGER LE RESTE DE L'API ---
           - path: /
             pathType: Prefix
@@ -49,14 +42,7 @@ spec:
                 name: ingress-blackhole
                 port:
                   number: 80
-          # --- REGLE POUR WEBSOCKETS ---
-          - path: /api/v1/socket.io
-            pathType: Prefix
-            backend:
-              service:
-                name: ws-service
-                port:
-                  number: 80
+
           # --- REGLE GENERIQUE POUR REDIRIGER LE RESTE DE L'API ---
           - path: /
             pathType: Prefix
