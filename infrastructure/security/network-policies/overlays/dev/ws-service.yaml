@@ -25,6 +25,9 @@ spec:
               app: ws-service
         - podSelector:
             matchLabels:
+              app: ws-service-redis
+        - podSelector:
+            matchLabels:
               app.kubernetes.io/instance: redis
         - namespaceSelector:
             matchLabels:
