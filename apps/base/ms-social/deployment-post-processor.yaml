@@ -57,6 +57,24 @@ spec:
             requests:
               cpu: 10m
               memory: 32Mi
+        - name: wait-for-neo4j
+          image: busybox:1.28
+          command: ['sh', '-c', 'until nc -zv neo4j 7687; do echo waiting for neo4j; sleep 2; done']
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ['ALL']
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
       containers:
         - name: post-processor-social
           image: ghcr.io/volontariapp/post-processor-social:latest
@@ -98,6 +116,17 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: redis-password
+            - name: NEO4J_HOST
+              value: 'neo4j'
+            - name: NEO4J_PORT
+              value: '7687'
+            - name: NEO4J_USERNAME
+              value: 'neo4j'
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: neo4j-password
           resources:
             limits:
               cpu: 50m
