@@ -47,6 +47,8 @@ spec:
               value: "ms-social:80"
             - name: MS_EVENT_URL
               value: "ms-event:80"
+            - name: MS_WS_URL
+              value: "ws-service:80"
           livenessProbe:
             tcpSocket:
               port: http
