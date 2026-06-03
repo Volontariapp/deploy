@@ -74,6 +74,10 @@ spec:
           env:
             - name: NODE_ENV
               value: "production"
+            - name: OUTBOX_BATCH_INTERVAL_MS
+              value: "500"
+            - name: OUTBOX_BATCH_SIZE
+              value: "50"
             - name: PORT
               value: "4101"
             - name: DB_HOST
