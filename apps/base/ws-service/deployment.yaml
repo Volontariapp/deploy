@@ -76,6 +76,8 @@ spec:
               value: "true"
             - name: NODE_ENV
               value: "production"
+            - name: POST_PROCESSOR_BATCH_SIZE
+              value: "10"
             - name: PORT
               value: "3005"
             - name: MS_USER_URL

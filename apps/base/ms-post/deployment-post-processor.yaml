@@ -74,6 +74,8 @@ spec:
           env:
             - name: NODE_ENV
               value: "production"
+            - name: POST_PROCESSOR_BATCH_SIZE
+              value: "10"
             - name: PORT
               value: "4204"
             - name: DB_HOST
