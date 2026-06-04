@@ -74,6 +74,15 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: ms-event-password
+            - name: GEOCODING_OSM_USER_AGENT
+              valueFrom:
+                secretKeyRef:
+                  name: geocoding-secrets
+                  key: osmUserAgent
+            - name: GEOCODING_GOOGLE_MAPS_API_KEY
+              value: "" # TODO: Create a secret and use secretKeyRef when the API key is available
+            - name: GEOCODING_SKIP_IN_TEST_ENV
+              value: "false"
           resources:
             limits:
               cpu: 100m
@@ -126,6 +135,13 @@ spec:
               value: "0.0.0.0:3000"
             - name: MS_SOCIAL_URL
               value: "ms-social:3000"
+            - name: GEOCODING_OSM_USER_AGENT
+              valueFrom:
+                secretKeyRef:
+                  name: geocoding-secrets
+                  key: osmUserAgent
+            - name: GEOCODING_GOOGLE_MAPS_API_KEY
+              value: "" # TODO: Create a secret and use secretKeyRef when the API key is available
           livenessProbe:
             tcpSocket:
               port: http
