@@ -80,7 +80,7 @@ spec:
                   name: geocoding-secrets
                   key: osmUserAgent
             - name: GEOCODING_GOOGLE_MAPS_API_KEY
-              value: "" # TODO: Create a secret and use secretKeyRef when the API key is available
+              value: "PENDING_KEY" # TODO: Create a secret and use secretKeyRef when the API key is available
             - name: GEOCODING_SKIP_IN_TEST_ENV
               value: "false"
           resources:
@@ -141,7 +141,9 @@ spec:
                   name: geocoding-secrets
                   key: osmUserAgent
             - name: GEOCODING_GOOGLE_MAPS_API_KEY
-              value: "" # TODO: Create a secret and use secretKeyRef when the API key is available
+              value: "PENDING_KEY" # TODO: Create a secret and use secretKeyRef when the API key is available
+            - name: GEOCODING_SKIP_IN_TEST_ENV
+              value: "false"
           livenessProbe:
             tcpSocket:
               port: http
