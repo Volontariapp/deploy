@@ -82,7 +82,7 @@ spec:
             - name: GEOCODING_GOOGLE_MAPS_API_KEY
               value: "PENDING_KEY" # TODO: Create a secret and use secretKeyRef when the API key is available
             - name: GEOCODING_SKIP_IN_TEST_ENV
-              value: "true"
+              value: "false"
           resources:
             limits:
               cpu: 100m
@@ -143,7 +143,7 @@ spec:
             - name: GEOCODING_GOOGLE_MAPS_API_KEY
               value: "PENDING_KEY" # TODO: Create a secret and use secretKeyRef when the API key is available
             - name: GEOCODING_SKIP_IN_TEST_ENV
-              value: "true"
+              value: "false"
           livenessProbe:
             tcpSocket:
               port: http
