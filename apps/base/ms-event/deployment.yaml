@@ -127,13 +127,13 @@ spec:
                   name: db-secrets
                   key: ms-event-password
             - name: MS_USER_URL
-              value: "ms-user:3000"
+              value: "ms-user:80"
             - name: MS_POST_URL
-              value: "ms-post:3000"
+              value: "ms-post:80"
             - name: MS_EVENT_URL
               value: "0.0.0.0:3000"
             - name: MS_SOCIAL_URL
-              value: "ms-social:3000"
+              value: "ms-social:80"
             - name: GEOCODING_OSM_USER_AGENT
               valueFrom:
                 secretKeyRef:

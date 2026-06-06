@@ -139,11 +139,11 @@ spec:
             - name: MS_USER_URL
               value: "0.0.0.0:3000"
             - name: MS_POST_URL
-              value: "ms-post:3000"
+              value: "ms-post:80"
             - name: MS_EVENT_URL
-              value: "ms-event:3000"
+              value: "ms-event:80"
             - name: MS_SOCIAL_URL
-              value: "ms-social:3000"
+              value: "ms-social:80"
           livenessProbe:
             tcpSocket:
               port: http
