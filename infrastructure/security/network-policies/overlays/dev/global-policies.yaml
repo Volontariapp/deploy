@@ -87,6 +87,7 @@ spec:
             values:
               - ms-social
               - post-processor-social
+              - worker-social
     ports: 
     - protocol: TCP
       port: 7474
