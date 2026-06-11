@@ -98,6 +98,17 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: redis-password
+            - name: NEO4J_HOST
+              value: "neo4j"
+            - name: NEO4J_PORT
+              value: "7687"
+            - name: NEO4J_USERNAME
+              value: "neo4j"
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: neo4j-password
           resources:
             limits:
               cpu: 50m
