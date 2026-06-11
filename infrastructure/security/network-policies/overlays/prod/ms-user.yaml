@@ -26,13 +26,6 @@ spec:
                   - worker-post
                   - worker-social
                   - worker-event
-              - worker-event
-              - worker-social
-              - worker-post
-              - >-
-                worker-user - ms-event - ms-post - ms-social - ms-user -
-                ws-service - post-processor-event - post-processor-post -
-                post-processor-social - post-processor-user
   egress:
     - to:
         - podSelector:

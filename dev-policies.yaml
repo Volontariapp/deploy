@@ -1,0 +1,579 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-gateway-policy
+  namespace: dev
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: ms-user
+    - podSelector:
+        matchLabels:
+          app: ms-post
+    - podSelector:
+        matchLabels:
+          app: ms-social
+    - podSelector:
+        matchLabels:
+          app: ms-event
+    - podSelector:
+        matchLabels:
+          app: ws-service
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: traefik
+  podSelector:
+    matchLabels:
+      app: api-gateway
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: dev
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-event-policy
+  namespace: dev
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ms-event
+          - ms-post
+          - ms-social
+          - ms-user
+          - ws-service
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: ms-event-db
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: redis
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+  - ports:
+    - port: 443
+      protocol: TCP
+    - port: 80
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - api-gateway
+          - worker-event
+          - worker-social
+          - worker-post
+          - worker-user
+          - ms-event
+          - ms-post
+          - ms-social
+          - ms-user
+          - ws-service
+          - post-processor-event
+          - post-processor-post
+          - post-processor-social
+          - post-processor-user
+  podSelector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - ms-event
+      - post-processor-event
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-post-policy
+  namespace: dev
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ms-event
+          - ms-post
+          - ms-social
+          - ms-user
+          - ws-service
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: ms-post-db
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: redis
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - api-gateway
+          - worker-event
+          - worker-social
+          - worker-post
+          - worker-user
+          - ms-event
+          - ms-post
+          - ms-social
+          - ms-user
+          - ws-service
+          - post-processor-event
+          - post-processor-post
+          - post-processor-social
+          - post-processor-user
+  podSelector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - ms-post
+      - post-processor-post
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-social-policy
+  namespace: dev
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ms-event
+          - ms-post
+          - ms-social
+          - ms-user
+          - ws-service
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: ms-social-db
+    - podSelector:
+        matchLabels:
+          app: neo4j
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: redis
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - api-gateway
+          - worker-event
+          - worker-social
+          - worker-post
+          - worker-user
+          - ms-event
+          - ms-post
+          - ms-social
+          - ms-user
+          - ws-service
+          - post-processor-event
+          - post-processor-post
+          - post-processor-social
+          - post-processor-user
+  podSelector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - ms-social
+      - post-processor-social
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-user-policy
+  namespace: dev
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: ms-user-db
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: redis
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - api-gateway
+          - worker-user
+          - worker-post
+          - worker-social
+          - worker-event
+  podSelector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - ms-user
+      - post-processor-user
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: neo4j-access-policy
+  namespace: dev
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ms-social
+          - post-processor-social
+    ports:
+    - port: 7474
+      protocol: TCP
+    - port: 7687
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: neo4j
+  policyTypes:
+  - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-access-policy
+  namespace: dev
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ms-user
+          - ms-post
+          - ms-event
+          - ms-social
+          - post-processor-user
+          - post-processor-post
+          - post-processor-event
+          - post-processor-social
+    - podSelector:
+        matchLabels:
+          app: outbox-runners
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - outbox-user
+          - worker-user
+          - outbox-post
+          - worker-post
+          - outbox-event
+          - worker-event
+          - outbox-social
+          - worker-social
+    ports:
+    - port: 5432
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql
+  policyTypes:
+  - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-access-policy
+  namespace: dev
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ms-user
+          - ms-post
+          - ms-event
+          - ms-social
+          - post-processor-user
+          - post-processor-post
+          - post-processor-event
+          - post-processor-social
+    - podSelector:
+        matchLabels:
+          app: ws-service
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - outbox-user
+          - worker-user
+          - outbox-post
+          - worker-post
+          - outbox-event
+          - worker-event
+          - outbox-social
+          - worker-social
+    ports:
+    - port: 6379
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: redis
+  policyTypes:
+  - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: runners-policy
+  namespace: dev
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: postgresql
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: redis
+    - podSelector:
+        matchLabels:
+          app: neo4j
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - api-gateway
+          - ms-user
+          - ms-post
+          - ms-social
+          - ms-event
+          - ws-service
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+  podSelector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - outbox-user
+      - worker-user
+      - outbox-post
+      - worker-post
+      - outbox-event
+      - worker-event
+      - outbox-social
+      - worker-social
+      - post-processor-user
+      - post-processor-post
+      - post-processor-event
+      - post-processor-social
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ws-service-policy
+  namespace: dev
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ms-event
+          - ms-post
+          - ms-social
+          - ms-user
+  - to:
+    - podSelector:
+        matchLabels:
+          app: ws-service
+    - podSelector:
+        matchLabels:
+          app: ws-service-redis
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: redis
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    - podSelector:
+        matchLabels:
+          app: ws-service
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - api-gateway
+          - worker-user
+          - worker-post
+          - worker-social
+          - worker-event
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ms-event
+          - ms-post
+          - ms-social
+          - ms-user
+          - post-processor-event
+          - post-processor-post
+          - post-processor-social
+          - post-processor-user
+          - worker-user
+          - worker-post
+          - worker-social
+          - worker-event
+  podSelector:
+    matchLabels:
+      app: ws-service
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ws-service-redis-policy
+  namespace: dev
+spec:
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: ws-service
+  podSelector:
+    matchLabels:
+      app: ws-service-redis
+  policyTypes:
+  - Ingress
+  - Egress
