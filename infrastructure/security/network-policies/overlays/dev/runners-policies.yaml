@@ -17,6 +17,10 @@ spec:
           - worker-event
           - outbox-social
           - worker-social
+          - post-processor-user
+          - post-processor-post
+          - post-processor-event
+          - post-processor-social
   policyTypes:
     - Egress
   egress:
@@ -27,6 +31,20 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/instance: redis
+        - podSelector:
+            matchLabels:
+              app: neo4j
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - api-gateway
+                  - ms-user
+                  - ms-post
+                  - ms-social
+                  - ms-event
+                  - ws-service
     - to:
         - namespaceSelector:
             matchLabels:

@@ -12,50 +12,54 @@ spec:
           - ms-social
           - post-processor-social
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - podSelector:
-        matchExpressions:
-          - key: app
-            operator: In
-            values:
-              - api-gateway
-              - ms-event
-              - ms-post
-              - ms-social
-              - ms-user
-              - ws-service
-              - post-processor-event
-              - post-processor-post
-              - post-processor-social
-              - post-processor-user
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - api-gateway
+                  - worker-event
+                  - worker-social
+                  - worker-post
+                  - worker-user
+                  - ms-event
+                  - ms-post
+                  - ms-social
+                  - ms-user
+                  - ws-service
+                  - post-processor-event
+                  - post-processor-post
+                  - post-processor-social
+                  - post-processor-user
   egress:
-  - to:
-    - podSelector:
-        matchExpressions:
-          - key: app
-            operator: In
-            values:
-              - ms-event
-              - ms-post
-              - ms-social
-              - ms-user
-              - ws-service
-  - to:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/instance: ms-social-db
-    - podSelector:
-        matchLabels:
-          app: neo4j
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/instance: redis
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: kube-system
-      podSelector:
-        matchLabels:
-          k8s-app: kube-dns
+    - to:
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - ms-event
+                  - ms-post
+                  - ms-social
+                  - ms-user
+                  - ws-service
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: ms-social-db
+        - podSelector:
+            matchLabels:
+              app: neo4j
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: redis
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns

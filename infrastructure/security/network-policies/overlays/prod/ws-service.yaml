@@ -19,8 +19,15 @@ spec:
             matchLabels:
               app: ws-service
         - podSelector:
-            matchLabels:
-              app: api-gateway
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - api-gateway
+                  - worker-user
+                  - worker-post
+                  - worker-social
+                  - worker-event
         - podSelector:
             matchExpressions:
               - key: app
@@ -34,6 +41,10 @@ spec:
                   - post-processor-post
                   - post-processor-social
                   - post-processor-user
+                  - worker-user
+                  - worker-post
+                  - worker-social
+                  - worker-event
   egress:
     - to:
         - podSelector:
@@ -61,6 +72,7 @@ spec:
           podSelector:
             matchLabels:
               k8s-app: kube-dns
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

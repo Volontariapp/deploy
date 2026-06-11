@@ -34,6 +34,17 @@ spec:
         - podSelector:
             matchLabels:
               app: neo4j
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - api-gateway
+                  - ms-user
+                  - ms-post
+                  - ms-social
+                  - ms-event
+                  - ws-service
     - to:
         - namespaceSelector:
             matchLabels:
