@@ -23,12 +23,7 @@ spec:
       initContainers:
         - name: wait-for-db
           image: busybox:1.28
-          command:
-            [
-              'sh',
-              '-c',
-              'until nc -zv ms-social-db-postgresql 5432; do echo waiting for postgres; sleep 2; done',
-            ]
+          command: ['sh', '-c', 'until nc -zv ms-social-db-postgresql 5432; do echo waiting for postgres; sleep 2; done']
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -47,14 +42,7 @@ spec:
         - name: run-migrations
           image: ghcr.io/volontariapp/ms-social:latest
           imagePullPolicy: Always
-          command:
-            [
-              'node',
-              'node_modules/typeorm/cli.js',
-              'migration:run',
-              '-d',
-              'dist/config/data-source.js',
-            ]
+          command: ['node', 'node_modules/typeorm/cli.js', 'migration:run', '-d', 'dist/config/data-source.js']
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -120,7 +108,7 @@ spec:
               memory: 32Mi
       containers:
         - name: ms-social
-          image: ghcr.io/volontariapp/ms-social:latest
+          image: ghcr.io/volontariapp/ms-social:sha-21fdb50
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
