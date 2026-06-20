@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Volontariapp/deploy.git
     path: apps/overlays/dev/ms-user
-    targetRevision: 2d5507655693d5fb972e511eb9e8879cb061ceb8
+    targetRevision: fb2dc2618dac39ab3f7571d328ec9f70a5a70c31
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
