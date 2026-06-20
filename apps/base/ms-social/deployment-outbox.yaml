@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: outbox-social
-          image: ghcr.io/volontariapp/outbox-social:sha-7127f81
+          image: ghcr.io/volontariapp/outbox-social:sha-c8f5c37
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
