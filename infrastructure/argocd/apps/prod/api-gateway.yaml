@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Volontariapp/deploy.git
     path: apps/overlays/prod/api-gateway
-    targetRevision: e2fd3ad52a4d051f398443db1346219abd433800
+    targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
     namespace: prod

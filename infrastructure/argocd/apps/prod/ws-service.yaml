@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Volontariapp/deploy.git
     path: apps/overlays/prod/ws-service
-    targetRevision: 9be527d85fcf3c010cb98f2bd82af3a2ee0c438a
+    targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
     namespace: prod
