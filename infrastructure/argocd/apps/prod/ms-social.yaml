@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Volontariapp/deploy.git
     path: apps/overlays/prod/ms-social
-    targetRevision: fb2dc2618dac39ab3f7571d328ec9f70a5a70c31
+    targetRevision: 790d5449643c1541c86ee88984c59dc2b372cc87
   destination:
     server: https://kubernetes.default.svc
     namespace: prod
