@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: ws-service
-          image: ghcr.io/volontariapp/ws-service:sha-0bfdc38
+          image: ghcr.io/volontariapp/ws-service:sha-8c6c488
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
