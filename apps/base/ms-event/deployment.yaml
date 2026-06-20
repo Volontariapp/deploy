@@ -42,14 +42,7 @@ spec:
         - name: run-migrations
           image: ghcr.io/volontariapp/ms-event:latest
           imagePullPolicy: Always
-          command:
-            [
-              'node',
-              'node_modules/typeorm/cli.js',
-              'migration:run',
-              '-d',
-              'dist/config/data-source.js',
-            ]
+          command: ['node', 'node_modules/typeorm/cli.js', 'migration:run', '-d', 'dist/config/data-source.js']
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -81,7 +74,6 @@ spec:
                   key: osmUserAgent
             - name: GEOCODING_GOOGLE_MAPS_API_KEY
               value: "PENDING_KEY" # TODO: Create a secret and use secretKeyRef when the API key is available
-
           resources:
             limits:
               cpu: 100m
@@ -94,7 +86,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: ms-event
-          image: ghcr.io/volontariapp/ms-event:latest
+          image: ghcr.io/volontariapp/ms-event:sha-de1ef07
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
@@ -141,7 +133,6 @@ spec:
                   key: osmUserAgent
             - name: GEOCODING_GOOGLE_MAPS_API_KEY
               value: "PENDING_KEY" # TODO: Create a secret and use secretKeyRef when the API key is available
-
           livenessProbe:
             tcpSocket:
               port: http
