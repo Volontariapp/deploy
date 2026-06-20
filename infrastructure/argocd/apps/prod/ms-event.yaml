@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Volontariapp/deploy.git
     path: apps/overlays/prod/ms-event
-    targetRevision: 36f88c53e8bd9b9d92fd69b0d7a7ce83883b4698
+    targetRevision: 6e213d8007b4bcfee388654604f2e004554588ce
   destination:
     server: https://kubernetes.default.svc
     namespace: prod
