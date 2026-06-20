@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Volontariapp/deploy.git
     path: apps/overlays/prod/ms-post
-    targetRevision: HEAD
+    targetRevision: c3d67014caab6ddd32c7c48ed74abc43d7d30f4c
   destination:
     server: https://kubernetes.default.svc
     namespace: prod
