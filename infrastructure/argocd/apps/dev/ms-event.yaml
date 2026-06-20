@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dev-ms-event
+  namespace: argocd
+spec:
+  project: dev-project
+  source:
+    repoURL: https://github.com/Volontariapp/deploy.git
+    path: apps/overlays/dev/ms-event
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

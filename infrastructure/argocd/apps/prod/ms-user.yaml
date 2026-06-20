@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-ms-user
+  namespace: argocd
+spec:
+  project: prod-project
+  source:
+    repoURL: https://github.com/Volontariapp/deploy.git
+    path: apps/overlays/prod/ms-user
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
