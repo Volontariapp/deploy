@@ -48,6 +48,9 @@ spec:
               app: ms-social
         - podSelector:
             matchLabels:
+              app: ws-service
+        - podSelector:
+            matchLabels:
               app: outbox-runners
         - podSelector:
             matchExpressions:
@@ -62,6 +65,7 @@ spec:
                   - worker-event
                   - outbox-social
                   - worker-social
+                  - outbox-ws
                   - post-processor-user
                   - post-processor-post
                   - post-processor-event

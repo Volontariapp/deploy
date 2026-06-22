@@ -6,7 +6,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: ws-outbox
+      app: outbox-ws
   policyTypes:
     - Ingress
     - Egress

@@ -42,6 +42,7 @@ spec:
               - ms-post
               - ms-event
               - ms-social
+              - ws-service
               - post-processor-user
               - post-processor-post
               - post-processor-event
@@ -62,6 +63,7 @@ spec:
               - worker-event
               - outbox-social
               - worker-social
+              - outbox-ws
     ports:
     - protocol: TCP
       port: 5432
