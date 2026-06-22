@@ -1,0 +1,45 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ws-outbox-policy
+  namespace: dev
+spec:
+  podSelector:
+    matchLabels:
+      app: ws-outbox
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+    
+    - to: 
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: redis
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: ws-service-redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+      - protocol: UDP
+        port: 53
+      - protocol: TCP
+        port: 53

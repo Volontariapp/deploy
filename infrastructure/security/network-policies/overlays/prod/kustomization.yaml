@@ -8,4 +8,5 @@ resources:
   - ms-social.yaml
   - api-gateway.yaml
   - runners-policies.yaml
+  - ws-outbox-policy.yaml
   - ws-service.yaml

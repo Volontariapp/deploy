@@ -6,5 +6,6 @@ resources:
   - ../ms-post
   - ../ms-event
   - ../ms-social
+  - ../ws-service
   - ../redis
   - ../neo4j
