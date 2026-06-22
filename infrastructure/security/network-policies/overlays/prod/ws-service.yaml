@@ -59,6 +59,13 @@ spec:
     - to:
         - podSelector:
             matchLabels:
+              app.kubernetes.io/name: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
               app: ws-service
         - podSelector:
             matchLabels:
