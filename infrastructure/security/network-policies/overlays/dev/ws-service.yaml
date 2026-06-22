@@ -98,6 +98,9 @@ spec:
         - podSelector:
             matchLabels:
               app: ws-service
+        - podSelector:
+            matchLabels:
+              app: outbox-ws
   egress:
     - to:
         - namespaceSelector:
