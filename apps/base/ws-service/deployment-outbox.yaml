@@ -67,6 +67,19 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: redis-password
+            - name: DB_HOST
+              value: "ws-service-db-postgresql"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "ws-service"
+            - name: DB_USERNAME
+              value: "ws-service"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: ms-user-password
           resources:
             limits:
               cpu: 100m
