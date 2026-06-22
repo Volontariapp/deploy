@@ -26,7 +26,7 @@ spec:
               app.kubernetes.io/instance: redis
         - podSelector:
             matchLabels:
-              app.kubernetes.io/instance: ws-service-redis
+              app: ws-service-redis
       ports:
         - protocol: TCP
           port: 6379
