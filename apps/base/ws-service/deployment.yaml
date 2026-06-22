@@ -21,6 +21,62 @@ spec:
       imagePullSecrets:
         - name: ghcr-login
       initContainers:
+        - name: wait-for-db
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv ws-service-db-postgresql 5432; do echo waiting for db; sleep 2; done"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+        - name: run-migrations
+          image: ghcr.io/volontariapp/ws-service:sha-8c6c488
+          imagePullPolicy: Always
+          command: ['node', 'node_modules/typeorm/cli.js', 'migration:run', '-d', 'dist/config/data-source.js']
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: DB_HOST
+              value: "ws-service-db-postgresql"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "ws-service"
+            - name: DB_USERNAME
+              value: "ws-service"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: ms-user-password
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
         - name: wait-for-redis
           image: busybox:1.28
           command: ['sh', '-c', "until nc -zv ws-service-redis 6379; do echo waiting for redis; sleep 2; done"]
@@ -106,6 +162,19 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: redis-password
+            - name: DB_HOST
+              value: "ws-service-db-postgresql"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "ws-service"
+            - name: DB_USERNAME
+              value: "ws-service"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: ms-user-password
           livenessProbe:
             tcpSocket:
               port: http
