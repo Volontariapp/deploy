@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: outbox-ws
+  labels:
+    app: outbox-ws
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: outbox-ws
+  template:
+    metadata:
+      labels:
+        app: outbox-ws
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullSecrets:
+        - name: ghcr-login
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.28
+          command: ['sh', '-c', "until nc -zv ws-service-db-postgresql 5432; do echo waiting for db; sleep 2; done"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+      containers:
+        - name: outbox-ws
+          image: ghcr.io/volontariapp/outbox-ws:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            readOnlyRootFilesystem: true
+          ports:
+            - containerPort: 4105
+              name: http
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "4105"
+            - name: REDIS_HOST
+              value: ws-service-redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: redis-password
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 20m
+              memory: 64Mi
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}

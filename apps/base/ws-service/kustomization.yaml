@@ -5,6 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - deployment-redis.yaml
+  - deployment-outbox.yaml
   - service-redis.yaml
 
 patches:
