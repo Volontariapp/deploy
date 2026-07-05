@@ -9,44 +9,44 @@
 
 ---
 
-## 🏗️ Architecture Globale (High-Level)
+## ️ Architecture Globale (High-Level)
 
 L'infrastructure repose sur le pattern **App-of-Apps**, permettant une gestion récursive et modulaire de tous les composants du cluster.
 
 ```mermaid
 graph TD
-    subgraph "GitOps Engine"
-        Git[Git Repository] -- Webhook/Polling --> Argo[ArgoCD Controller]
-    end
+ subgraph "GitOps Engine"
+ Git[Git Repository] -- Webhook/Polling --> Argo[ArgoCD Controller]
+ end
 
-    subgraph "Core Infrastructure"
-        Argo --> CM[Cert-Manager]
-        Argo --> SS[Sealed Secrets]
-        Argo --> NP[Network Policies]
-        Argo --> TR[Traefik Ingress]
-    end
+ subgraph "Core Infrastructure"
+ Argo --> CM[Cert-Manager]
+ Argo --> SS[Sealed Secrets]
+ Argo --> NP[Network Policies]
+ Argo --> TR[Traefik Ingress]
+ end
 
-    subgraph "Persistence Layer (Databases)"
-        Argo --> PG[PostgreSQL Cluster]
-        Argo --> RD[Redis Cache]
-        Argo --> NJ[Neo4j Graph DB]
-    end
+ subgraph "Persistence Layer (Databases)"
+ Argo --> PG[PostgreSQL Cluster]
+ Argo --> RD[Redis Cache]
+ Argo --> NJ[Neo4j Graph DB]
+ end
 
-    subgraph "Application Layer"
-        Argo --> AG[API Gateway]
-        Argo --> MS[Microservices Ecosystem]
-    end
+ subgraph "Application Layer"
+ Argo --> AG[API Gateway]
+ Argo --> MS[Microservices Ecosystem]
+ end
 
-    MS -- gRPC --> MS
-    MS -- SQL/Bolt --> PG
-    MS -- Bolt --> NJ
-    CM -- DNS-01 --> LE[Let's Encrypt]
-    TR -- HTTPS --> User((User))
+ MS -- gRPC --> MS
+ MS -- SQL/Bolt --> PG
+ MS -- Bolt --> NJ
+ CM -- DNS-01 --> LE[Let's Encrypt]
+ TR -- HTTPS --> User((User))
 ```
 
 ---
 
-## 🔐 Sécurité & Conformité
+## Sécurité & Conformité
 
 Le cluster est durci selon les standards **PSA (Pod Security Admissions) Restricted**, le niveau le plus élevé de sécurité Kubernetes.
 
@@ -68,18 +68,18 @@ Pour respecter le principe de GitOps sans compromettre la sécurité, nous utili
 
 ```mermaid
 sequenceDiagram
-    participant Dev as Développeur
-    participant KS as Kubeseal CLI
-    participant Git as Git Repository
-    participant SSC as SealedSecret Controller
-    participant K8s as K8s Secret Object
+ participant Dev as Développeur
+ participant KS as Kubeseal CLI
+ participant Git as Git Repository
+ participant SSC as SealedSecret Controller
+ participant K8s as K8s Secret Object
 
-    Dev->>KS: Secret en clair (dry-run)
-    KS->>Dev: SealedSecret (Chiffré)
-    Dev->>Git: Push SealedSecret.yaml
-    Git->>SSC: Sync via ArgoCD
-    SSC->>SSC: Déchiffrement via clé privée RSA-4096
-    SSC->>K8s: Création du Secret natif K8s
+ Dev->>KS: Secret en clair (dry-run)
+ KS->>Dev: SealedSecret (Chiffré)
+ Dev->>Git: Push SealedSecret.yaml
+ Git->>SSC: Sync via ArgoCD
+ SSC->>SSC: Déchiffrement via clé privée RSA-4096
+ SSC->>K8s: Création du Secret natif K8s
 ```
 
 ### 3. Network Policies (Zero-Trust)
@@ -91,27 +91,27 @@ Nous appliquons une politique de **Default-Deny All**. Aucune communication n'es
 
 ```mermaid
 graph LR
-    subgraph "Microservice ms-social"
-        MS[ms-social pod]
-    end
+ subgraph "Microservice ms-social"
+ MS[ms-social pod]
+ end
 
-    subgraph "PostgreSQL"
-        DB[ms-social-db]
-    end
+ subgraph "PostgreSQL"
+ DB[ms-social-db]
+ end
 
-    subgraph "Neo4j"
-        NJ[neo4j-db]
-    end
+ subgraph "Neo4j"
+ NJ[neo4j-db]
+ end
 
-    MS -- "Port 5432 (Allowed)" --> DB
-    MS -- "Port 7687 (Allowed)" --> NJ
-    MS -- "External Web (Blocked)" --> Internet((Internet))
-    Attacker -- "Direct Access (Blocked)" --> DB
+ MS -- "Port 5432 (Allowed)" --> DB
+ MS -- "Port 7687 (Allowed)" --> NJ
+ MS -- "External Web (Blocked)" --> Internet((Internet))
+ Attacker -- "Direct Access (Blocked)" --> DB
 ```
 
 ---
 
-## 🛰️ Matrice de Communication Microservices (gRPC & HTTP)
+## ️ Matrice de Communication Microservices (gRPC & HTTP)
 
 L'architecture Volontariapp utilise une communication hybride : **HTTP/REST** pour l'entrée utilisateur via l'API Gateway, et **gRPC** pour la communication inter-services ultra-performante.
 
@@ -119,28 +119,28 @@ L'architecture Volontariapp utilise une communication hybride : **HTTP/REST** po
 
 Toutes les communications internes passent par le port `3000` (défini comme `http` dans les services pour simplifier, mais utilisant le protocole gRPC).
 
-| Source        | Destination | Port   | Rôle                       |
+| Source | Destination | Port | Rôle |
 | :------------ | :---------- | :----- | :------------------------- |
-| `api-gateway` | `ms-user`   | `3000` | Authentification & Profils |
-| `api-gateway` | `ms-post`   | `3000` | Flux d'actualités          |
-| `api-gateway` | `ms-event`  | `3000` | Gestion des événements     |
-| `api-gateway` | `ms-social` | `3000` | Relations & Interactions   |
-| `ms-social`   | `ms-user`   | `3000` | Validation des identités   |
-| `ms-event`    | `ms-post`   | `3000` | Publication automatique    |
+| `api-gateway` | `ms-user` | `3000` | Authentification & Profils |
+| `api-gateway` | `ms-post` | `3000` | Flux d'actualités |
+| `api-gateway` | `ms-event` | `3000` | Gestion des événements |
+| `api-gateway` | `ms-social` | `3000` | Relations & Interactions |
+| `ms-social` | `ms-user` | `3000` | Validation des identités |
+| `ms-event` | `ms-post` | `3000` | Publication automatique |
 
 ### 2. Protocole de Connexion Database
 
-| Microservice | Database Type | Port   | Instance (Prod)           |
+| Microservice | Database Type | Port | Instance (Prod) |
 | :----------- | :------------ | :----- | :------------------------ |
-| `ms-user`    | PostgreSQL    | `5432` | `ms-user-db-postgresql`   |
-| `ms-post`    | PostgreSQL    | `5432` | `ms-post-db-postgresql`   |
-| `ms-event`   | PostgreSQL    | `5432` | `ms-event-db-postgresql`  |
-| `ms-social`  | PostgreSQL    | `5432` | `ms-social-db-postgresql` |
-| `ms-social`  | Neo4j (Bolt)  | `7687` | `neo4j`                   |
+| `ms-user` | PostgreSQL | `5432` | `ms-user-db-postgresql` |
+| `ms-post` | PostgreSQL | `5432` | `ms-post-db-postgresql` |
+| `ms-event` | PostgreSQL | `5432` | `ms-event-db-postgresql` |
+| `ms-social` | PostgreSQL | `5432` | `ms-social-db-postgresql` |
+| `ms-social` | Neo4j (Bolt) | `7687` | `neo4j` |
 
 ---
 
-## 🛡️ Focus Sécurité : Le "Wait-For" Lifecycle
+## ️ Focus Sécurité : Le "Wait-For" Lifecycle
 
 Pour éviter les crashs en boucle (`CrashLoopBackOff`) dus à des bases de données plus lentes que les services, nous implémentons une stratégie de **Séquençage de Démarrage**.
 
@@ -150,14 +150,14 @@ Chaque microservice possède un initContainer basé sur `busybox` qui bloque le 
 
 ```yaml
 initContainers:
-  - name: wait-for-db
-    image: busybox:1.28
-    command:
-      [
-        'sh',
-        '-c',
-        'until nc -zv ms-social-db-postgresql 5432; do echo waiting for db; sleep 2; done;',
-      ]
+ - name: wait-for-db
+ image: busybox:1.28
+ command:
+ [
+ 'sh',
+ '-c',
+ 'until nc -zv ms-social-db-postgresql 5432; do echo waiting for db; sleep 2; done;',
+ ]
 ```
 
 **Avantages :**
@@ -167,7 +167,7 @@ initContainers:
 
 ---
 
-## 💎 Le Cas Neo4j : Sécurisation par Injection Dynamique
+## Le Cas Neo4j : Sécurisation par Injection Dynamique
 
 Neo4j 5.x impose des contraintes fortes sur le changement de mot de passe. Notre infrastructure utilise une technique de **Bash-Wrapper** dans le patch Kustomize pour assurer la sécurité sans mot de passe en clair.
 
@@ -177,59 +177,59 @@ Nous désactivons `NEO4J_AUTH_PATH` pour forcer Neo4j à lire la variable d'envi
 
 ```yaml
 command:
-  - '/bin/bash'
-  - '-c'
-  - 'export NEO4J_AUTH=neo4j/$NEO4J_TEMP_PASSWORD && /startup/docker-entrypoint.sh neo4j'
+ - '/bin/bash'
+ - '-c'
+ - 'export NEO4J_AUTH=neo4j/$NEO4J_TEMP_PASSWORD && /startup/docker-entrypoint.sh neo4j'
 ```
 
 Cette méthode garantit que le mot de passe réel provient uniquement de ton **SealedSecret**, rendant le repository Git totalement inoffensif en cas de fuite de code.
 
 ---
 
-## 📈 Gestion des Ressources & Quotas
+## Gestion des Ressources & Quotas
 
 Pour garantir la stabilité du cluster K3s, des `ResourceQuotas` et des `LimitRanges` sont appliqués sur chaque namespace.
 
-| Composant     | Requests (CPU/RAM) | Limits (CPU/RAM) |
+| Composant | Requests (CPU/RAM) | Limits (CPU/RAM) |
 | :------------ | :----------------- | :--------------- |
-| API Gateway   | 50m / 64Mi         | 200m / 128Mi     |
-| Microservices | 100m / 128Mi       | 500m / 256Mi     |
-| PostgreSQL    | 100m / 256Mi       | 500m / 512Mi     |
-| Neo4j         | 200m / 512Mi       | 500m / 1Gi       |
-| Redis         | 50m / 64Mi         | 100m / 128Mi     |
+| API Gateway | 50m / 64Mi | 200m / 128Mi |
+| Microservices | 100m / 128Mi | 500m / 256Mi |
+| PostgreSQL | 100m / 256Mi | 500m / 512Mi |
+| Neo4j | 200m / 512Mi | 500m / 1Gi |
+| Redis | 50m / 64Mi | 100m / 128Mi |
 
 ---
 
-## 🏗️ Structure détaillée du Repository
+## ️ Structure détaillée du Repository
 
 ```text
 .
-├── .github/ workflows/      # Pipelines CI (Gitleaks, Lint, Build)
+├── .github/ workflows/ # Pipelines CI (Gitleaks, Lint, Build)
 ├── apps/
-│   ├── base/                # Définitions génériques (Images, Ports, Env)
-│   │   ├── api-gateway/     # Point d'entrée HTTP
-│   │   ├── ms-user/         # Service Identité
-│   │   ├── ms-post/         # Service Contenus
-│   │   ├── ms-social/       # Service Graphe & Relations
-│   │   └── ms-event/        # Service Événements
-│   └── overlays/
-│       ├── dev/             # Configuration spécifique Développement
-│       └── prod/            # Configuration durcie Production
+│ ├── base/ # Définitions génériques (Images, Ports, Env)
+│ │ ├── api-gateway/ # Point d'entrée HTTP
+│ │ ├── ms-user/ # Service Identité
+│ │ ├── ms-post/ # Service Contenus
+│ │ ├── ms-social/ # Service Graphe & Relations
+│ │ └── ms-event/ # Service Événements
+│ └── overlays/
+│ ├── dev/ # Configuration spécifique Développement
+│ └── prod/ # Configuration durcie Production
 ├── infrastructure/
-│   ├── argocd/              # Définitions des "Applications" ArgoCD
-│   ├── databases/           # Charts Helm PostgreSQL, Redis, Neo4j
-│   ├── security/
-│   │   ├── cert-manager/    # Gestion TLS DNS-01
-│   │   ├── network-policies/# Isolation réseau par namespace
-│   │   └── sealed-secrets/  # Clés de déchiffrement
-│   └── namespaces/          # Labellisation PSA Restricted
-├── submodules/              # Code source NestJS (en lecture seule ici)
-└── PROGRESS.md              # Journal de bord technique
+│ ├── argocd/ # Définitions des "Applications" ArgoCD
+│ ├── databases/ # Charts Helm PostgreSQL, Redis, Neo4j
+│ ├── security/
+│ │ ├── cert-manager/ # Gestion TLS DNS-01
+│ │ ├── network-policies/# Isolation réseau par namespace
+│ │ └── sealed-secrets/ # Clés de déchiffrement
+│ └── namespaces/ # Labellisation PSA Restricted
+├── submodules/ # Code source NestJS (en lecture seule ici)
+└── PROGRESS.md # Journal de bord technique
 ```
 
 ---
 
-## 🛠️ Runbook d'Urgence (Opérations de secours)
+## ️ Runbook d'Urgence (Opérations de secours)
 
 ### Scénario A : Une base de données est corrompue ou bloquée
 
@@ -257,7 +257,7 @@ Si `https://cyrus-ag.com` affiche une erreur de certificat :
 
 ---
 
-## 📝 Glossaire Technique
+## Glossaire Technique
 
 - **PSA (Pod Security Admission)** : Système natif K8s remplaçant les PSP pour valider la sécurité des pods.
 - **Kustomize** : Outil de personnalisation des manifests sans templates (contrairement à Helm).
@@ -268,7 +268,7 @@ Si `https://cyrus-ag.com` affiche une erreur de certificat :
 
 ---
 
-## 🤖 CI/CD & Qualité
+## CI/CD & Qualité
 
 Chaque Push déclenche une pipeline GitHub Actions :
 
@@ -278,4 +278,4 @@ Chaque Push déclenche une pipeline GitHub Actions :
 
 ---
 
-© 2026 Volontariapp
+ 2026 Volontariapp
