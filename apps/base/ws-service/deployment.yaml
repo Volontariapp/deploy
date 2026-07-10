@@ -40,7 +40,7 @@ spec:
               cpu: 10m
               memory: 32Mi
         - name: run-migrations
-          image: ghcr.io/volontariapp/ws-service:sha-15e5fb3
+          image: ghcr.io/volontariapp/ws-service:sha-4d3be0c
           imagePullPolicy: Always
           command: ['node', 'node_modules/typeorm/cli.js', 'migration:run', '-d', 'dist/config/data-source.js']
           securityContext:
@@ -115,7 +115,7 @@ spec:
               memory: 32Mi
       containers:
         - name: ws-service
-          image: ghcr.io/volontariapp/ws-service:sha-15e5fb3
+          image: ghcr.io/volontariapp/ws-service:sha-4d3be0c
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
