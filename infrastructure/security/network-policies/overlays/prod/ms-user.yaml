@@ -26,6 +26,13 @@ spec:
                   - worker-post
                   - worker-social
                   - worker-event
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 3000
   egress:
     - to:
         - podSelector:

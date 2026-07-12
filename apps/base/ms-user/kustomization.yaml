@@ -7,6 +7,9 @@ resources:
   - deployment-outbox.yaml
   - deployment-post-processor.yaml
   - deployment-worker.yaml
+  - service-worker.yaml
+  - service-post-processor.yaml
+  - service-outbox.yaml
 
 patches:
   - target:
