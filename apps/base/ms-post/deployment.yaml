@@ -40,7 +40,7 @@ spec:
               cpu: 10m
               memory: 32Mi
         - name: run-migrations
-          image: ghcr.io/volontariapp/ms-post:sha-da57377
+          image: ghcr.io/volontariapp/ms-post:sha-9e49d76
           imagePullPolicy: Always
           command: ['node', 'node_modules/typeorm/cli.js', 'migration:run', '-d', 'dist/config/data-source.js']
           securityContext:
@@ -79,7 +79,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: ms-post
-          image: ghcr.io/volontariapp/ms-post:sha-da57377
+          image: ghcr.io/volontariapp/ms-post:sha-9e49d76
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
