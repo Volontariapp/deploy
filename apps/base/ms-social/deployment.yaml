@@ -40,7 +40,7 @@ spec:
               cpu: 10m
               memory: 32Mi
         - name: run-migrations
-          image: ghcr.io/volontariapp/ms-social:sha-7c6bc1d
+          image: ghcr.io/volontariapp/ms-social:sha-60f87a5
           imagePullPolicy: Always
           command: ['node', 'node_modules/typeorm/cli.js', 'migration:run', '-d', 'dist/config/data-source.js']
           securityContext:
@@ -108,7 +108,7 @@ spec:
               memory: 32Mi
       containers:
         - name: ms-social
-          image: ghcr.io/volontariapp/ms-social:sha-7c6bc1d
+          image: ghcr.io/volontariapp/ms-social:sha-60f87a5
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
