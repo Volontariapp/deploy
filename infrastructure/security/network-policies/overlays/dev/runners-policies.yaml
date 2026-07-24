@@ -22,7 +22,34 @@ spec:
           - post-processor-event
           - post-processor-social
   policyTypes:
+    - Ingress
     - Egress
+  ingress:
+    # Diagnostic /health endpoints for workers, outbox runners (user/post/
+    # event/social) and post-processors.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 4101
+        - protocol: TCP
+          port: 4102
+        - protocol: TCP
+          port: 4103
+        - protocol: TCP
+          port: 4104
+        - protocol: TCP
+          port: 4105
+        - protocol: TCP
+          port: 4202
+        - protocol: TCP
+          port: 4203
+        - protocol: TCP
+          port: 4204
+        - protocol: TCP
+          port: 4205
   egress:
     - to:
         - podSelector:
