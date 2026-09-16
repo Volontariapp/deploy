@@ -3,11 +3,11 @@ apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret
 metadata:
   name: datadog-keys
-  namespace: datadog-agent
+  namespace: datadog
 spec:
   encryptedData:
     api-key: AgCMPCgOfB+mUNgfXdSHYTdQU9Ef84zKk5ggH+bg4Nuq8pisDnMy5QHiyfKkf4W1HP+x1onFciJ2t4CSolvlqNMCJVyZ34Qjg9fqN1lAd0JQ+s3hWJTUzzD+T6plgzEtMerN8alFaJlm6R1XigonvK/Mo/Y3ZB0i39wEtHA87ajQvbutuefKEo7FZMzEx7xnP9EoFlcDlWIsqSPMpZrJ4ZFEuYALsA5xaVM0ESQ1oNc3L2nkERgP/tYtkLzvJR2/bdAneXkoRpje+qdIaq48Mbe4zCb0jMft2r2nPU3tHgjfArHGCm11llwd4CUJuVOWSfDydzt7YxyaXRb4+MLt0//niwnsTdvrvIaY04UQ5TLjzhp0WqFuHFEeopv9BPWNUh02Eao27JeI+GN80Iu7nJiWfzm8ioq0RbQMb3vTTSmEAUtk2cJD4k8hJA070I3L8b+65UpnzPiuM/hh9VVR9deH2lvn4/Gr+wzPabFZxh+bHYq/wN4JqvGNndULii0hgVTYnNXXKst1rgTG3EhBHxnJrNVzKWtlZNHQOGnC4y6qGnlbln9t6y3lJWgFDLDJekMZCGKNNEd41chiNPhKm+e0Y8GJ0bBMWoLL45173y8/MsnzcSzwYlTznUwuP5nlTSK4WljR8fFZ5NJEOvi+wA/H4HvTXA2Jdv0mK7YkDs4/4W5A9kdjWrvUQX+jG3rvO2TZ/taTAQXhoySW0XF1CstkGEXAIHN+E5dntgpqi0uwsg==
   template:
     metadata:
       name: datadog-keys
-      namespace: datadog-agent
+      namespace: datadog
