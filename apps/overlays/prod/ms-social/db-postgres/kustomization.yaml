@@ -19,6 +19,11 @@ helmCharts:
         secretKeys:
           userPasswordKey: ms-social-password
       primary:
+        podAnnotations:
+          ad.datadoghq.com/postgresql.check_names: '["postgres"]'
+          ad.datadoghq.com/postgresql.init_configs: '[{}]'
+          ad.datadoghq.com/postgresql.instances: >-
+            [{"host": "%%host%%", "port": 5432, "username": "ms-social", "password": "ENC[k8s_secret@prod/db-secrets/ms-social-password]", "dbname": "ms-social"}]
         persistence:
           storageClass: local-path
         resources:

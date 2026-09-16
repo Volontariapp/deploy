@@ -14,6 +14,11 @@ helmCharts:
       auth:
         existingSecret: db-secrets
       master:
+        podAnnotations:
+          ad.datadoghq.com/redis.check_names: '["redisdb"]'
+          ad.datadoghq.com/redis.init_configs: '[{}]'
+          ad.datadoghq.com/redis.instances: >-
+            [{"host": "%%host%%", "port": 6379, "password": "ENC[k8s_secret@prod/db-secrets/redis-password]"}]
         persistence:
           storageClass: local-path
         resources:

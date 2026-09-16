@@ -18,6 +18,11 @@ helmCharts:
         secretKeys:
           userPasswordKey: ms-event-password
       primary:
+        podAnnotations:
+          ad.datadoghq.com/postgresql.check_names: '["postgres"]'
+          ad.datadoghq.com/postgresql.init_configs: '[{}]'
+          ad.datadoghq.com/postgresql.instances: >-
+            [{"host": "%%host%%", "port": 5432, "username": "ms-event", "password": "ENC[k8s_secret@prod/db-secrets/ms-event-password]", "dbname": "ms-event"}]
         persistence:
           storageClass: local-path
         resources:
