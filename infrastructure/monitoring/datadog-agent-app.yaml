@@ -12,6 +12,7 @@ spec:
     helm:
       values: |
         datadog:
+          site: datadoghq.eu
           apiKeyExistingSecret: datadog-keys
           kubeStateMetricsEnabled: true
           
