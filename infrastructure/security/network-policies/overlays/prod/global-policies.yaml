@@ -70,6 +70,10 @@ spec:
                   - post-processor-post
                   - post-processor-event
                   - post-processor-social
+                  - ms-storage
+                  - post-processor-storage
+                  - outbox-storage
+                  - worker-storage
       ports:
         - protocol: TCP
           port: 5432
@@ -95,6 +99,10 @@ spec:
                 values:
                   - ms-social
                   - post-processor-social
+                  - ms-storage
+                  - post-processor-storage
+                  - outbox-storage
+                  - worker-storage
                   - worker-social
       ports:
         - protocol: TCP
@@ -148,6 +156,10 @@ spec:
                   - post-processor-post
                   - post-processor-event
                   - post-processor-social
+                  - ms-storage
+                  - post-processor-storage
+                  - outbox-storage
+                  - worker-storage
       ports:
         - protocol: TCP
           port: 6379

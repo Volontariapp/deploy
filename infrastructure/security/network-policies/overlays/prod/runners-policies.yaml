@@ -21,6 +21,9 @@ spec:
           - post-processor-post
           - post-processor-event
           - post-processor-social
+          - post-processor-storage
+          - outbox-storage
+          - worker-storage
   policyTypes:
     - Egress
   egress:
@@ -45,6 +48,7 @@ spec:
                   - ms-social
                   - ms-event
                   - ws-service
+                  - ms-storage
     - to:
         - namespaceSelector:
             matchLabels:

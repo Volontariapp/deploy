@@ -32,6 +32,9 @@ spec:
         - podSelector:
             matchLabels:
               app: ws-service
+        - podSelector:
+            matchLabels:
+              app: ms-storage
     - to:
         - namespaceSelector:
             matchLabels:

@@ -10,3 +10,4 @@ resources:
   - runners-policies.yaml
   - ws-outbox-policy.yaml
   - ws-service.yaml
+  - ms-storage.yaml
