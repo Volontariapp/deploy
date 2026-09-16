@@ -9,6 +9,10 @@ spec:
     chart: datadog
     repoURL: https://helm.datadoghq.com
     targetRevision: 3.245.1
+    helm:
+      values: |
+        datadog:
+          apiKeyExistingSecret: datadog-keys
   destination:
     server: https://kubernetes.default.svc
     namespace: datadog
