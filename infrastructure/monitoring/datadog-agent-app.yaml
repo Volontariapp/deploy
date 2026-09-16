@@ -13,6 +13,20 @@ spec:
       values: |
         datadog:
           apiKeyExistingSecret: datadog-keys
+          kubeStateMetricsEnabled: true
+          logs:
+            enabled: false # TODO: Enable logs phase 3
+
+        agents:
+          containers:
+            agent:
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: datadog
