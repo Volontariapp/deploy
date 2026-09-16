@@ -24,6 +24,10 @@ spec:
                   enabled: true
                   # useHostPort: true est activé par défaut par Datadog, ce qui expose le port 4317
           
+          secretBackend:
+            command: "/readsecret_multiple_providers.sh"
+            enableGlobalPermissions: true
+            
           logs:
             enabled: false # TODO: Enable logs phase 3
         agents:

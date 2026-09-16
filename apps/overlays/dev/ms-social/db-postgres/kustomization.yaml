@@ -22,7 +22,7 @@ helmCharts:
           ad.datadoghq.com/postgresql.check_names: '["postgres"]'
           ad.datadoghq.com/postgresql.init_configs: '[{}]'
           ad.datadoghq.com/postgresql.instances: >-
-            [{"host": "%%host%%", "port": "5432", "username": "%%env_POSTGRES_USER%%", "password": "%%env_POSTGRES_PASSWORD%%", "dbname": "%%env_POSTGRES_DATABASE%%"}]
+            [{"host": "%%host%%", "port": "5432", "username": "ms-social", "password": "ENC[k8s_secret@dev/db-secrets/ms-social-password]", "dbname": "ms-social"}]
         persistence:
           storageClass: local-path
         resources:
