@@ -14,9 +14,16 @@ spec:
         datadog:
           apiKeyExistingSecret: datadog-keys
           kubeStateMetricsEnabled: true
+          
+          otlp:
+            receiver:
+              protocols:
+                grpc:
+                  enabled: true
+                  # useHostPort: true est activé par défaut par Datadog, ce qui expose le port 4317
+          
           logs:
             enabled: false # TODO: Enable logs phase 3
-
         agents:
           containers:
             agent:
