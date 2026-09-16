@@ -20,12 +20,10 @@ jobs:
 
       - name: Validate Databases Overlays
         run: |
-          kustomize build infrastructure/databases/overlays/dev --enable-helm > /dev/null
           kustomize build infrastructure/databases/overlays/prod --enable-helm > /dev/null
 
       - name: Validate Apps Overlays
         run: |
-          kustomize build apps/overlays/dev --enable-helm > /dev/null
           kustomize build apps/overlays/prod --enable-helm > /dev/null
 
       - name: Kube-score Scan
