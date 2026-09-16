@@ -7,6 +7,11 @@ helmCharts:
     releaseName: neo4j
     version: 5.20.0
     valuesInline:
+      podAnnotations:
+        ad.datadoghq.com/neo4j.check_names: '["neo4j"]'
+        ad.datadoghq.com/neo4j.init_configs: '[{}]'
+        ad.datadoghq.com/neo4j.instances: >-
+          [{"neo4j_url": "http://%%host%%:7474"}]
       neo4j:
         name: neo4j
         acceptLicenseAgreement: 'yes'
