@@ -25,3 +25,6 @@
 [submodule "submodules/ws-service"]
 	path = submodules/ws-service
 	url = ../ws-service.git
+[submodule "submodules/ms-storage"]
+	path = submodules/ms-storage
+	url = git@github.com:Volontariapp/ms-storage
