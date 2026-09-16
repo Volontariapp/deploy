@@ -6,4 +6,5 @@ resources:
   - ms-post/
   - ms-event/
   - ms-social/
+  - ms-storage/
   - api-gateway/

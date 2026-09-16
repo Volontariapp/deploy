@@ -16,6 +16,8 @@ images:
     newName: ghcr.io/volontariapp/ms-event
   - name: volontariapp/ms-social
     newName: ghcr.io/volontariapp/ms-social
+  - name: volontariapp/ms-storage
+    newName: ghcr.io/volontariapp/ms-storage
   - name: volontariapp/ws-service
     newName: ghcr.io/volontariapp/ws-service
 
