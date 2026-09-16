@@ -7,14 +7,6 @@ helmCharts:
     releaseName: neo4j
     version: 5.20.0
     valuesInline:
-      podSpec:
-        annotations:
-          ad.datadoghq.com/neo4j.check_names: '["openmetrics"]'
-          ad.datadoghq.com/neo4j.init_configs: '[{}]'
-          ad.datadoghq.com/neo4j.instances: >-
-            [{"openmetrics_endpoint": "http://%%host%%:7474/metrics", "namespace": "neo4j", "metrics": [".*"], "username": "neo4j", "password": "ENC[k8s_secret@dev/db-secrets/neo4j-password]"}]
-      config:
-        server.metrics.prometheus.enabled: "true"
       neo4j:
         name: neo4j
         acceptLicenseAgreement: 'yes'
