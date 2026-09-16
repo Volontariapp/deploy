@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
   - sealed-secrets-app.yaml
+  - datadog-keys-sealed.yaml
