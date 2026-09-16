@@ -13,6 +13,7 @@ spec:
       values: |
         datadog:
           site: us5.datadoghq.com
+          clusterName: volontariapp-cluster
           apiKeyExistingSecret: datadog-keys
           kubeStateMetricsEnabled: true
           
