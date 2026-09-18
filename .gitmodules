@@ -31,3 +31,6 @@
 [submodule "submodules/mcp-meta-indexer"]
 	path = submodules/mcp-meta-indexer
 	url = git@github.com:Volontariapp/mcp-meta-indexer.git
+[submodule "submodules/npm-packages"]
+	path = submodules/npm-packages
+	url = https://github.com/Volontariapp/npm-packages.git
