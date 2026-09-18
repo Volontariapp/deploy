@@ -28,3 +28,6 @@
 [submodule "submodules/ms-storage"]
 	path = submodules/ms-storage
 	url = git@github.com:Volontariapp/ms-storage
+[submodule "submodules/mcp-meta-indexer"]
+	path = submodules/mcp-meta-indexer
+	url = git@github.com:Volontariapp/mcp-meta-indexer.git
