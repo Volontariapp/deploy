@@ -27,10 +27,10 @@
 	url = ../ws-service.git
 [submodule "submodules/ms-storage"]
 	path = submodules/ms-storage
-	url = git@github.com:Volontariapp/ms-storage
+	url = ../ms-storage.git
 [submodule "submodules/mcp-meta-indexer"]
 	path = submodules/mcp-meta-indexer
-	url = git@github.com:Volontariapp/mcp-meta-indexer.git
+	url = ../mcp-meta-indexer.git
 [submodule "submodules/npm-packages"]
 	path = submodules/npm-packages
-	url = https://github.com/Volontariapp/npm-packages.git
+	url = ../npm-packages.git
