@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-meta-indexer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-meta-indexer
+  template:
+    metadata:
+      labels:
+        app: mcp-meta-indexer
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      imagePullSecrets:
+        - name: ghcr-login
+      containers:
+        - name: git-sync
+          image: registry.k8s.io/git-sync/git-sync:v4.2.1
+          args:
+            - --repo=git@github.com:Volontariapp/meta.git
+            - --branch=main
+            - --depth=1
+            - --wait=60
+            - --root=/code
+            - --ssh=true
+            - --submodules=recursive
+          securityContext:
+            runAsUser: 1001
+          volumeMounts:
+            - name: code-volume
+              mountPath: /code
+            - name: git-secret
+              mountPath: /etc/git-secret
+              readOnly: true
+        - name: mcp-meta-indexer
+          image: ghcr.io/volontariapp/mcp-meta-indexer:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: MCP_TRANSPORT
+              value: "sse"
+          workingDir: /code/meta/mcp-meta-indexer
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          volumeMounts:
+            - name: code-volume
+              mountPath: /code
+      volumes:
+        - name: code-volume
+          emptyDir: {}
+        - name: git-secret
+          secret:
+            secretName: git-creds
+            defaultMode: 0400

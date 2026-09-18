@@ -8,3 +8,5 @@ resources:
   - ms-social/
   - ms-storage/
   - api-gateway/
+  - ws-service/
+  - mcp-meta-indexer/
