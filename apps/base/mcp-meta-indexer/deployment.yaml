@@ -38,7 +38,7 @@ spec:
               mountPath: /etc/git-secret
               readOnly: true
         - name: mcp-meta-indexer
-          image: ghcr.io/volontariapp/mcp-meta-indexer:latest
+          image: ghcr.io/volontariapp/mcp-meta-indexer:sha-9e1d431
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
