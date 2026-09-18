@@ -16,6 +16,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1001
         fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
       imagePullSecrets:
         - name: ghcr-login
       containers:
@@ -31,6 +33,17 @@ spec:
             - --submodules=recursive
           securityContext:
             runAsUser: 1001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - name: code-volume
               mountPath: /code
@@ -44,6 +57,9 @@ spec:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
             runAsUser: 1001
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 3000
               name: http
