@@ -37,3 +37,6 @@
 [submodule "submodules/proto-registry"]
 	path = submodules/proto-registry
 	url = ../proto-registry.git
+[submodule "submodules/docs"]
+	path = submodules/docs
+	url = ../docs.git
