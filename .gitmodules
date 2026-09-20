@@ -34,3 +34,6 @@
 [submodule "submodules/npm-packages"]
 	path = submodules/npm-packages
 	url = ../npm-packages.git
+[submodule "submodules/proto-registry"]
+	path = submodules/proto-registry
+	url = ../proto-registry.git
