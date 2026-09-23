@@ -9,4 +9,3 @@ resources:
   - ms-storage/
   - api-gateway/
   - ws-service/
-  - mcp-meta-indexer/
