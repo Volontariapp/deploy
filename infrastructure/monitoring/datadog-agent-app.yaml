@@ -22,6 +22,7 @@ spec:
               protocols:
                 grpc:
                   enabled: true
+                  endpoint: "0.0.0.0:4317"
                   # useHostPort: true est activé par défaut par Datadog, ce qui expose le port 4317
           
           secretBackend:
