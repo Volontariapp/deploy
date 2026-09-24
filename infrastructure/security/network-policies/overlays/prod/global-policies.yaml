@@ -163,3 +163,24 @@ spec:
       ports:
         - protocol: TCP
           port: 6379
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: datadog-agent-access-policy
+  namespace: prod
+spec:
+  podSelector: {} # Tous les pods du namespace prod peuvent envoyer vers Datadog
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: datadog
+      ports:
+        - protocol: TCP
+          port: 4317 # OTLP gRPC (Traces & Métriques OpenTelemetry)
+        - protocol: TCP
+          port: 8126 # APM Datadog Agent
