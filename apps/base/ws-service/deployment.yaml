@@ -129,7 +129,9 @@ spec:
               name: http
           env:
             - name: OTEL_SDK_DISABLED
-              value: "true"
+              value: "false"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://datadog-agent.datadog.svc.cluster.local:4317"
             - name: NODE_ENV
               value: "production"
             - name: POST_PROCESSOR_BATCH_SIZE
