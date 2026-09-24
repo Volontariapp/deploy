@@ -22,7 +22,7 @@ spec:
         - name: ghcr-login
       containers:
         - name: api-gateway
-          image: ghcr.io/volontariapp/api-gateway:sha-996077b
+          image: ghcr.io/volontariapp/api-gateway:sha-7c91b35
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
