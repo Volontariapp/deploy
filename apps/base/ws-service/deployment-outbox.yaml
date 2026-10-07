@@ -59,7 +59,7 @@ spec:
             - name: PORT
               value: "4105"
             - name: REDIS_HOST
-              value: ws-service-redis
+              value: redis-master
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_PASSWORD
