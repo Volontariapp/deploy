@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: post-processor-user
-          image: ghcr.io/volontariapp/post-processor-user:sha-706a3ee
+          image: ghcr.io/volontariapp/post-processor-user:sha-9a5faf9
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
@@ -100,6 +100,10 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: redis-password
+            - name: MS_SOCIAL_URL
+              value: "ms-social:80"
+            - name: AUTH_INTERNAL_PRIVATE_KEY_PATH
+              value: "certs/internal.key"
           resources:
             limits:
               cpu: 50m
@@ -110,6 +114,12 @@ spec:
           volumeMounts:
             - name: tmp-volume
               mountPath: /tmp
+            - name: certs-volume
+              mountPath: /app/certs
+              readOnly: true
       volumes:
+        - name: certs-volume
+          secret:
+            secretName: auth-certs
         - name: tmp-volume
           emptyDir: {}
