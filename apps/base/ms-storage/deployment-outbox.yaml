@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: outbox-storage
-          image: ghcr.io/volontariapp/outbox-storage:sha-9388dde
+          image: ghcr.io/volontariapp/outbox-storage:sha-a13c828
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
