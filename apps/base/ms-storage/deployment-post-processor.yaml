@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: post-processor-storage
-          image: ghcr.io/volontariapp/post-processor-storage:sha-47f6cbe
+          image: ghcr.io/volontariapp/post-processor-storage:sha-ff726c3
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
