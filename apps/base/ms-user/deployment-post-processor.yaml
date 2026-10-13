@@ -72,6 +72,12 @@ spec:
             - containerPort: 4202
               name: http
           env:
+            - name: OTEL_SDK_DISABLED
+              value: "false"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://datadog-agent-install.datadog.svc.cluster.local:4317"
+            - name: DD_ENV
+              value: "prod"
             - name: NODE_ENV
               value: "production"
             - name: POST_PROCESSOR_BATCH_SIZE
@@ -107,10 +113,10 @@ spec:
           resources:
             limits:
               cpu: 50m
-              memory: 96Mi
+              memory: 320Mi
             requests:
               cpu: 10m
-              memory: 48Mi
+              memory: 96Mi
           volumeMounts:
             - name: tmp-volume
               mountPath: /tmp
