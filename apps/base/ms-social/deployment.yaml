@@ -125,6 +125,8 @@ spec:
               value: "false"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://datadog-agent-install.datadog.svc.cluster.local:4317"
+            - name: DD_ENV
+              value: "prod"
             - name: NODE_ENV
               value: 'production'
             - name: PORT
