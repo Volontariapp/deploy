@@ -62,6 +62,12 @@ spec:
               value: "prod"
             - name: NODE_ENV
               value: production
+            - name: OUTBOX_BATCH_INTERVAL_MS
+              value: "500"
+            - name: OUTBOX_MAX_IDLE_INTERVAL_MS
+              value: "5000"
+            - name: OUTBOX_BATCH_SIZE
+              value: "50"
             - name: PORT
               value: "4105"
             - name: REDIS_HOST
