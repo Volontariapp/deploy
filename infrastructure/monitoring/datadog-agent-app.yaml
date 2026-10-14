@@ -30,7 +30,15 @@ spec:
             enableGlobalPermissions: true
             
           logs:
-            enabled: false # TODO: Enable logs phase 3
+            enabled: true
+            containerCollectAll: true
+            containerCollectUsingFiles: true
+
+          # Exclusion des conteneurs système, agent, initContainers et bases de données brutes
+          containerExcludeLogs: "name:datadog-agent image:.*datadog.* kube_namespace:kube-system kube_namespace:argocd kube_namespace:traefik kube_namespace:cert-manager kube_namespace:datadog name:wait-for-.* name:.*-postgresql name:.*redis.* name:.*neo4j.* image:.*postgres.* image:.*redis.* image:.*neo4j.*"
+
+          # Inclusion explicite des namespaces applicatifs
+          containerIncludeLogs: "kube_namespace:prod kube_namespace:dev"
         agents:
           containers:
             agent:
