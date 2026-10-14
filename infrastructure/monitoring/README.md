@@ -17,3 +17,25 @@ Le secret chiffré est déployé dans le cluster pour être utilisé par ce char
 ### Installation / Mise à jour
 L'installation est gérée automatiquement par ArgoCD en se basant sur le fichier `datadog-agent-app.yaml`.
 La version du chart est figée via le paramètre `targetRevision` pour éviter toute mise à jour non planifiée. Pour mettre à jour l'Agent Datadog, incrémentez cette version dans une Pull Request.
+
+## Collecte des Logs (Ticket 3.3)
+
+La collecte des logs est activée au niveau du DaemonSet Datadog (`datadog.logs.enabled: true`) via lecture directe des fichiers journaux K3s / containerd (`containerCollectUsingFiles: true`).
+
+### Périmètre et Filtrage des Conteneurs
+Pour maîtriser les quotas d'ingestion et éviter le bruit :
+* **Inclusions (`containerIncludeLogs`)** : Seuls les namespaces applicatifs (`prod`, `dev`) sont collectés.
+* **Exclusions (`containerExcludeLogs`)** :
+  * Namespaces système & infra : `kube-system`, `argocd`, `traefik`, `cert-manager`, `datadog`.
+  * Agent Datadog lui-même : `name:datadog-agent`, `image:.*datadog.*`.
+  * InitContainers récurrents : `name:wait-for-.*`.
+  * Bases de données brutes : `name:.*-postgresql`, `name:.*redis.*`, `name:.*neo4j.*`, `image:.*postgres.*`, `image:.*redis.*`, `image:.*neo4j.*`.
+
+### Corrélation Logs-Traces
+Les microservices utilisent `@volontariapp/logger` en format JSON en production (`production.config.json`). Le logger injecte automatiquement :
+* `trace_id`
+* `dd.trace_id` (64-bit lower decimal)
+* `dd.span_id` (64-bit lower decimal)
+
+L'Agent Datadog et les pipelines de parsing corrèlent nativement chaque ligne de log avec sa trace APM distribuée correspondante.
+
