@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: outbox-event
-          image: ghcr.io/volontariapp/outbox-event:sha-322b900
+          image: ghcr.io/volontariapp/outbox-event:sha-d87d88a
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
