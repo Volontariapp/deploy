@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - storageclass.yaml
   - minio-sealed-secret.yaml
+  - public-config.yaml
   - ../../../base/minio
   - ../../../base/clamd
   - ingress.yaml
