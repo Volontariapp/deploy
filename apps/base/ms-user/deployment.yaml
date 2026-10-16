@@ -141,6 +141,9 @@ spec:
               value: "ms-event:80"
             - name: MS_SOCIAL_URL
               value: "ms-social:80"
+            # Rattachement de l'avatar : ms-user confirme le fichier aupres de ms-storage
+            - name: MS_STORAGE_URL
+              value: "ms-storage:80"
           livenessProbe:
             tcpSocket:
               port: http
