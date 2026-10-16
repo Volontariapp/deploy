@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clamd
+  labels:
+    app: clamd
+spec:
+  replicas: 1
+  strategy:
+    # Le volume de signatures est RWO : on arrete l'ancien pod avant de lancer le nouveau
+    type: Recreate
+  selector:
+    matchLabels:
+      app: clamd
+  template:
+    metadata:
+      labels:
+        app: clamd
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: clamd
+          # Variante _base : sans signatures embarquees, elles sont telechargees par freshclam
+          # au premier demarrage puis conservees sur le volume clamd-db.
+          image: clamav/clamav:1.5.4_base-debian13-slim@sha256:25420050b2b469d97990f074cf454d8a67e9c7c6013a11fa1f47ac6a11347ce6
+          # Point d'entree non-root fourni par l'image (clamd ecoute sur TCP 3310, voir son clamd.conf)
+          command: ["/init-unprivileged"]
+          ports:
+            - containerPort: 3310
+              name: clamd
+          env:
+            - name: CLAMD_STARTUP_TIMEOUT
+              value: "1800"
+          startupProbe:
+            tcpSocket:
+              port: clamd
+            periodSeconds: 10
+            failureThreshold: 90
+          livenessProbe:
+            tcpSocket:
+              port: clamd
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: clamd
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1280Mi
+            limits:
+              cpu: 1500m
+              # clamd peut doubler brievement sa memoire lors du rechargement des signatures
+              memory: 3Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            # L'image ecrit dans /var/lib/clamav, /var/log/clamav et /tmp (et d'autres chemins internes)
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: clamd-db
+              mountPath: /var/lib/clamav
+            - name: logs
+              mountPath: /var/log/clamav
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: clamd-db
+          persistentVolumeClaim:
+            claimName: clamd-db
+        - name: logs
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}

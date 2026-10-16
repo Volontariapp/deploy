@@ -1,0 +1,25 @@
+# Endpoint S3 public : les URLs d'upload signees (POST presigne) et les images publiques y pointent.
+# Le certificat wildcard *.cyrus-ag.com (secret volontariapp-wildcard-tls) couvre ce sous-domaine.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-ingress
+  namespace: prod
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  tls:
+    - hosts:
+        - s3.cyrus-ag.com
+      secretName: volontariapp-wildcard-tls
+  rules:
+    - host: s3.cyrus-ag.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio
+                port:
+                  number: 9000
