@@ -53,6 +53,12 @@ spec:
               value: "ms-event:80"
             - name: MS_STORAGE_URL
               value: "ms-storage:80"
+            - name: S3_PUBLIC_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: storage-public-config
+                  key: S3_PUBLIC_BASE_URL
+                  optional: true
             - name: MS_WS_URL
               value: "ws-service:80"
           livenessProbe:

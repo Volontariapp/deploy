@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storage-public-config
+  labels:
+    app.kubernetes.io/part-of: storage
+data:
+  # Single source of truth for the public base URL of processed files.
+  # Read by ms-storage and by api-gateway (buildPublicFileUrl), keep them aligned.
+  S3_PUBLIC_BASE_URL: "https://s3.cyrus-ag.com/volontariapp-public"
