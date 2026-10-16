@@ -12,3 +12,7 @@ spec:
     kind: ClusterIssuer
     name: cloudflare-issuer
   secretName: volontariapp-wildcard-tls
+  # Seul Certificate wildcard du cluster : un second (namespace traefik) demandait les memes noms
+  # en DNS-01 et bloquait les renouvellements. Renouvellement 60 jours avant expiration
+  # (certificats de 90 jours) pour disposer d'une longue fenetre de nouvelles tentatives.
+  renewBefore: 1440h
