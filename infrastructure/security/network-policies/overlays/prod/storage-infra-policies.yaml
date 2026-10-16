@@ -133,3 +133,45 @@ spec:
       ports:
         - protocol: TCP
           port: 3000
+---
+# ms-post -> ms-storage : confirmation du rattachement des images d'un post (ConfirmFileAttachment).
+# Politique distincte de ms-post-policy, qui est partagee avec post-processor-post.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-post-to-ms-storage-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: ms-post
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: ms-storage
+      ports:
+        - protocol: TCP
+          port: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-storage-from-ms-post-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: ms-storage
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ms-post
+      ports:
+        - protocol: TCP
+          port: 3000
