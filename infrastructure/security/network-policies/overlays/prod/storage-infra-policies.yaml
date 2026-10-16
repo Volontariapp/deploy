@@ -1,0 +1,93 @@
+# MinIO : joignable par ms-storage, par le Job d'initialisation et par Traefik (endpoint public).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: minio-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: minio
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - ms-storage
+                  - minio-init
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: TCP
+          port: 9000
+---
+# clamd : scanne pour ms-storage (chemin SYNC) ; sortie HTTPS vers Internet pour freshclam uniquement.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: clamd-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: clamd
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ms-storage
+      ports:
+        - protocol: TCP
+          port: 3310
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443
+---
+# Flux sortants vers le stockage objet et l'antivirus (complete ms-storage-policy, qui reste inchangee).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: storage-pipeline-egress-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - ms-storage
+          - minio-init
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: minio
+      ports:
+        - protocol: TCP
+          port: 9000
+    - to:
+        - podSelector:
+            matchLabels:
+              app: clamd
+      ports:
+        - protocol: TCP
+          port: 3310

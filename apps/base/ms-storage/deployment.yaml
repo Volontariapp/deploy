@@ -133,14 +133,49 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: ms-storage-password
-            - name: MS_USER_URL
+            # Adresse d'ecoute gRPC de ms-storage (le Service redirige le port 80 vers 3000)
+            - name: MS_STORAGE_URL
               value: "0.0.0.0:3000"
+            - name: MS_USER_URL
+              value: "ms-user:80"
             - name: MS_POST_URL
               value: "ms-post:80"
             - name: MS_EVENT_URL
               value: "ms-event:80"
             - name: MS_SOCIAL_URL
               value: "ms-social:80"
+            # Stockage objet (MinIO du cluster) : endpoint interne pour les appels, endpoint public pour signer
+            - name: S3_ENDPOINT
+              value: "http://minio:9000"
+            - name: S3_REGION
+              value: "us-east-1"
+            - name: S3_USE_PATH_STYLE
+              value: "true"
+            - name: S3_PUBLIC_BUCKET
+              value: "volontariapp-public"
+            - name: S3_PRIVATE_BUCKET
+              value: "volontariapp-private"
+            - name: S3_PUBLIC_ENDPOINT
+              value: "https://s3.cyrus-ag.com"
+            - name: S3_PUBLIC_BASE_URL
+              value: "https://s3.cyrus-ag.com/volontariapp-public"
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: S3_ACCESS_KEY
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: S3_SECRET_KEY
+            # Antivirus clamd (chemin SYNC)
+            - name: SCANNER_HOST
+              value: "clamd"
+            - name: SCANNER_PORT
+              value: "3310"
+            - name: SCANNER_TIMEOUT_MS
+              value: "5000"
           livenessProbe:
             tcpSocket:
               port: http
@@ -149,10 +184,10 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 128Mi
+              memory: 192Mi
             limits:
-              cpu: 200m
-              memory: 256Mi
+              cpu: 300m
+              memory: 512Mi
           volumeMounts:
             - name: tmp-volume
               mountPath: /tmp
