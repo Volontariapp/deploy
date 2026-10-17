@@ -175,3 +175,45 @@ spec:
       ports:
         - protocol: TCP
           port: 3000
+---
+# ms-event -> ms-storage : confirmation du rattachement de la photo d'un evenement (ConfirmFileAttachment).
+# Politique distincte de ms-event-policy, qui est partagee avec post-processor-event.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-event-to-ms-storage-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: ms-event
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: ms-storage
+      ports:
+        - protocol: TCP
+          port: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-storage-from-ms-event-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: ms-storage
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ms-event
+      ports:
+        - protocol: TCP
+          port: 3000

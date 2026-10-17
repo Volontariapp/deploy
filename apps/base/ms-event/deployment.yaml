@@ -130,6 +130,9 @@ spec:
               value: "0.0.0.0:3000"
             - name: MS_SOCIAL_URL
               value: "ms-social:80"
+            # Photo d'un evenement : ms-event confirme le fichier aupres de ms-storage
+            - name: MS_STORAGE_URL
+              value: "ms-storage:80"
             - name: GEOCODING_OSM_USER_AGENT
               valueFrom:
                 secretKeyRef:
