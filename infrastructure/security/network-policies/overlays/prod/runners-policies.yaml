@@ -24,6 +24,9 @@ spec:
           - post-processor-storage
           - outbox-storage
           - worker-storage
+          - outbox-ranking
+          - worker-ranking
+          - post-processor-ranking
   policyTypes:
     - Egress
   egress:
@@ -49,6 +52,7 @@ spec:
                   - ms-event
                   - ws-service
                   - ms-storage
+                  - ms-ranking
     - to:
         - namespaceSelector:
             matchLabels:

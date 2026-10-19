@@ -35,6 +35,9 @@ spec:
         - podSelector:
             matchLabels:
               app: ms-storage
+        - podSelector:
+            matchLabels:
+              app: ms-ranking
     - to:
         - namespaceSelector:
             matchLabels:

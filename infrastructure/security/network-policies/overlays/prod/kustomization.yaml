@@ -11,4 +11,5 @@ resources:
   - ws-outbox-policy.yaml
   - ws-service.yaml
   - ms-storage.yaml
+  - ms-ranking.yaml
   - storage-infra-policies.yaml

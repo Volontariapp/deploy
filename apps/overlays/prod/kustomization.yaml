@@ -17,6 +17,8 @@ images:
     newName: ghcr.io/volontariapp/ms-social
   - name: volontariapp/ms-storage
     newName: ghcr.io/volontariapp/ms-storage
+  - name: volontariapp/ms-ranking
+    newName: ghcr.io/volontariapp/ms-ranking
   - name: volontariapp/ws-service
     newName: ghcr.io/volontariapp/ws-service
 
