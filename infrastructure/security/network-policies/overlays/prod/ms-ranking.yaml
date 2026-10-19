@@ -1,0 +1,132 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-ranking-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - ms-ranking
+          - post-processor-ranking
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - api-gateway
+                  - worker-ranking
+                  - ms-ranking
+                  - post-processor-ranking
+  egress:
+    - to:
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - ms-user
+                  - ms-post
+                  - ms-event
+                  - ms-social
+                  - ws-service
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: ms-ranking-db
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: redis
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+---
+# Appels gRPC de worker-ranking vers ms-social et ms-event : l'egress est ouvert par runners-policy,
+# l'ingress est ouvert ici par une policy dediee (les policies de ms-social et ms-event restent inchangees).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-social-ms-event-from-worker-ranking-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - ms-social
+          - ms-event
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: worker-ranking
+      ports:
+        - protocol: TCP
+          port: 3000
+---
+# Appels gRPC de ms-ranking vers les autres domaines (ingress cote appele).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ms-user-post-ws-from-ms-ranking-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - ms-user
+          - ms-post
+          - ms-social
+          - ms-event
+          - ws-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ms-ranking
+      ports:
+        - protocol: TCP
+          port: 3000
+---
+# Seule sortie vers Internet du domaine ranking : api.typesafe.ai:443 (Jev).
+# NetworkPolicy ne sait pas filtrer par nom de domaine : on ouvre le port 443 vers Internet en
+# excluant les plages privees (reseau du cluster et LAN).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: worker-ranking-typesafe-egress-policy
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: worker-ranking
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443

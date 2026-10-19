@@ -74,6 +74,10 @@ spec:
                   - post-processor-storage
                   - outbox-storage
                   - worker-storage
+                  - ms-ranking
+                  - post-processor-ranking
+                  - outbox-ranking
+                  - worker-ranking
       ports:
         - protocol: TCP
           port: 5432
@@ -160,6 +164,10 @@ spec:
                   - post-processor-storage
                   - outbox-storage
                   - worker-storage
+                  - ms-ranking
+                  - post-processor-ranking
+                  - outbox-ranking
+                  - worker-ranking
       ports:
         - protocol: TCP
           port: 6379

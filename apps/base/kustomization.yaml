@@ -7,5 +7,6 @@ resources:
   - ms-event/
   - ms-social/
   - ms-storage/
+  - ms-ranking/
   - api-gateway/
   - ws-service/
