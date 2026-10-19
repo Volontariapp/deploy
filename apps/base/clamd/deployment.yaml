@@ -55,7 +55,7 @@ spec:
               cpu: 100m
               memory: 1280Mi
             limits:
-              # prod-quota plafonne la somme des limits.cpu du namespace a 8 : 600m laisse la place
+              # prod-quota plafonne la somme des limits.cpu du namespace a 10 : 600m laisse la place
               # a MinIO, au Job minio-init et aux redeploiements (le scan d'un avatar est peu couteux)
               cpu: 600m
               # clamd peut doubler brievement sa memoire lors du rechargement des signatures

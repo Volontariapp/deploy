@@ -8,4 +8,4 @@ spec:
     requests.memory: "12Gi"
     limits.memory: "18Gi"
     requests.cpu: "6"
-    limits.cpu: "8"
+    limits.cpu: "10"
