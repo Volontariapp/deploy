@@ -40,3 +40,6 @@
 [submodule "submodules/docs"]
 	path = submodules/docs
 	url = ../docs.git
+[submodule "submodules/ms-ranking"]
+	path = submodules/ms-ranking
+	url = ../ms-ranking.git
