@@ -67,6 +67,12 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: ms-ranking-password
+            # Requise par la validation de la config chargee par data-source.js
+            - name: RANKING_LOCATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ranking-secrets
+                  key: RANKING_LOCATION_KEY
           resources:
             limits:
               cpu: 100m
