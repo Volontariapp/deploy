@@ -61,6 +61,8 @@ spec:
                   optional: true
             - name: MS_WS_URL
               value: "ws-service:80"
+            - name: MS_RANKING_URL
+              value: "ms-ranking:80"
           livenessProbe:
             tcpSocket:
               port: http
