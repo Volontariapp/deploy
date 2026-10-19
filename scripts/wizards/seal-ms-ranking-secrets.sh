@@ -51,21 +51,21 @@ banner() {
 stage() {
   _clear
   _STAGE_INDEX=$((_STAGE_INDEX + 1))
-  printf '\n%s%s▸ Stage %s/%s · %s%s\n' \
+  printf '\n%s%s> Stage %s/%s - %s%s\n' \
     "$BOLD" "$BLUE" "$_STAGE_INDEX" "$TOTAL_STAGES" "$1" "$RESET"
 }
 
 # say "..." prints a plain instruction line.
 say()  { printf '  %s\n' "$1"; }
 # step "..." is a numbered-feeling action the human takes in the browser.
-step() { printf '  %s•%s %s\n' "$BLUE" "$RESET" "$1"; }
+step() { printf '  %s-%s %s\n' "$BLUE" "$RESET" "$1"; }
 note() { printf '  %s%s%s\n' "$DIM" "$1" "$RESET"; }
-warn() { printf '  %s⚠ %s%s\n' "$YELLOW" "$1" "$RESET"; }
+warn() { printf '  %s! %s%s\n' "$YELLOW" "$1" "$RESET"; }
 
 # open_url URL opens it in the human's browser, cross-platform incl. WSL.
 open_url() {
   local url="$1"
-  printf '  %s↗ opening%s %s\n' "$GREEN" "$RESET" "$url"
+  printf '  %s-> opening%s %s\n' "$GREEN" "$RESET" "$url"
   { if   command -v wslview     >/dev/null 2>&1; then wslview "$url"
     elif command -v explorer.exe >/dev/null 2>&1; then explorer.exe "$url"
     elif command -v xdg-open    >/dev/null 2>&1; then xdg-open "$url"
@@ -135,7 +135,7 @@ write_env() {
   printf '%s=%s\n' "$key" "$value" >> "$tmp"
   mv "$tmp" "$ENV_FILE"
   WRITTEN_ENV+=("$key")
-  printf '  %s✓ wrote%s %s → %s\n' "$GREEN" "$RESET" "$key" "$ENV_FILE"
+  printf '  %sOK wrote%s %s -> %s\n' "$GREEN" "$RESET" "$key" "$ENV_FILE"
 }
 
 # set_secret NAME VALUE sets a GitHub Actions repo secret via gh. Falls back
@@ -145,7 +145,7 @@ set_secret() {
   if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
     if printf '%s' "$value" | gh secret set "$name" >/dev/null 2>&1; then
       WRITTEN_SECRET+=("$name")
-      printf '  %s✓ set%s GitHub secret %s\n' "$GREEN" "$RESET" "$name"
+      printf '  %sOK set%s GitHub secret %s\n' "$GREEN" "$RESET" "$name"
       return
     fi
   fi
@@ -158,7 +158,7 @@ set_var() {
   local name="$1" value="$2"
   if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
     if gh variable set "$name" --body "$value" >/dev/null 2>&1; then
-      printf '  %s✓ set%s GitHub variable %s\n' "$GREEN" "$RESET" "$name"
+      printf '  %sOK set%s GitHub variable %s\n' "$GREEN" "$RESET" "$name"
       return
     fi
   fi
@@ -169,7 +169,7 @@ set_var() {
 # finish clears, then shows a closing summary of everything configured.
 finish() {
   _clear
-  printf '\n%s%s  ✓ Setup complete%s\n' "$BOLD" "$GREEN" "$RESET"
+  printf '\n%s%s  OK Setup complete%s\n' "$BOLD" "$GREEN" "$RESET"
   (( ${#WRITTEN_ENV[@]} ))    && note "wrote ${#WRITTEN_ENV[@]} value(s) to $ENV_FILE: ${WRITTEN_ENV[*]}"
   (( ${#WRITTEN_SECRET[@]} )) && note "set ${#WRITTEN_SECRET[@]} GitHub secret(s): ${WRITTEN_SECRET[*]}"
   if (( ${#SKIPPED[@]} )); then
@@ -219,7 +219,7 @@ say "  - TYPESAFE_API_KEY : cle Jev (optionnelle pour l'instant, le scoreur n'es
 note "Rien n'est ecrit en clair dans Git. Les valeurs passent par $WORKDIR (supprime a la sortie)."
 for bin in kubeseal kubectl openssl; do
   if command -v "$bin" >/dev/null 2>&1; then
-    printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$bin"
+    printf '  %sOK%s %s\n' "$GREEN" "$RESET" "$bin"
   else
     warn "$bin est introuvable : installe-le puis relance ce wizard"
     exit 1
@@ -230,13 +230,13 @@ done
 say ""
 say "Verification de l'acces au cluster (lecture seule) :"
 if kubectl -n "$NAMESPACE" get secret auth-certs >/dev/null 2>&1; then
-  printf '  %s✓%s secret auth-certs present dans %s (cles internal.key / internal.pub montees par ms-ranking et worker-ranking)\n' "$GREEN" "$RESET" "$NAMESPACE"
+  printf '  %sOK%s secret auth-certs present dans %s (cles internal.key / internal.pub montees par ms-ranking et worker-ranking)\n' "$GREEN" "$RESET" "$NAMESPACE"
 else
   warn "secret auth-certs introuvable ou cluster inaccessible : ms-ranking et worker-ranking en ont besoin (certs/internal.*)."
   confirm "Continuer quand meme ?" || exit 1
 fi
 if kubectl -n "$CONTROLLER_NAMESPACE" get deploy "$CONTROLLER_NAME" >/dev/null 2>&1; then
-  printf '  %s✓%s controleur %s joignable\n' "$GREEN" "$RESET" "$CONTROLLER_NAME"
+  printf '  %sOK%s controleur %s joignable\n' "$GREEN" "$RESET" "$CONTROLLER_NAME"
 else
   warn "controleur $CONTROLLER_NAME introuvable dans $CONTROLLER_NAMESPACE : kubeseal ne pourra pas chiffrer"
   confirm "Continuer quand meme ?" || exit 1
@@ -261,7 +261,7 @@ if [[ -z "${SKIP_DB:-}" ]]; then
     | kubeseal --controller-name="$CONTROLLER_NAME" --controller-namespace="$CONTROLLER_NAMESPACE" \
         --format=yaml --merge-into "$DB_SEALED"
   rm -f "$WORKDIR/ms-ranking-password"
-  printf '  %s✓%s ms-ranking-password fusionne dans %s\n' "$GREEN" "$RESET" "$DB_SEALED"
+  printf '  %sOK%s ms-ranking-password fusionne dans %s\n' "$GREEN" "$RESET" "$DB_SEALED"
   note "Le mot de passe en clair n'est jamais affiche ni conserve : il n'existe que dans le SealedSecret."
 fi
 pause "Entree pour continuer"
@@ -293,13 +293,13 @@ if [[ -z "${SKIP_RANKING:-}" ]]; then
     | kubeseal --controller-name="$CONTROLLER_NAME" --controller-namespace="$CONTROLLER_NAMESPACE" \
         --format=yaml > "$RANKING_SEALED"
   rm -f "$WORKDIR/RANKING_LOCATION_KEY" "$WORKDIR/TYPESAFE_API_KEY"
-  printf '  %s✓%s SealedSecret ecrit : %s\n' "$GREEN" "$RESET" "$RANKING_SEALED"
+  printf '  %sOK%s SealedSecret ecrit : %s\n' "$GREEN" "$RESET" "$RANKING_SEALED"
 fi
 if [[ -f "$RANKING_SEALED" ]] && ! grep -q 'ranking-sealed-secret.yaml' "$RANKING_KUSTOMIZATION"; then
   tmp="$WORKDIR/kustomization.yaml"
   awk '{print} /^  - \.\/db-postgres$/ {print "  - ranking-sealed-secret.yaml"}' "$RANKING_KUSTOMIZATION" > "$tmp"
   cat "$tmp" > "$RANKING_KUSTOMIZATION"
-  printf '  %s✓%s ranking-sealed-secret.yaml declare dans %s\n' "$GREEN" "$RESET" "$RANKING_KUSTOMIZATION"
+  printf '  %sOK%s ranking-sealed-secret.yaml declare dans %s\n' "$GREEN" "$RESET" "$RANKING_KUSTOMIZATION"
 fi
 note "Sauvegarde la RANKING_LOCATION_KEY hors cluster si tu veux pouvoir restaurer le secret : elle ne se relit pas depuis le SealedSecret."
 pause "Entree pour continuer"
@@ -310,10 +310,10 @@ if grep -rIl -E '^kind: Secret$' "$DB_SEALED" "$RANKING_DIR" 2>/dev/null | grep 
   warn "un 'kind: Secret' en clair a ete detecte : ne commite pas, supprime-le"
   exit 1
 fi
-printf '  %s✓%s aucun kind: Secret en clair dans les fichiers touches\n' "$GREEN" "$RESET"
+printf '  %sOK%s aucun kind: Secret en clair dans les fichiers touches\n' "$GREEN" "$RESET"
 if command -v kustomize >/dev/null 2>&1; then
   if (cd "$REPO_ROOT" && kustomize build apps/overlays/prod --enable-helm >/dev/null); then
-    printf '  %s✓%s kustomize build apps/overlays/prod OK\n' "$GREEN" "$RESET"
+    printf '  %sOK%s kustomize build apps/overlays/prod OK\n' "$GREEN" "$RESET"
   else
     warn "kustomize build en echec : corrige avant de commiter"
   fi
