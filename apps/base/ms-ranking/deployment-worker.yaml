@@ -104,11 +104,13 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: redis-password
-            # Clients gRPC du worker : candidats et historique (ms-social, ms-event)
+            # Clients gRPC du worker : candidats et historique (ms-social, ms-event, ms-post)
             - name: MS_SOCIAL_URL
               value: "ms-social:80"
             - name: MS_EVENT_URL
               value: "ms-event:80"
+            - name: MS_POST_URL
+              value: "ms-post:80"
             - name: RANKING_LOCATION_KEY
               valueFrom:
                 secretKeyRef:

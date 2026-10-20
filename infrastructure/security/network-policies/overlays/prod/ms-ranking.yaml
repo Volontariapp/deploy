@@ -51,8 +51,8 @@ spec:
             matchLabels:
               k8s-app: kube-dns
 ---
-# Appels gRPC de worker-ranking vers ms-social et ms-event : l'egress est ouvert par runners-policy,
-# l'ingress est ouvert ici par une policy dediee (les policies de ms-social et ms-event restent inchangees).
+# Appels gRPC de worker-ranking vers ms-social, ms-event et ms-post : l'egress est ouvert par runners-policy,
+# l'ingress est ouvert ici par une policy dediee (les policies de ms-social, ms-event et ms-post restent inchangees).
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -66,6 +66,7 @@ spec:
         values:
           - ms-social
           - ms-event
+          - ms-post
   policyTypes:
     - Ingress
   ingress:
