@@ -116,7 +116,10 @@ spec:
                 secretKeyRef:
                   name: ranking-secrets
                   key: RANKING_LOCATION_KEY
-            # Cle Jev (api.typesafe.ai) : le scoreur n'est pas encore branche, donc optionnelle
+            # Activation du scoreur semantique Jev (active par defaut, repli structurel si TYPESAFE_API_KEY absente)
+            - name: RANKING_JEV_ENABLED
+              value: "true"
+            # Cle Jev (api.typesafe.ai) : SealedSecret ranking-secrets
             - name: TYPESAFE_API_KEY
               valueFrom:
                 secretKeyRef:
