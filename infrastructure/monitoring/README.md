@@ -39,7 +39,7 @@ Les microservices utilisent `@volontariapp/logger` en format JSON en production 
 
 L'Agent Datadog et les pipelines de parsing corrèlent nativement chaque ligne de log avec sa trace APM distribuée correspondante.
 
-## Dashboards Datadog (Tickets 4.1 & 4.2)
+## Dashboards Datadog (Tickets 4.1, 4.2 & 4.5)
 
 Le dossier `dashboards/` contient les définitions JSON de nos tableaux de bord Datadog versionnés (Dashboard-as-Code) :
 
@@ -56,5 +56,13 @@ Le dossier `dashboards/` contient les définitions JSON de nos tableaux de bord 
     * **Redis** : Mémoire résidente RSS vs allouée, débit de commandes (ops/s), clients connectés, ratio de cache hit vs miss.
     * **Stockage persistant (PVC)** : Espace disque utilisé et taux d'occupation des volumes persistants par composant.
   * **Filtres interactifs** : `$kube_namespace` (namespace K8s, par défaut `prod`), `$pod_name` (filtrage par pod), et `$db` (base de données).
+
+* **`dashboards/storage.json`** (Ticket 4.5) : Dashboard d'activité métier et du stockage de fichiers.
+  * **Périmètre** : Inscriptions (`ms-user`), événements (`ms-event`), publications (`ms-post`), participations (`ms-social`), et cycle de vie complet de `ms-storage`.
+  * **Métriques clés** :
+    * **Activité Produit (Golden Signals Métier)** : Inscriptions (signups), créations d'événements, publications créées, interactions sociales.
+    * **Stockage gRPC (`ms-storage`)** : Débit par RPC (`GetUploadUrl`, `ConfirmUpload`, `DeleteFile`, `GetFileMetadata`), latence p50/p95 et erreurs par méthode.
+    * **Sécurité & Pipeline Asynchrone** : Confirmations d'upload (SYNC vs ASYNC), libérations de fichiers, espace disque consommé par le stockage objet MinIO S3, et taille de la base `ms-storage`.
+  * **Filtres interactifs** : `$service` et `$kube_namespace`.
 
 
