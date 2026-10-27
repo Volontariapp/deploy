@@ -136,11 +136,11 @@
           },
           {
             "definition": {
-              "title": "Activité Sociale & Participations (ms-social)",
+              "title": "Activité Sociale & Interactions (ms-social)",
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.hits{service:ms-social, resource_name:*participat*}.as_rate()",
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-social} by {resource_name}.as_rate()",
                   "display_type": "line",
                   "style": {
                     "palette": "warm",
@@ -278,7 +278,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace, persistentvolumeclaim:*minio*} by {persistentvolumeclaim}",
+                  "q": "sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace, persistentvolumeclaim:data-minio-0}",
                   "display_type": "line",
                   "style": {
                     "palette": "purple",
