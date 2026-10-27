@@ -39,13 +39,22 @@ Les microservices utilisent `@volontariapp/logger` en format JSON en production 
 
 L'Agent Datadog et les pipelines de parsing corrèlent nativement chaque ligne de log avec sa trace APM distribuée correspondante.
 
-## Dashboards Datadog (Ticket 4.1)
+## Dashboards Datadog (Tickets 4.1 & 4.2)
 
 Le dossier `dashboards/` contient les définitions JSON de nos tableaux de bord Datadog versionnés (Dashboard-as-Code) :
 
-* **`dashboards/overview.json`** : Dashboard de santé globale et de performance de la plateforme.
+* **`dashboards/overview.json`** (Ticket 4.1) : Dashboard de santé globale et de performance de la plateforme.
   * **Périmètre** : `api-gateway`, microservices `ms-*`, `ws-service` et runners (`outbox-*`, `worker-*`, `post-processor-*`).
   * **Golden Signals** : Débit (hits/s), latence percentile (p50, p95, p99), et taux d'erreurs (%).
-  * **Filtres interactifs** : `$env` (environnement) et `$service` (par service).
+  * **Filtres interactifs** : `$service` (par service).
+
+* **`dashboards/infra-db.json`** (Ticket 4.2) : Dashboard d'infrastructure et de persistance des données.
+  * **Périmètre** : Cluster Kubernetes (K3s), conteneurs / pods, bases relationnelles PostgreSQL, cache Redis, et volumes persistants (MinIO S3 / Neo4j).
+  * **Métriques clés** :
+    * **Kubernetes** : Statut des pods (running/pending), redémarrages de conteneurs, utilisation CPU totale et mémoire par pod.
+    * **PostgreSQL** : Connexions actives par service (`db`), débit de transactions (commits vs rollbacks), lignes lues/écrites, taille des bases sur disque.
+    * **Redis** : Mémoire résidente RSS vs allouée, débit de commandes (ops/s), clients connectés, ratio de cache hit vs miss.
+    * **Stockage persistant (PVC)** : Espace disque utilisé et taux d'occupation des volumes persistants par composant.
+  * **Filtres interactifs** : `$kube_namespace` (namespace K8s, par défaut `prod`), `$pod_name` (filtrage par pod), et `$db` (base de données).
 
 
