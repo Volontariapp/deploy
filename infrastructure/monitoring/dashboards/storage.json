@@ -1,0 +1,322 @@
+{
+  "title": "Métier & Stockage de Fichiers (Activité Produit, ms-storage, Scans & Médias)",
+  "description": "Dashboard d'activité produit et du cycle de vie du stockage : inscriptions, événements, posts, uploads, scans ClamAV, bascules asynchrones et rattachements (Ticket 4.5).",
+  "layout_type": "ordered",
+  "template_variables": [
+    {
+      "name": "service",
+      "prefix": "service",
+      "default": "*"
+    },
+    {
+      "name": "kube_namespace",
+      "prefix": "kube_namespace",
+      "default": "prod"
+    }
+  ],
+  "widgets": [
+    {
+      "definition": {
+        "title": "Indicateurs Clés de l'Activité Métier (Golden Signals Produit)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Inscriptions Utilisateurs (Signups)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-user, resource_name:*signup*}.as_count()",
+                  "aggregator": "sum"
+                }
+              ],
+              "precision": 0
+            }
+          },
+          {
+            "definition": {
+              "title": "Événements Créés (Total)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-event, resource_name:*createevent*}.as_count()",
+                  "aggregator": "sum"
+                }
+              ],
+              "precision": 0
+            }
+          },
+          {
+            "definition": {
+              "title": "Publications Créées (Posts)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-post, resource_name:*createpost*}.as_count()",
+                  "aggregator": "sum"
+                }
+              ],
+              "precision": 0
+            }
+          },
+          {
+            "definition": {
+              "title": "Demandes d'Upload de Fichiers",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-storage, resource_name:*getuploadurl*}.as_count()",
+                  "aggregator": "sum"
+                }
+              ],
+              "precision": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Dynamique Métier dans le Temps (Créations & Engagement)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Inscriptions vs Connexions (ms-user)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-user, resource_name:*signup*}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "green",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-user, resource_name:*login*}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "cool",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Créations de Contenus (Événements & Publications)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-event, resource_name:*createevent*}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-post, resource_name:*createpost*}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "orange",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Activité Sociale & Interactions (ms-social)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-social} by {resource_name}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-post, resource_name:*social*} by {resource_name}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "dashed",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Activité & Débit du Stockage de Fichiers (ms-storage)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Débit gRPC Storage par Opération (req/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-storage} by {resource_name}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Volume Total des Opérations Storage (Toplist)",
+              "type": "toplist",
+              "requests": [
+                {
+                  "q": "top(sum:trace.grpc.server.request.hits{service:ms-storage} by {resource_name}.as_count(), 10, 'sum', 'desc')"
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Latence gRPC ms-storage (p50 vs p95)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "p50:trace.grpc.server.request{service:ms-storage}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "cool",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "p95:trace.grpc.server.request{service:ms-storage}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "orange",
+                    "line_type": "dashed",
+                    "line_width": "thick"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Erreurs gRPC Storage par Opération",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.errors{service:ms-storage} by {resource_name}.as_count()",
+                  "display_type": "bars",
+                  "style": {
+                    "palette": "red"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Pipeline Asynchrone & Sécurité (MinIO S3, Workers & Quarantaine)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Confirmations d'Upload (ConfirmUpload)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-storage, resource_name:*confirmupload*}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "green",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Suppressions & Libérations de Fichiers (DeleteFile)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-storage, resource_name:*deletefile*}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Espace Disque Utilisé par les Volumes Stockage (Bytes)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace} by {persistentvolumeclaim}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Taille de la Base de Données ms-storage (Bytes)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:postgresql.database_size{$kube_namespace, db:ms-storage}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "cool",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
