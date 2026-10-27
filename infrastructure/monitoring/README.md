@@ -39,3 +39,13 @@ Les microservices utilisent `@volontariapp/logger` en format JSON en production 
 
 L'Agent Datadog et les pipelines de parsing corrèlent nativement chaque ligne de log avec sa trace APM distribuée correspondante.
 
+## Dashboards Datadog (Ticket 4.1)
+
+Le dossier `dashboards/` contient les définitions JSON de nos tableaux de bord Datadog versionnés (Dashboard-as-Code) :
+
+* **`dashboards/overview.json`** : Dashboard de santé globale et de performance de la plateforme.
+  * **Périmètre** : `api-gateway`, microservices `ms-*`, `ws-service` et runners (`outbox-*`, `worker-*`, `post-processor-*`).
+  * **Golden Signals** : Débit (hits/s), latence percentile (p50, p95, p99), et taux d'erreurs (%).
+  * **Filtres interactifs** : `$env` (environnement) et `$service` (par service).
+
+
