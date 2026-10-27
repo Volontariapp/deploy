@@ -368,11 +368,11 @@
           },
           {
             "definition": {
-              "title": "Taux d'Occupation des Volumes (%)",
+              "title": "Top Volumes PVC les Plus Utilisés (Bytes)",
               "type": "toplist",
               "requests": [
                 {
-                  "q": "top(avg:kubernetes.volume.used_bytes{$kube_namespace} by {persistentvolumeclaim} / avg:kubernetes.volume.capacity_bytes{$kube_namespace} by {persistentvolumeclaim} * 100, 10, 'avg', 'desc')"
+                  "q": "top(sum:kubernetes.volume.used_bytes{$kube_namespace} by {persistentvolumeclaim}, 10, 'sum', 'desc')"
                 }
               ]
             }
