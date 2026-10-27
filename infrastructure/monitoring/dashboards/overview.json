@@ -165,7 +165,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "p50:trace.grpc.server{$service}",
+                  "q": "p50:trace.grpc.server.request{$service}",
                   "display_type": "line",
                   "style": {
                     "palette": "purple",
@@ -174,7 +174,7 @@
                   }
                 },
                 {
-                  "q": "p95:trace.grpc.server{$service}",
+                  "q": "p95:trace.grpc.server.request{$service}",
                   "display_type": "line",
                   "style": {
                     "palette": "red",
