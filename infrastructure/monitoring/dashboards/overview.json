@@ -35,7 +35,7 @@
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.hits{$service}.as_rate()",
+                  "q": "sum:trace.grpc.server.request.hits{$service}.as_rate()",
                   "aggregator": "sum"
                 }
               ],
@@ -102,7 +102,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.hits{$service} by {service}.as_rate()",
+                  "q": "sum:trace.grpc.server.request.hits{$service} by {service}.as_rate()",
                   "display_type": "line",
                   "style": {
                     "palette": "purple",
@@ -215,7 +215,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.errors{$service} by {service}.as_count()",
+                  "q": "sum:trace.grpc.server.request.errors{$service} by {service}.as_count()",
                   "display_type": "bars",
                   "style": {
                     "palette": "orange"
