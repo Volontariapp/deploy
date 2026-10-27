@@ -1,0 +1,384 @@
+{
+  "title": "Infrastructure & Bases de Données (Kubernetes, PostgreSQL, Redis, Stockage)",
+  "description": "Dashboard d'infrastructure et de persistance : santé des pods K8s, consommation CPU/RAM, bases PostgreSQL par service, Redis et stockage objet (Ticket 4.2).",
+  "layout_type": "ordered",
+  "template_variables": [
+    {
+      "name": "kube_namespace",
+      "prefix": "kube_namespace",
+      "default": "prod"
+    },
+    {
+      "name": "pod_name",
+      "prefix": "pod_name",
+      "default": "*"
+    },
+    {
+      "name": "db",
+      "prefix": "db",
+      "default": "*"
+    }
+  ],
+  "widgets": [
+    {
+      "definition": {
+        "title": "Indicateurs Clés du Cluster K8s (Vue Globale)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Pods en cours d'exécution (Running)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:kubernetes_state.pod.status_phase{phase:running, $kube_namespace}",
+                  "aggregator": "sum"
+                }
+              ],
+              "precision": 0
+            }
+          },
+          {
+            "definition": {
+              "title": "Redémarrages de Conteneurs (Total)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:kubernetes.containers.restarts{$kube_namespace}.as_count()",
+                  "aggregator": "sum"
+                }
+              ],
+              "precision": 0
+            }
+          },
+          {
+            "definition": {
+              "title": "CPU Total Utilisé (Cores)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:kubernetes.cpu.usage.total{$kube_namespace} / 1000000000",
+                  "aggregator": "avg"
+                }
+              ],
+              "precision": 2,
+              "custom_unit": "cores"
+            }
+          },
+          {
+            "definition": {
+              "title": "Mémoire Totale Utilisée",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:kubernetes.memory.usage{$kube_namespace}",
+                  "aggregator": "avg"
+                }
+              ],
+              "custom_unit": "byte"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Ressources Conteneurs & Pods (CPU, RAM, Redémarrages)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Utilisation CPU par Pod (Cores)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:kubernetes.cpu.usage.total{$kube_namespace, $pod_name} by {pod_name} / 1000000000",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Utilisation Mémoire par Pod",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:kubernetes.memory.usage{$kube_namespace, $pod_name} by {pod_name}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "cool",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Top Pods Consommateurs de Mémoire",
+              "type": "toplist",
+              "requests": [
+                {
+                  "q": "top(sum:kubernetes.memory.usage{$kube_namespace} by {pod_name}, 10, 'sum', 'desc')"
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Redémarrages par Pod (Instabilité / CrashLoop)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:kubernetes.containers.restarts{$kube_namespace, $pod_name} by {pod_name}.as_count()",
+                  "display_type": "bars",
+                  "style": {
+                    "palette": "warm"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Bases de Données PostgreSQL par Service",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Connexions Actives par Base de Données",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:postgresql.connections{$kube_namespace, $db} by {db}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Transactions Validées (Commits/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:postgresql.commits{$kube_namespace, $db} by {db}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "green",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Transactions Annulées (Rollbacks/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:postgresql.rollbacks{$kube_namespace, $db} by {db}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "red",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Débit de Lignes Lues vs Insérées (lignes/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:postgresql.rows_returned{$kube_namespace, $db} by {db}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "sum:postgresql.rows_inserted{$kube_namespace, $db} by {db}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "dashed",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Taille des Bases de Données (Bytes)",
+              "type": "toplist",
+              "requests": [
+                {
+                  "q": "top(sum:postgresql.database_size{$kube_namespace, $db} by {db}, 10, 'sum', 'desc')"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Cache & Queues Redis (shared-infra)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Mémoire Utilisée Redis (RSS vs Mémoire Allouée)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:redis.mem.rss{$kube_namespace}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "orange",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "sum:redis.mem.used{$kube_namespace}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "dashed",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Débit de Commandes Redis (ops/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:redis.net.commands{$kube_namespace}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Clients Connectés Redis",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:redis.net.clients{$kube_namespace}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "cool",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Efficacité du Cache (Hits vs Misses /s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:redis.stats.keyspace_hits{$kube_namespace}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "green",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "sum:redis.stats.keyspace_misses{$kube_namespace}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "red",
+                    "line_type": "dashed",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Stockage Persistant & Volumes (MinIO, Neo4j, PostgreSQL)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Espace Utilisé par Volume PVC (Bytes)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace} by {persistentvolumeclaim}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Top Volumes PVC les Plus Utilisés (Bytes)",
+              "type": "toplist",
+              "requests": [
+                {
+                  "q": "top(sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace} by {persistentvolumeclaim}, 10, 'sum', 'desc')"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
