@@ -180,7 +180,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:postgresql.xact_commit.rate{$kube_namespace, $db} by {db}",
+                  "q": "sum:postgresql.commits{$kube_namespace, $db} by {db}",
                   "display_type": "line",
                   "style": {
                     "palette": "green",
@@ -197,7 +197,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:postgresql.xact_rollback.rate{$kube_namespace, $db} by {db}",
+                  "q": "sum:postgresql.rollbacks{$kube_namespace, $db} by {db}",
                   "display_type": "line",
                   "style": {
                     "palette": "red",
@@ -214,7 +214,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:postgresql.rows_read.rate{$kube_namespace, $db} by {db}",
+                  "q": "sum:postgresql.rows_returned{$kube_namespace, $db} by {db}",
                   "display_type": "line",
                   "style": {
                     "palette": "purple",
@@ -223,7 +223,7 @@
                   }
                 },
                 {
-                  "q": "sum:postgresql.rows_inserted.rate{$kube_namespace, $db} by {db}",
+                  "q": "sum:postgresql.rows_inserted{$kube_namespace, $db} by {db}",
                   "display_type": "line",
                   "style": {
                     "palette": "warm",
