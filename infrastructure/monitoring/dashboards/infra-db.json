@@ -286,7 +286,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:redis.net.commands.rate{$kube_namespace}",
+                  "q": "sum:redis.net.commands.instantaneous_ops_per_sec{$kube_namespace}",
                   "display_type": "line",
                   "style": {
                     "palette": "dog_classic",
@@ -303,7 +303,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:redis.net.connected_clients{$kube_namespace}",
+                  "q": "sum:redis.net.clients{$kube_namespace}",
                   "display_type": "line",
                   "style": {
                     "palette": "cool",
