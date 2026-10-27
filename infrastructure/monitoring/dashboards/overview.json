@@ -1,6 +1,6 @@
 {
   "title": "Vue d'ensemble - Plateforme (Santé, Débit, Latence, Erreurs)",
-  "description": "Dashboard synthétique d'observabilité : débit, latence p50/p95/p99 et taux d'erreur par service et runner (Ticket 4.1).",
+  "description": "Dashboard synthétique d'observabilité : débit, latence p50/p95/p99 et erreurs par service et runner (Ticket 4.1).",
   "layout_type": "ordered",
   "template_variables": [
     {
@@ -23,11 +23,11 @@
         "widgets": [
           {
             "definition": {
-              "title": "Débit Total (Transactions / sec)",
+              "title": "Débit HTTP Global (req/s)",
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:trace.*.request.hits{$env, $service}.as_rate()",
+                  "q": "sum:trace.http.request.hits{$env, $service}.as_rate()",
                   "aggregator": "sum"
                 }
               ],
@@ -36,44 +36,43 @@
           },
           {
             "definition": {
-              "title": "Latence Médiane (p50)",
+              "title": "Débit gRPC Inter-services (req/s)",
               "type": "query_value",
               "requests": [
                 {
-                  "q": "p50:trace.*.request{$env, $service}",
-                  "aggregator": "avg"
+                  "q": "sum:trace.grpc.request.hits{$env, $service}.as_rate()",
+                  "aggregator": "sum"
                 }
               ],
-              "custom_unit": "s",
-              "precision": 3
-            }
-          },
-          {
-            "definition": {
-              "title": "Latence Critique (p95)",
-              "type": "query_value",
-              "requests": [
-                {
-                  "q": "p95:trace.*.request{$env, $service}",
-                  "aggregator": "avg"
-                }
-              ],
-              "custom_unit": "s",
-              "precision": 3
-            }
-          },
-          {
-            "definition": {
-              "title": "Taux d'Erreur Moyen (%)",
-              "type": "query_value",
-              "requests": [
-                {
-                  "q": "(sum:trace.*.request.errors{$env, $service}.as_count() / sum:trace.*.request.hits{$env, $service}.as_count()) * 100",
-                  "aggregator": "avg"
-                }
-              ],
-              "custom_unit": "%",
               "precision": 2
+            }
+          },
+          {
+            "definition": {
+              "title": "Latence HTTP p50 (Médiane)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "p50:trace.http.request{$env, $service}",
+                  "aggregator": "avg"
+                }
+              ],
+              "custom_unit": "s",
+              "precision": 3
+            }
+          },
+          {
+            "definition": {
+              "title": "Latence HTTP p95 (Critique)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "p95:trace.http.request{$env, $service}",
+                  "aggregator": "avg"
+                }
+              ],
+              "custom_unit": "s",
+              "precision": 3
             }
           }
         ]
@@ -87,11 +86,11 @@
         "widgets": [
           {
             "definition": {
-              "title": "Débit de requêtes par service (hits/s)",
+              "title": "Débit HTTP par service (req/s)",
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.*.request.hits{$env, $service} by {service}.as_rate()",
+                  "q": "sum:trace.http.request.hits{$env, $service} by {service}.as_rate()",
                   "display_type": "line",
                   "style": {
                     "palette": "dog_classic",
@@ -104,11 +103,28 @@
           },
           {
             "definition": {
-              "title": "Top 10 Services les plus sollicités (Requêtes totales)",
+              "title": "Débit gRPC par service (req/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.request.hits{$env, $service} by {service}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Top 10 Services les plus sollicités (Requêtes HTTP)",
               "type": "toplist",
               "requests": [
                 {
-                  "q": "top(sum:trace.*.request.hits{$env, $service} by {service}.as_count(), 10, 'sum', 'desc')"
+                  "q": "top(sum:trace.http.request.hits{$env, $service} by {service}.as_count(), 10, 'sum', 'desc')"
                 }
               ]
             }
@@ -124,16 +140,25 @@
         "widgets": [
           {
             "definition": {
-              "title": "Latence p50 (Médiane) par service",
+              "title": "Latence HTTP (p50 vs p95)",
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "p50:trace.*.request{$env, $service} by {service}",
+                  "q": "p50:trace.http.request{$env, $service}",
                   "display_type": "line",
                   "style": {
-                    "palette": "warm",
+                    "palette": "cool",
                     "line_type": "solid",
                     "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "p95:trace.http.request{$env, $service}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "orange",
+                    "line_type": "dashed",
+                    "line_width": "thick"
                   }
                 }
               ]
@@ -141,20 +166,20 @@
           },
           {
             "definition": {
-              "title": "Latence p95 & p99 (Pire cas)",
+              "title": "Latence gRPC inter-services (p50 vs p95)",
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "p95:trace.*.request{$env, $service}",
+                  "q": "p50:trace.grpc.request{$env, $service}",
                   "display_type": "line",
                   "style": {
-                    "palette": "orange",
+                    "palette": "purple",
                     "line_type": "solid",
                     "line_width": "normal"
                   }
                 },
                 {
-                  "q": "p99:trace.*.request{$env, $service}",
+                  "q": "p95:trace.grpc.request{$env, $service}",
                   "display_type": "line",
                   "style": {
                     "palette": "red",
@@ -176,11 +201,11 @@
         "widgets": [
           {
             "definition": {
-              "title": "Taux d'erreur global (%)",
+              "title": "Erreurs HTTP par service",
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "(sum:trace.*.request.errors{$env, $service}.as_count() / sum:trace.*.request.hits{$env, $service}.as_count()) * 100",
+                  "q": "sum:trace.http.request.errors{$env, $service} by {service}.as_count()",
                   "display_type": "bars",
                   "style": {
                     "palette": "red"
@@ -191,57 +216,14 @@
           },
           {
             "definition": {
-              "title": "Nombre d'erreurs par service",
+              "title": "Erreurs gRPC par service",
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.*.request.errors{$env, $service} by {service}.as_count()",
-                  "display_type": "line",
-                  "style": {
-                    "palette": "cool",
-                    "line_type": "solid",
-                    "line_width": "normal"
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "definition": {
-        "title": "Activité des Runners (Workers, Outbox & Post-processors)",
-        "type": "group",
-        "layout_type": "ordered",
-        "widgets": [
-          {
-            "definition": {
-              "title": "Événements traités par les Runners (outbox-*, worker-*, post-processor-*)",
-              "type": "timeseries",
-              "requests": [
-                {
-                  "q": "sum:trace.*.request.hits{service:*-runner* OR service:worker-* OR service:post-processor-* OR service:outbox-*, $env} by {service}.as_rate()",
-                  "display_type": "line",
-                  "style": {
-                    "palette": "purple",
-                    "line_type": "solid",
-                    "line_width": "normal"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "definition": {
-              "title": "Erreurs sur les Runners",
-              "type": "timeseries",
-              "requests": [
-                {
-                  "q": "sum:trace.*.request.errors{service:*-runner* OR service:worker-* OR service:post-processor-* OR service:outbox-*, $env} by {service}.as_count()",
+                  "q": "sum:trace.grpc.request.errors{$env, $service} by {service}.as_count()",
                   "display_type": "bars",
                   "style": {
-                    "palette": "warm"
+                    "palette": "orange"
                   }
                 }
               ]
