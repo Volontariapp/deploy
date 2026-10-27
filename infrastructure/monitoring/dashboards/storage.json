@@ -147,6 +147,15 @@
                     "line_type": "solid",
                     "line_width": "normal"
                   }
+                },
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:ms-post, resource_name:*social*} by {resource_name}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "dashed",
+                    "line_width": "normal"
+                  }
                 }
               ]
             }
@@ -274,11 +283,11 @@
           },
           {
             "definition": {
-              "title": "Espace Disque Utilisé par MinIO S3 (Bytes)",
+              "title": "Espace Disque Utilisé par les Volumes Stockage (Bytes)",
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace, persistentvolumeclaim:data-minio-0}",
+                  "q": "sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace} by {persistentvolumeclaim}",
                   "display_type": "line",
                   "style": {
                     "palette": "purple",
