@@ -355,7 +355,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:kubernetes.volume.used_bytes{$kube_namespace} by {persistentvolumeclaim}",
+                  "q": "sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace} by {persistentvolumeclaim}",
                   "display_type": "line",
                   "style": {
                     "palette": "dog_classic",
@@ -372,7 +372,7 @@
               "type": "toplist",
               "requests": [
                 {
-                  "q": "top(sum:kubernetes.volume.used_bytes{$kube_namespace} by {persistentvolumeclaim}, 10, 'sum', 'desc')"
+                  "q": "top(sum:kubernetes.kubelet.volume.stats.used_bytes{$kube_namespace} by {persistentvolumeclaim}, 10, 'sum', 'desc')"
                 }
               ]
             }
