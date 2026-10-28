@@ -40,7 +40,7 @@ spec:
               cpu: 10m
               memory: 32Mi
         - name: run-migrations
-          image: ghcr.io/volontariapp/ms-ranking:sha-641e36a
+          image: ghcr.io/volontariapp/ms-ranking:sha-051864f
           imagePullPolicy: Always
           command: ['node', 'node_modules/typeorm/cli.js', 'migration:run', '-d', 'dist/config/data-source.js']
           securityContext:
@@ -85,7 +85,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: ms-ranking
-          image: ghcr.io/volontariapp/ms-ranking:sha-641e36a
+          image: ghcr.io/volontariapp/ms-ranking:sha-051864f
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
