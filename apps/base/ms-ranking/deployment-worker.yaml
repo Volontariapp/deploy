@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: worker-ranking
-          image: ghcr.io/volontariapp/worker-ranking:sha-e565d38
+          image: ghcr.io/volontariapp/worker-ranking:sha-89f0ae6
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
