@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: worker-event
-          image: ghcr.io/volontariapp/worker-event:sha-569a997
+          image: ghcr.io/volontariapp/worker-event:sha-1f6ee02
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
