@@ -252,7 +252,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:redis.net.commands.as_rate(){$kube_namespace}",
+                  "q": "sum:redis.net.commands{$kube_namespace}.as_rate()",
                   "display_type": "line",
                   "style": {
                     "palette": "purple",
