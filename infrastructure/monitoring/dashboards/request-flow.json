@@ -17,7 +17,7 @@
   "widgets": [
     {
       "definition": {
-        "title": "Service Map : api-gateway vers ms-*, runners et ws-service",
+        "title": "Service Map : api-gateway et ses dépendances",
         "type": "topology_map",
         "requests": [
           {
@@ -27,8 +27,7 @@
               "filters": [
                 "env:prod"
               ],
-              "query_string": "*",
-              "service": ""
+              "service": "api-gateway"
             }
           }
         ]
