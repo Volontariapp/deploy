@@ -1,6 +1,6 @@
 {
   "title": "Flux des Requêtes (api-gateway, ms-*, Outbox, Post-Processors, Workers)",
-  "description": "Parcours complet des requêtes issues des traces APM : carte des services (gateway vers ms-* en gRPC, puis runners asynchrones), débit et erreurs par étage, traces en erreur.",
+  "description": "Parcours complet des requêtes issues des traces APM : carte des services (gateway vers ms-* en gRPC, puis runners asynchrones), débit, latence et erreurs par étage.",
   "layout_type": "free",
   "template_variables": [
     {
@@ -162,47 +162,6 @@
         "y": 11,
         "width": 4,
         "height": 3
-      }
-    },
-    {
-      "definition": {
-        "title": "Dernières traces en erreur",
-        "type": "list_stream",
-        "requests": [
-          {
-            "response_format": "event_list",
-            "query": {
-              "data_source": "trace_stream",
-              "query_string": "env:prod status:error",
-              "indexes": [],
-              "event_size": "s"
-            },
-            "columns": [
-              {
-                "field": "timestamp",
-                "width": "auto"
-              },
-              {
-                "field": "service",
-                "width": "auto"
-              },
-              {
-                "field": "resource_name",
-                "width": "auto"
-              },
-              {
-                "field": "@duration",
-                "width": "auto"
-              }
-            ]
-          }
-        ]
-      },
-      "layout": {
-        "x": 0,
-        "y": 14,
-        "width": 12,
-        "height": 5
       }
     }
   ]
