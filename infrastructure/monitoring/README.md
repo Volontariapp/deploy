@@ -65,6 +65,16 @@ Le dossier `dashboards/` contient les définitions JSON de nos tableaux de bord 
     * **Sécurité & Pipeline Asynchrone** : Confirmations d'upload (SYNC vs ASYNC), libérations de fichiers, espace disque consommé par le stockage objet MinIO S3, et taille de la base `ms-storage`.
   * **Filtres interactifs** : `$service` et `$kube_namespace`.
 
+* **`dashboards/async-flows.json`** (Ticket 4.3) : Dashboard dédié aux flux asynchrones, à l'outbox et aux files de messages.
+  * **Périmètre** : Outbox transactionnelle SQL (`outbox-*`), workers et jobs BullMQ (`worker-*`), Redis Streams (`shared-infra`), Dead Letter Queues (DLQ), post-processors (`post-processor-*`), et relai WebSocket (`ws-service`).
+  * **Métriques clés** :
+    * **Indicateurs Clés & Alertes** : Messages en Dead Letter Queue (DLQ), débit global outbox, débit global des workers, débit des post-processors et volume total d'erreurs asynchrones.
+    * **Outbox Transactionnelle** : Débit de dépilage par service (req/s), erreurs de dépilage, latence p50/p95 et top des méthodes outbox les plus sollicitées.
+    * **Jobs BullMQ** : Débit d'exécution par worker (jobs/s), erreurs et échecs (`job_audit FAILED`), latence p95 et top des handlers de jobs exécutés.
+    * **Redis Streams & DLQ** : Débit global de commandes Redis (ops/s), flux des Dead Letter Queues (`*-dlq`), mémoire Redis RSS (MiB) et clients connectés.
+    * **Post-Processing & WebSocket** : Débit d'absorption des post-processors (event/s), sagas bloquées / erreurs, latence p50/p95 et diffusion temps réel via `ws-service`.
+  * **Filtres interactifs** : `$service` et `$kube_namespace`.
+
 ## Status Page Interne & Guide Opérationnel de l'Équipe (Ticket 4.4)
 
 Conformément aux décisions d'architecture d'observabilité, la « status page » de la plateforme Volontariapp est centralisée en interne directement sous Datadog sous forme d'une **Dashboard List** épinglée, évitant la dépendance et les coûts d'un service tiers externe.
@@ -78,7 +88,7 @@ Conformément aux décisions d'architecture d'observabilité, la « status page 
 | **Vue d'ensemble — Plateforme** | [`dashboards/overview.json`](dashboards/overview.json) | **Santé globale & Golden Signals** : débit global HTTP & gRPC, latence médiane (p50) et critique (p95), volume d'erreurs par microservice et runner. | **Au quotidien** et en **première intention** lors de toute alerte. |
 | **Infrastructure & Bases de Données** | [`dashboards/infra-db.json`](dashboards/infra-db.json) | **Persistance & Conteneurs** : statut des pods (CrashLoops, redémarrages), CPU/RAM, connexions & transactions PostgreSQL par service, métriques Redis (`shared-infra`), et occupation des volumes PVCs. | En cas de lenteur applicative, de saturation de connexion DB ou de pod instable. |
 | **Métier & Stockage de Fichiers** | [`dashboards/storage.json`](dashboards/storage.json) | **Activité Produit & Cycle de Vie S3** : volumétrie métier (signups, events, posts, interactions), suivi des uploads gRPC `ms-storage`, scans antivirus et espace MinIO S3. | Pour suivre l'adoption produit et diagnostiquer les échecs de traitement de médias. |
-| *(Prévu Sprint 9)* **Flux Asynchrones** | `dashboards/async-flows.json` (Ticket 4.3) | **Résilience & Event-Driven** : latence des Redis Streams, état des Dead Letter Queues (DLQ), files d'attente BullMQ et audit des jobs asynchrones. | Lors d'un retard de notification WebSocket ou d'un blocage d'outbox. |
+| **Flux Asynchrones** | [`dashboards/async-flows.json`](dashboards/async-flows.json) | **Résilience & Event-Driven** : latence et débit de l'Outbox, jobs BullMQ, statut `job_audit`, streams Redis, Dead Letter Queues (DLQ) et notifications WebSocket. | Lors d'un retard de notification WebSocket, d'un blocage d'outbox ou d'un incident asynchrone. |
 
 ---
 
