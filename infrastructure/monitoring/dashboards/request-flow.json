@@ -165,74 +165,269 @@
     },
     {
       "definition": {
-        "title": "Service Map : Outbox (outbox-event)",
-        "type": "topology_map",
+        "title": "Evenements emis : type, service producteur (outbox)",
+        "type": "query_table",
+        "has_search_bar": "always",
         "requests": [
           {
-            "request_type": "topology",
-            "query": {
-              "data_source": "service_map",
-              "filters": [
-                "env:prod"
-              ],
-              "service": "outbox-event"
-            }
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod operation_name:Producer"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "@type",
+                    "limit": 25,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  },
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a",
+                "alias": "Sauts (24h)",
+                "cell_display_mode": "bar",
+                "limit": {
+                  "count": 100,
+                  "order": "desc"
+                }
+              }
+            ]
           }
         ]
       },
       "layout": {
         "x": 0,
         "y": 72,
-        "width": 32,
-        "height": 28
+        "width": 48,
+        "height": 26
       }
     },
     {
       "definition": {
-        "title": "Service Map : Post-processor (post-processor-event)",
-        "type": "topology_map",
+        "title": "Evenements consommes : type, service consommateur (post-processors, workers, ws)",
+        "type": "query_table",
+        "has_search_bar": "always",
         "requests": [
           {
-            "request_type": "topology",
-            "query": {
-              "data_source": "service_map",
-              "filters": [
-                "env:prod"
-              ],
-              "service": "post-processor-event"
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod operation_name:Consumer"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "@type",
+                    "limit": 25,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  },
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a",
+                "alias": "Sauts (24h)",
+                "cell_display_mode": "bar",
+                "limit": {
+                  "count": 100,
+                  "order": "desc"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "layout": {
+        "x": 48,
+        "y": 72,
+        "width": 48,
+        "height": 26
+      }
+    },
+    {
+      "definition": {
+        "title": "Sauts emis par service (outbox)",
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod operation_name:Producer"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a"
+              }
+            ],
+            "display_type": "bars",
+            "style": {
+              "palette": "dog_classic"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 98,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Sauts consommes par service",
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod operation_name:Consumer"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a"
+              }
+            ],
+            "display_type": "bars",
+            "style": {
+              "palette": "green"
             }
           }
         ]
       },
       "layout": {
         "x": 32,
-        "y": 72,
+        "y": 98,
         "width": 32,
-        "height": 28
+        "height": 16
       }
     },
     {
       "definition": {
-        "title": "Service Map : Worker (worker-event)",
-        "type": "topology_map",
+        "title": "Erreurs sur les sauts asynchrones",
+        "type": "timeseries",
         "requests": [
           {
-            "request_type": "topology",
-            "query": {
-              "data_source": "service_map",
-              "filters": [
-                "env:prod"
-              ],
-              "service": "worker-event"
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod status:error operation_name:(Consumer OR Producer)"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a"
+              }
+            ],
+            "display_type": "bars",
+            "style": {
+              "palette": "warm"
             }
           }
         ]
       },
       "layout": {
         "x": 64,
-        "y": 72,
+        "y": 98,
         "width": 32,
-        "height": 28
+        "height": 16
       }
     }
   ]
