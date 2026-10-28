@@ -1,0 +1,408 @@
+{
+  "title": "Flux Asynchrones (Outbox, BullMQ, Redis Streams & DLQ)",
+  "description": "Dashboard dédié à la résilience et à la surveillance des flux asynchrones : lag et débit outbox, jobs BullMQ, statut job_audit, streams Redis, dead letter queues (DLQ), post-processors et relai WebSocket (Ticket 4.3).",
+  "layout_type": "ordered",
+  "template_variables": [
+    {
+      "name": "service",
+      "prefix": "service",
+      "default": "*"
+    },
+    {
+      "name": "kube_namespace",
+      "prefix": "kube_namespace",
+      "default": "prod"
+    }
+  ],
+  "widgets": [
+    {
+      "definition": {
+        "title": "Indicateurs Clés de Résilience Asynchrone (Golden Signals)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Messages en Dead Letter Queue (DLQ)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.redis.command.hits{resource_name:*dlq*, $kube_namespace}.as_count()",
+                  "aggregator": "sum"
+                }
+              ],
+              "precision": 0
+            }
+          },
+          {
+            "definition": {
+              "title": "Débit Global Outbox (req/s)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:outbox-*, $kube_namespace}.as_rate()",
+                  "aggregator": "avg"
+                }
+              ],
+              "precision": 2
+            }
+          },
+          {
+            "definition": {
+              "title": "Débit Global Workers (jobs/s)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:worker-*, $kube_namespace}.as_rate()",
+                  "aggregator": "avg"
+                }
+              ],
+              "precision": 2
+            }
+          },
+          {
+            "definition": {
+              "title": "Débit Post-Processors (event/s)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:post-processor-*, $kube_namespace}.as_rate()",
+                  "aggregator": "avg"
+                }
+              ],
+              "precision": 2
+            }
+          },
+          {
+            "definition": {
+              "title": "Erreurs Asynchrones Globales (Total)",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.errors{service:outbox-*, $kube_namespace}.as_count() + sum:trace.grpc.server.request.errors{service:worker-*, $kube_namespace}.as_count() + sum:trace.grpc.server.request.errors{service:post-processor-*, $kube_namespace}.as_count()",
+                  "aggregator": "sum"
+                }
+              ],
+              "precision": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Outbox Transactionnelle (Dépilage des Événements & Commandes)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Débit de Dépilage Outbox par Service (req/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:outbox-*, $kube_namespace} by {service}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Erreurs de Dépilage Outbox par Service",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.errors{service:outbox-*, $kube_namespace} by {service}.as_rate()",
+                  "display_type": "bars",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Latence Médiane (p50) et Critique (p95) Outbox (ms)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "p50:trace.grpc.server.request.duration{service:outbox-*, $kube_namespace} by {service} * 1000",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "cool",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "p95:trace.grpc.server.request.duration{service:outbox-*, $kube_namespace} by {service} * 1000",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "dashed",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Top Méthodes Outbox les Plus Sollicitées",
+              "type": "toplist",
+              "requests": [
+                {
+                  "q": "top(sum:trace.grpc.server.request.hits{service:outbox-*, $kube_namespace} by {resource_name}, 10, 'sum', 'desc')"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Jobs d'Arrière-Plan BullMQ & Audit d'Exécution",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Débit d'Exécution des Jobs par Worker (jobs/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:worker-*, $kube_namespace} by {service}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Erreurs et Échecs de Jobs (Statut FAILED)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.errors{service:worker-*, $kube_namespace} by {service}.as_rate()",
+                  "display_type": "bars",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Latence d'Exécution des Workers (p95 en secondes)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "p95:trace.grpc.server.request.duration{service:worker-*, $kube_namespace} by {service}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Top Handlers de Jobs les Plus Exécutés",
+              "type": "toplist",
+              "requests": [
+                {
+                  "q": "top(sum:trace.grpc.server.request.hits{service:worker-*, $kube_namespace} by {resource_name}, 10, 'sum', 'desc')"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Redis Streams & Dead Letter Queues (DLQ)",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Débit de Commandes Redis Global (cmd/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:redis.net.commands.as_rate(){$kube_namespace}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Activité des Dead Letter Queues (Poison Pills)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.redis.command.hits{resource_name:*dlq*, $kube_namespace} by {resource_name}.as_rate()",
+                  "display_type": "bars",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Consommation Mémoire Redis (RSS en MiB)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:redis.mem.rss{$kube_namespace} / 1048576",
+                  "display_type": "area",
+                  "style": {
+                    "palette": "cool",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Clients Redis Connectés (Runners & Services)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:redis.net.clients{$kube_namespace}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Post-Processing Événementiel, Sagas & Relais WebSocket",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "title": "Débit de Traitement des Post-Processors (event/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.hits{service:post-processor-*, $kube_namespace} by {service}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Erreurs Post-Processors & Sagas Bloquées",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.grpc.server.request.errors{service:post-processor-*, $kube_namespace} by {service}.as_rate()",
+                  "display_type": "bars",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Latence Médiane et Critique Post-Processors (ms)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "p50:trace.grpc.server.request.duration{service:post-processor-*, $kube_namespace} by {service} * 1000",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "cool",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "p95:trace.grpc.server.request.duration{service:post-processor-*, $kube_namespace} by {service} * 1000",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "dashed",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Activité & Notifications WebSocket (ws-service)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.http.server.request.hits{service:ws-service, $kube_namespace} by {resource_name}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "purple",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
