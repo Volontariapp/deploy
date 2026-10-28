@@ -68,15 +68,16 @@
           },
           {
             "definition": {
-              "title": "Mémoire Totale Utilisée",
+              "title": "Mémoire Totale Utilisée (GiB)",
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:kubernetes.memory.usage{$kube_namespace}",
+                  "q": "sum:kubernetes.memory.usage{$kube_namespace} / 1073741824",
                   "aggregator": "avg"
                 }
               ],
-              "custom_unit": "byte"
+              "precision": 2,
+              "custom_unit": "GiB"
             }
           }
         ]
