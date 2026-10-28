@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: outbox-ranking
-          image: ghcr.io/volontariapp/outbox-ranking:sha-70241c2
+          image: ghcr.io/volontariapp/outbox-ranking:sha-4088cc3
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
