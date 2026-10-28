@@ -17,26 +17,17 @@
   "widgets": [
     {
       "definition": {
-        "title": "Carte des flux (appels entre services)",
-        "type": "group",
-        "layout_type": "ordered",
-        "widgets": [
+        "title": "Service Map : api-gateway vers ms-*, runners et ws-service",
+        "type": "topology_map",
+        "requests": [
           {
-            "definition": {
-              "title": "Service Map : api-gateway vers ms-*, runners et ws-service",
-              "type": "topology_map",
-              "requests": [
-                {
-                  "request_type": "topology",
-                  "query": {
-                    "data_source": "service_map",
-                    "filters": [
-                      "env:prod"
-                    ],
-                    "query_string": "*"
-                  }
-                }
-              ]
+            "request_type": "topology",
+            "query": {
+              "data_source": "service_map",
+              "filters": [
+                "env:prod"
+              ],
+              "query_string": "*"
             }
           }
         ]
@@ -50,55 +41,14 @@
     },
     {
       "definition": {
-        "title": "Étage Edge et Sync (HTTP puis gRPC)",
-        "type": "group",
-        "layout_type": "ordered",
-        "widgets": [
+        "title": "Entrées HTTP par service (req/s)",
+        "type": "timeseries",
+        "requests": [
           {
-            "definition": {
-              "title": "Entrées HTTP par service (req/s)",
-              "type": "timeseries",
-              "requests": [
-                {
-                  "q": "sum:trace.http.server.request.hits{$env,$service} by {service}.as_rate()",
-                  "display_type": "bars",
-                  "style": {
-                    "palette": "dog_classic"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "definition": {
-              "title": "Appels gRPC inter-services par service (req/s)",
-              "type": "timeseries",
-              "requests": [
-                {
-                  "q": "sum:trace.grpc.server.request.hits{$env,$service} by {service}.as_rate()",
-                  "display_type": "bars",
-                  "style": {
-                    "palette": "purple"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "definition": {
-              "title": "Latence gRPC p95 par service",
-              "type": "timeseries",
-              "requests": [
-                {
-                  "q": "p95:trace.grpc.server.request{$env,$service} by {service}",
-                  "display_type": "line",
-                  "style": {
-                    "palette": "orange",
-                    "line_type": "solid",
-                    "line_width": "normal"
-                  }
-                }
-              ]
+            "q": "sum:trace.http.server.request.hits{$env,$service} by {service}.as_rate()",
+            "display_type": "bars",
+            "style": {
+              "palette": "dog_classic"
             }
           }
         ]
@@ -106,56 +56,144 @@
       "layout": {
         "x": 0,
         "y": 8,
-        "width": 12,
-        "height": 6
+        "width": 4,
+        "height": 3
       }
     },
     {
       "definition": {
-        "title": "Où ça casse (erreurs par étage)",
-        "type": "group",
-        "layout_type": "ordered",
-        "widgets": [
+        "title": "Appels gRPC inter-services par service (req/s)",
+        "type": "timeseries",
+        "requests": [
           {
-            "definition": {
-              "title": "Erreurs HTTP par service",
-              "type": "timeseries",
-              "requests": [
-                {
-                  "q": "sum:trace.http.server.request.errors{$env,$service} by {service}.as_count()",
-                  "display_type": "bars",
-                  "style": {
-                    "palette": "red"
-                  }
-                }
-              ]
+            "q": "sum:trace.grpc.server.request.hits{$env,$service} by {service}.as_rate()",
+            "display_type": "bars",
+            "style": {
+              "palette": "purple"
             }
-          },
+          }
+        ]
+      },
+      "layout": {
+        "x": 4,
+        "y": 8,
+        "width": 4,
+        "height": 3
+      }
+    },
+    {
+      "definition": {
+        "title": "Latence gRPC p95 par service",
+        "type": "timeseries",
+        "requests": [
           {
-            "definition": {
-              "title": "Erreurs gRPC par service",
-              "type": "timeseries",
-              "requests": [
-                {
-                  "q": "sum:trace.grpc.server.request.errors{$env,$service} by {service}.as_count()",
-                  "display_type": "bars",
-                  "style": {
-                    "palette": "orange"
-                  }
-                }
-              ]
+            "q": "p95:trace.grpc.server.request{$env,$service} by {service}",
+            "display_type": "line",
+            "style": {
+              "palette": "orange",
+              "line_type": "solid",
+              "line_width": "normal"
             }
-          },
+          }
+        ]
+      },
+      "layout": {
+        "x": 8,
+        "y": 8,
+        "width": 4,
+        "height": 3
+      }
+    },
+    {
+      "definition": {
+        "title": "Erreurs HTTP par service",
+        "type": "timeseries",
+        "requests": [
           {
-            "definition": {
-              "title": "Top services en erreur (toutes couches)",
-              "type": "toplist",
-              "requests": [
-                {
-                  "q": "top(sum:trace.http.server.request.errors{$env,$service} by {service}.as_count() + sum:trace.grpc.server.request.errors{$env,$service} by {service}.as_count(), 10, 'sum', 'desc')"
-                }
-              ]
+            "q": "sum:trace.http.server.request.errors{$env,$service} by {service}.as_count()",
+            "display_type": "bars",
+            "style": {
+              "palette": "red"
             }
+          }
+        ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 11,
+        "width": 4,
+        "height": 3
+      }
+    },
+    {
+      "definition": {
+        "title": "Erreurs gRPC par service",
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "sum:trace.grpc.server.request.errors{$env,$service} by {service}.as_count()",
+            "display_type": "bars",
+            "style": {
+              "palette": "orange"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 4,
+        "y": 11,
+        "width": 4,
+        "height": 3
+      }
+    },
+    {
+      "definition": {
+        "title": "Top services en erreur (toutes couches)",
+        "type": "toplist",
+        "requests": [
+          {
+            "q": "top(sum:trace.http.server.request.errors{$env,$service} by {service}.as_count() + sum:trace.grpc.server.request.errors{$env,$service} by {service}.as_count(), 10, 'sum', 'desc')"
+          }
+        ]
+      },
+      "layout": {
+        "x": 8,
+        "y": 11,
+        "width": 4,
+        "height": 3
+      }
+    },
+    {
+      "definition": {
+        "title": "Dernières traces en erreur",
+        "type": "list_stream",
+        "requests": [
+          {
+            "response_format": "event_list",
+            "query": {
+              "data_source": "trace_stream",
+              "query_string": "env:prod status:error",
+              "indexes": [],
+              "storage": "hot"
+            },
+            "columns": [
+              {
+                "field": "timestamp",
+                "width": "auto"
+              },
+              {
+                "field": "service",
+                "width": "auto"
+              },
+              {
+                "field": "resource_name",
+                "width": "auto"
+              },
+              {
+                "field": "trace_id",
+                "width": "auto"
+              }
+            ]
           }
         ]
       },
@@ -163,57 +201,7 @@
         "x": 0,
         "y": 14,
         "width": 12,
-        "height": 6
-      }
-    },
-    {
-      "definition": {
-        "title": "Traces en erreur (passer à la cascade d'une trace_id)",
-        "type": "group",
-        "layout_type": "ordered",
-        "widgets": [
-          {
-            "definition": {
-              "title": "Dernières traces en erreur",
-              "type": "list_stream",
-              "requests": [
-                {
-                  "response_format": "event_list",
-                  "query": {
-                    "data_source": "trace_stream",
-                    "query_string": "env:prod status:error",
-                    "indexes": [],
-                    "storage": "hot"
-                  },
-                  "columns": [
-                    {
-                      "field": "timestamp",
-                      "width": "auto"
-                    },
-                    {
-                      "field": "service",
-                      "width": "auto"
-                    },
-                    {
-                      "field": "resource_name",
-                      "width": "auto"
-                    },
-                    {
-                      "field": "trace_id",
-                      "width": "auto"
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "layout": {
-        "x": 0,
-        "y": 20,
-        "width": 12,
-        "height": 7
+        "height": 5
       }
     }
   ]
