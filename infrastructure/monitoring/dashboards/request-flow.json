@@ -162,6 +162,78 @@
         "width": 32,
         "height": 16
       }
+    },
+    {
+      "definition": {
+        "title": "Service Map : Outbox (outbox-event)",
+        "type": "topology_map",
+        "requests": [
+          {
+            "request_type": "topology",
+            "query": {
+              "data_source": "service_map",
+              "filters": [
+                "env:prod"
+              ],
+              "service": "outbox-event"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 72,
+        "width": 32,
+        "height": 28
+      }
+    },
+    {
+      "definition": {
+        "title": "Service Map : Post-processor (post-processor-event)",
+        "type": "topology_map",
+        "requests": [
+          {
+            "request_type": "topology",
+            "query": {
+              "data_source": "service_map",
+              "filters": [
+                "env:prod"
+              ],
+              "service": "post-processor-event"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 32,
+        "y": 72,
+        "width": 32,
+        "height": 28
+      }
+    },
+    {
+      "definition": {
+        "title": "Service Map : Worker (worker-event)",
+        "type": "topology_map",
+        "requests": [
+          {
+            "request_type": "topology",
+            "query": {
+              "data_source": "service_map",
+              "filters": [
+                "env:prod"
+              ],
+              "service": "worker-event"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 64,
+        "y": 72,
+        "width": 32,
+        "height": 28
+      }
     }
   ]
 }
