@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: worker-social
-          image: ghcr.io/volontariapp/worker-social:sha-7564a4e
+          image: ghcr.io/volontariapp/worker-social:sha-0907e7b
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
