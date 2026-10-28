@@ -1,7 +1,7 @@
 {
   "title": "Flux des Requêtes (api-gateway, ms-*, Outbox, Post-Processors, Workers)",
   "description": "Parcours complet des requêtes issues des traces APM : carte des services (gateway vers ms-* en gRPC, puis runners asynchrones), débit et erreurs par étage, traces en erreur.",
-  "layout_type": "ordered",
+  "layout_type": "free",
   "template_variables": [
     {
       "name": "service",
@@ -30,7 +30,9 @@
                   "request_type": "topology",
                   "query": {
                     "data_source": "service_map",
-                    "filters": ["env:prod"],
+                    "filters": [
+                      "env:prod"
+                    ],
                     "query_string": "*"
                   }
                 }
@@ -38,6 +40,12 @@
             }
           }
         ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "width": 12,
+        "height": 8
       }
     },
     {
@@ -94,6 +102,12 @@
             }
           }
         ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 8,
+        "width": 12,
+        "height": 6
       }
     },
     {
@@ -144,6 +158,12 @@
             }
           }
         ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 14,
+        "width": 12,
+        "height": 6
       }
     },
     {
@@ -166,16 +186,34 @@
                     "storage": "hot"
                   },
                   "columns": [
-                    { "field": "timestamp", "width": "auto" },
-                    { "field": "service", "width": "auto" },
-                    { "field": "resource_name", "width": "auto" },
-                    { "field": "trace_id", "width": "auto" }
+                    {
+                      "field": "timestamp",
+                      "width": "auto"
+                    },
+                    {
+                      "field": "service",
+                      "width": "auto"
+                    },
+                    {
+                      "field": "resource_name",
+                      "width": "auto"
+                    },
+                    {
+                      "field": "trace_id",
+                      "width": "auto"
+                    }
                   ]
                 }
               ]
             }
           }
         ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 20,
+        "width": 12,
+        "height": 7
       }
     }
   ]
