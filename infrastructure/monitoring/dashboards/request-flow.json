@@ -27,7 +27,8 @@
               "filters": [
                 "env:prod"
               ],
-              "query_string": "*"
+              "query_string": "*",
+              "service": ""
             }
           }
         ]
