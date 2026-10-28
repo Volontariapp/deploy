@@ -175,7 +175,7 @@
               "data_source": "trace_stream",
               "query_string": "env:prod status:error",
               "indexes": [],
-              "storage": "hot"
+              "event_size": "s"
             },
             "columns": [
               {
@@ -191,7 +191,7 @@
                 "width": "auto"
               },
               {
-                "field": "trace_id",
+                "field": "@duration",
                 "width": "auto"
               }
             ]
