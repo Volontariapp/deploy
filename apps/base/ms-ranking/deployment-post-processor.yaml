@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: post-processor-ranking
-          image: ghcr.io/volontariapp/post-processor-ranking:sha-424a90c
+          image: ghcr.io/volontariapp/post-processor-ranking:sha-943aa29
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
