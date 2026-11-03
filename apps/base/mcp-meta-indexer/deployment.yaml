@@ -55,7 +55,7 @@ spec:
             - name: code-volume
               mountPath: /code
         - name: mcp-meta-indexer
-          image: ghcr.io/volontariapp/mcp-meta-indexer:sha-a809ae5
+          image: ghcr.io/volontariapp/mcp-meta-indexer:sha-d5de2f4
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
