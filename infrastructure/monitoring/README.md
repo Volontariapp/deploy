@@ -122,7 +122,7 @@ Les monitors sont versionnés comme les dashboards, dans `infrastructure/monitor
 
 | Monitor | Source | Condition | Pourquoi |
 | :--- | :--- | :--- | :--- |
-| **DLQ Redis Streams non vide** | [`monitors/redis-streams-dlq.json`](monitors/redis-streams-dlq.json) | `max(last_5m)` de `volontariapp.redis_streams.dlq_length` par `stream` supérieur à 0 | Un message en DLQ a épuisé ses tentatives et a été acquitté : l'événement n'a pas eu son effet. La DLQ est vidée après 24 h, l'alerte est renotifiée toutes les 4 h. |
+| **DLQ Redis Streams non vide** | [`monitors/redis-streams-dlq.json`](monitors/redis-streams-dlq.json) | `max(last_5m)` de `volontariapp.redis_streams.dlq_length` par `stream` supérieur à 0 | Un message en DLQ a épuisé ses tentatives et a été acquitté : l'événement n'a pas eu son effet. La DLQ n'est jamais purgée automatiquement : l'alerte dure jusqu'à un `XDEL` manuel (voir le runbook) et est renotifiée toutes les 4 h. |
 | **Messages en attente Redis Streams** | [`monitors/redis-streams-pending.json`](monitors/redis-streams-pending.json) | `min(last_15m)` de `volontariapp.redis_streams.pending` par `stream` et `group` supérieur à 100 (warning) ou 500 (critical) | Un groupe qui garde des messages non acquittés pendant 15 minutes entières est bloqué ou trop lent ; le `min` ignore les pics courts. |
 
 Ces métriques viennent de `@volontariapp/post-processors` 3.5.0 (ticket 6.3) et n'existent dans Datadog qu'une fois les runners mis à jour. Chaque instance d'un runner publie les mêmes jauges : agréger en `max by {stream, group}`, jamais en `sum` (sinon la valeur est multipliée par le nombre de pods). Une jauge absente signifie que la lecture Redis a échoué, pas que la file est vide ; `notify_no_data` est donc désactivé.
