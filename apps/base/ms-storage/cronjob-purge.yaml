@@ -1,0 +1,72 @@
+# Periodic trigger of the file purge (docs/stockage-fichiers/07-nettoyage-et-orphelins.md, section 3).
+# The command only writes one storage.cleanup_files job in ms-storage's jobs_outbox; outbox-storage,
+# BullMQ and worker-storage do the purge. Safety net behind the jobs written on each release.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ms-storage-purge
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 120
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          labels:
+            app: ms-storage-purge
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          imagePullSecrets:
+            - name: ghcr-login
+          containers:
+            - name: request-file-purge
+              image: ghcr.io/volontariapp/ms-storage:sha-dbe3f82
+              imagePullPolicy: IfNotPresent
+              command: ['node', 'dist/commands/request-file-purge.js']
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                runAsNonRoot: true
+                runAsUser: 1001
+                readOnlyRootFilesystem: true
+              env:
+                - name: NODE_ENV
+                  value: "production"
+                - name: DB_HOST
+                  value: "ms-storage-db-postgresql"
+                - name: DB_PORT
+                  value: "5432"
+                - name: DB_NAME
+                  value: "ms-storage"
+                - name: DB_USERNAME
+                  value: "ms-storage"
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-secrets
+                      key: ms-storage-password
+              resources:
+                requests:
+                  cpu: 20m
+                  memory: 96Mi
+                limits:
+                  cpu: 200m
+                  memory: 192Mi
+              volumeMounts:
+                - name: tmp-volume
+                  mountPath: /tmp
+          volumes:
+            - name: tmp-volume
+              emptyDir: {}
