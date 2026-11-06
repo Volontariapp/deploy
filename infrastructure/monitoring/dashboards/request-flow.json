@@ -1,0 +1,434 @@
+{
+  "title": "Flux des Requêtes (api-gateway, ms-*, Outbox, Post-Processors, Workers)",
+  "description": "Parcours complet des requêtes issues des traces APM : carte des services (gateway vers ms-* en gRPC, puis runners asynchrones), débit, latence et erreurs par étage.",
+  "layout_type": "free",
+  "template_variables": [
+    {
+      "name": "service",
+      "prefix": "service",
+      "default": "*"
+    },
+    {
+      "name": "env",
+      "prefix": "env",
+      "default": "prod"
+    }
+  ],
+  "widgets": [
+    {
+      "definition": {
+        "title": "Service Map : api-gateway et ses dépendances",
+        "type": "topology_map",
+        "requests": [
+          {
+            "request_type": "topology",
+            "query": {
+              "data_source": "service_map",
+              "filters": [
+                "env:prod"
+              ],
+              "service": "api-gateway"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "width": 96,
+        "height": 40
+      }
+    },
+    {
+      "definition": {
+        "title": "Entrées HTTP par service (req/s)",
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "sum:trace.http.server.request.hits{$env,$service} by {service}.as_rate()",
+            "display_type": "bars",
+            "style": {
+              "palette": "dog_classic"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 40,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Appels gRPC inter-services par service (req/s)",
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "sum:trace.grpc.server.request.hits{$env,$service} by {service}.as_rate()",
+            "display_type": "bars",
+            "style": {
+              "palette": "purple"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 32,
+        "y": 40,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Latence gRPC p95 par service",
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "p95:trace.grpc.server.request{$env,$service} by {service}",
+            "display_type": "line",
+            "style": {
+              "palette": "orange",
+              "line_type": "solid",
+              "line_width": "normal"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 64,
+        "y": 40,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Erreurs HTTP par service",
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "sum:trace.http.server.request.errors{$env,$service} by {service}.as_count()",
+            "display_type": "bars",
+            "style": {
+              "palette": "red"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 56,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Erreurs gRPC par service",
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "sum:trace.grpc.server.request.errors{$env,$service} by {service}.as_count()",
+            "display_type": "bars",
+            "style": {
+              "palette": "orange"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 32,
+        "y": 56,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Top services en erreur (toutes couches)",
+        "type": "toplist",
+        "requests": [
+          {
+            "q": "top(sum:trace.http.server.request.errors{$env,$service} by {service}.as_count() + sum:trace.grpc.server.request.errors{$env,$service} by {service}.as_count(), 10, 'sum', 'desc')"
+          }
+        ]
+      },
+      "layout": {
+        "x": 64,
+        "y": 56,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Evenements emis : type, service producteur (outbox)",
+        "type": "query_table",
+        "has_search_bar": "always",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod operation_name:Producer"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "@type",
+                    "limit": 25,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  },
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a",
+                "alias": "Sauts (24h)",
+                "cell_display_mode": "bar",
+                "limit": {
+                  "count": 100,
+                  "order": "desc"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 72,
+        "width": 48,
+        "height": 26
+      }
+    },
+    {
+      "definition": {
+        "title": "Evenements consommes : type, service consommateur (post-processors, workers, ws)",
+        "type": "query_table",
+        "has_search_bar": "always",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod operation_name:Consumer"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "@type",
+                    "limit": 25,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  },
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a",
+                "alias": "Sauts (24h)",
+                "cell_display_mode": "bar",
+                "limit": {
+                  "count": 100,
+                  "order": "desc"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "layout": {
+        "x": 48,
+        "y": 72,
+        "width": 48,
+        "height": 26
+      }
+    },
+    {
+      "definition": {
+        "title": "Sauts emis par service (outbox)",
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod operation_name:Producer"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a"
+              }
+            ],
+            "display_type": "bars",
+            "style": {
+              "palette": "dog_classic"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 0,
+        "y": 98,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Sauts consommes par service",
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod operation_name:Consumer"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a"
+              }
+            ],
+            "display_type": "bars",
+            "style": {
+              "palette": "green"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 32,
+        "y": 98,
+        "width": 32,
+        "height": 16
+      }
+    },
+    {
+      "definition": {
+        "title": "Erreurs sur les sauts asynchrones",
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "a",
+                "data_source": "spans",
+                "indexes": [],
+                "search": {
+                  "query": "env:prod status:error operation_name:(Consumer OR Producer)"
+                },
+                "compute": {
+                  "aggregation": "count"
+                },
+                "group_by": [
+                  {
+                    "facet": "service",
+                    "limit": 10,
+                    "sort": {
+                      "aggregation": "count",
+                      "order": "desc"
+                    }
+                  }
+                ]
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "a"
+              }
+            ],
+            "display_type": "bars",
+            "style": {
+              "palette": "warm"
+            }
+          }
+        ]
+      },
+      "layout": {
+        "x": 64,
+        "y": 98,
+        "width": 32,
+        "height": 16
+      }
+    }
+  ]
+}

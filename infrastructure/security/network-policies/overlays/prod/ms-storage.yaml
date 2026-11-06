@@ -11,6 +11,7 @@ spec:
       values:
       - ms-storage
       - post-processor-storage
+      - ms-storage-purge
   policyTypes:
   - Ingress
   - Egress
