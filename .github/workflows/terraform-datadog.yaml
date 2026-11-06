@@ -1,0 +1,75 @@
+name: 'Terraform Datadog'
+
+# plan sur chaque PR qui touche infrastructure/monitoring, apply au merge sur main.
+# L'apply reste coupe tant que la variable de repo TF_APPLY_ENABLED n'est pas "true" :
+# on l'active apres avoir verifie qu'un plan ne propose aucun doublon.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infrastructure/monitoring/**'
+      - '.github/workflows/terraform-datadog.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'infrastructure/monitoring/**'
+      - '.github/workflows/terraform-datadog.yaml'
+
+# Un seul run a la fois : le state est verrouille cote HCP, on evite d'attendre ce verrou.
+concurrency:
+  group: terraform-datadog
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: 'true'
+  DD_API_KEY: ${{ secrets.DD_API_KEY }}
+  DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+defaults:
+  run:
+    working-directory: infrastructure/monitoring/terraform
+
+jobs:
+  plan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '1.17.1'
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform fmt
+        run: terraform fmt -check -diff
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -input=false -no-color
+
+  apply:
+    if: github.event_name == 'push' && vars.TF_APPLY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '1.17.1'
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform apply
+        run: terraform apply -input=false -auto-approve -no-color

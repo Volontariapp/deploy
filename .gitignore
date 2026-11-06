@@ -12,3 +12,9 @@ Thumbs.db
 # Temp
 *.tmp
 *.log
+
+# Terraform (le state peut contenir des secrets, ne jamais le commiter)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars

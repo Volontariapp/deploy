@@ -124,11 +124,13 @@ Tous les tableaux de bord sont versionnés dans ce dépôt Git dans le répertoi
 4. Ouvrir une Pull Request pour revue d'équipe.
 5. Une fois la PR mergée, réimporter le JSON dans Datadog via le menu **`...` > "Import dashboard JSON"**.
 
+> **Terraform.** Cette réimportation manuelle est remplacée par Terraform dès que l'`apply` automatique est activé (variable de dépôt `TF_APPLY_ENABLED`). Mise en place, import des objets existants et dépannage : [`terraform/README.md`](terraform/README.md). Tant que la variable n'est pas à `true`, la procédure manuelle ci-dessus reste valable.
+
 ---
 
 ### 4. Monitors (Monitor-as-Code)
 
-Les monitors sont versionnés comme les dashboards, dans `infrastructure/monitoring/monitors/`. Même procédure qu'en section 3 : valider le JSON (`python3 -m json.tool`), PR, puis après merge créer ou mettre à jour le monitor dans Datadog (**Monitors > New Monitor > Import from JSON**). Aucune synchronisation automatique tant que le ticket « CI / Terraform : Synchronisation automatique » n'est pas fait. L'ajout du canal de notification Discord (`#monitoring-alerts`, Ticket 5.1) se fait dans Datadog : aucun handle n'est écrit dans les JSON.
+Les monitors sont versionnés comme les dashboards, dans `infrastructure/monitoring/monitors/`. Même procédure qu'en section 3 : valider le JSON (`python3 -m json.tool`), PR, puis après merge créer ou mettre à jour le monitor dans Datadog (**Monitors > New Monitor > Import from JSON**). La synchronisation automatique passe par Terraform (voir [`terraform/README.md`](terraform/README.md)) : elle n'est active que lorsque `TF_APPLY_ENABLED` vaut `true`. L'ajout du canal de notification Discord (`#monitoring-alerts`, Ticket 5.1) se fait dans Datadog : aucun handle n'est écrit dans les JSON.
 
 | Monitor | Source | Condition | Pourquoi |
 | :--- | :--- | :--- | :--- |
