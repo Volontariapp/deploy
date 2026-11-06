@@ -108,6 +108,8 @@ spec:
                   key: redis-password
             - name: MS_SOCIAL_URL
               value: "ms-social:80"
+            - name: MS_POST_URL
+              value: "ms-post:80"
             - name: AUTH_INTERNAL_PRIVATE_KEY_PATH
               value: "certs/internal.key"
           resources:
