@@ -124,4 +124,27 @@ Tous les tableaux de bord sont versionnés dans ce dépôt Git dans le répertoi
 4. Ouvrir une Pull Request pour revue d'équipe.
 5. Une fois la PR mergée, réimporter le JSON dans Datadog via le menu **`...` > "Import dashboard JSON"**.
 
+---
 
+### 4. Monitors (Monitor-as-Code)
+
+Les monitors sont versionnés comme les dashboards, dans `infrastructure/monitoring/monitors/`. Même procédure qu'en section 3 : valider le JSON (`python3 -m json.tool`), PR, puis après merge créer ou mettre à jour le monitor dans Datadog (**Monitors > New Monitor > Import from JSON**). Aucune synchronisation automatique tant que le ticket « CI / Terraform : Synchronisation automatique » n'est pas fait. L'ajout du canal de notification Discord (`#monitoring-alerts`, Ticket 5.1) se fait dans Datadog : aucun handle n'est écrit dans les JSON.
+
+| Monitor | Source | Condition | Pourquoi |
+| :--- | :--- | :--- | :--- |
+| **DLQ Redis Streams non vide** | [`monitors/redis-streams-dlq.json`](monitors/redis-streams-dlq.json) | `max(last_5m)` de `volontariapp.redis_streams.dlq_length` par `stream` supérieur à 0 | Un message en DLQ a épuisé ses tentatives et a été acquitté : l'événement n'a pas eu son effet. La DLQ n'est jamais purgée automatiquement : l'alerte dure jusqu'à un `XDEL` manuel (voir le runbook) et est renotifiée toutes les 4 h. |
+| **Messages en attente Redis Streams** | [`monitors/redis-streams-pending.json`](monitors/redis-streams-pending.json) | `min(last_15m)` de `volontariapp.redis_streams.pending` par `stream` et `group` supérieur à 100 (warning) ou 500 (critical) | Un groupe qui garde des messages non acquittés pendant 15 minutes entières est bloqué ou trop lent ; le `min` ignore les pics courts. |
+
+Ces métriques viennent de `@volontariapp/post-processors` 3.5.0 (ticket 6.3) et n'existent dans Datadog qu'une fois les runners mis à jour. Chaque instance d'un runner publie les mêmes jauges : agréger en `max by {stream, group}`, jamais en `sum` (sinon la valeur est multipliée par le nombre de pods). Une jauge absente signifie que la lecture Redis a échoué, pas que la file est vide ; `notify_no_data` est donc désactivé.
+
+> Seuils de départ, non calibrés : le seuil de 500 messages en attente et la fenêtre de 15 minutes sont des valeurs prudentes choisies sans données de production. À ajuster après une semaine de métriques réelles. Le filtre `{*}` n'est pas restreint à un environnement : le tag `env` n'a pas été confirmé dans Datadog.
+
+#### Runbook Redis Streams
+
+1. **Identifier le stream et le groupe** dans le titre de l'alerte (`stream`, `group`).
+2. **Alerte DLQ** : inspecter les derniers messages avec `XRANGE <stream>-dlq - + COUNT 10`. Chaque entrée porte `messageId`, `error`, `payload` et `timestamp`. Copier le `payload` avant toute action : ne jamais `XDEL` sans sauvegarde. Une erreur d'infrastructure (base ou Redis indisponible) ne va pas en DLQ ; une entrée en DLQ est donc une erreur métier ou un bug.
+3. **Alerte messages en attente** : `XPENDING <stream> <groupe>` pour le total, puis `XPENDING <stream> <groupe> - + 10` pour les identifiants et le consumer. Si un consumer est inactif depuis plus de 5 minutes, réclamer avec `XCLAIM <stream> <groupe> <consumer-sain> 300000 <messageId>`.
+4. **Corriger la cause racine** (bug du post-processor ou donnée invalide en base) avant de rejouer.
+5. **Rejouer** avec `XADD`, vérifier le traitement dans les logs, puis supprimer l'entrée de la DLQ et nettoyer les clés `retry:post-processor:<groupe>:<messageId>*`, et réconcilier la ligne `event_queue` ou `jobs_outbox` du service émetteur.
+
+Le détail pas à pas, avec les commandes complètes, est dans la skill `volontariapp-async-remediation` du dépôt `meta`. Les responsables des alertes seront définis au ticket 5.11.
