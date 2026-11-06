@@ -91,6 +91,31 @@ Les guillemets simples protègent les crochets et les guillemets de la clé dans
 
 Alternative sans import : supprimer l'objet dans Datadog et laisser Terraform le recréer. Il reçoit alors un nouvel identifiant : l'URL du dashboard change, il disparaît de la Dashboard List de la status page (à ré-ajouter) et un monitor perd son historique.
 
+Objets à supprimer dans Datadog avant le premier `apply`, un par fichier du dépôt (chercher par titre, ne toucher à aucun autre objet, ne garder aucun doublon) :
+
+| Fichier | Titre ou nom |
+| :--- | :--- |
+| `dashboards/overview.json` | Vue d'ensemble - Plateforme (Santé, Débit, Latence, Erreurs) |
+| `dashboards/infra-db.json` | Infrastructure & Bases de Données (Kubernetes, PostgreSQL, Redis, Stockage) |
+| `dashboards/storage.json` | Métier & Stockage de Fichiers (Activité Produit, ms-storage, Scans & Médias) |
+| `dashboards/request-flow.json` | Flux des Requêtes (api-gateway, ms-*, Outbox, Post-Processors, Workers) |
+| `dashboards/async-flows.json` | Flux Asynchrones (Outbox, BullMQ, Redis Streams & DLQ) |
+| `monitors/redis-streams-dlq.json` | [Volontariapp] DLQ Redis Streams non vide ({{stream.name}}) |
+| `monitors/redis-streams-pending.json` | [Volontariapp] Messages en attente Redis Streams ({{stream.name}} / {{group.name}}) |
+
+Une modification faite dans l'interface sur ces objets depuis leur import est perdue : le JSON du dépôt fait foi.
+
+## Brancher une notification Discord sur un monitor
+
+Un monitor prévient par des mentions `@...` écrites dans son champ `message`. Sans mention, l'alerte se déclenche dans Datadog mais personne n'est notifié. Les deux monitors actuels n'en ont aucune.
+
+1. Dans Datadog, créer l'intégration (webhook Discord) une seule fois. L'URL du webhook est un secret : elle reste dans Datadog et n'entre jamais dans le dépôt.
+2. Relever le handle que Datadog donne à cette intégration (de la forme `@...`, à lire dans l'interface).
+3. Ajouter ce handle au champ `message` du JSON du monitor **dans le dépôt**, par exemple dans le bloc `{{#is_alert}}...{{/is_alert}}`. Le handle n'est pas un secret.
+4. Ouvrir une PR : le `plan` annonce `1 to change`, puis l'`apply` met le monitor à jour sur place, sans le recréer.
+
+À ne pas faire : ajouter la mention dans l'interface (elle est écrasée au prochain `apply`) ou copier le JSON exporté depuis Datadog (il contient des champs que le fichier du dépôt n'a pas, et cause des écarts permanents au `plan`). Un nouveau monitor porte sa mention dans son JSON dès la création.
+
 ## Dépannage
 
 | Message | Cause | Correction |
