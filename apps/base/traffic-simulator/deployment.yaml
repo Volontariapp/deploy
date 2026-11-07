@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traffic-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traffic-simulator
+  template:
+    metadata:
+      labels:
+        app: traffic-simulator
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullSecrets:
+        - name: ghcr-login
+      containers:
+        - name: traffic-simulator
+          image: ghcr.io/volontariapp/traffic-simulator:sha-c99d056
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            readOnlyRootFilesystem: true
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: API_GATEWAY_URL
+              value: "http://api-gateway:3000"
+            - name: TICK_INTERVAL_MS
+              value: "8000"
+            - name: EVENT_LIFESPAN_SEC
+              value: "180"
+            - name: TARGET_ACTORS
+              value: "40"
+            - name: INITIAL_MASS_SEED
+              value: "true"
+            - name: MASS_EVENTS_COUNT
+              value: "100"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+

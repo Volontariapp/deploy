@@ -13,3 +13,4 @@ resources:
   - ms-storage.yaml
   - ms-ranking.yaml
   - storage-infra-policies.yaml
+  - traffic-simulator.yaml
