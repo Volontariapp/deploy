@@ -35,7 +35,7 @@ spec:
             - name: NODE_ENV
               value: "production"
             - name: API_GATEWAY_URL
-              value: "http://api-gateway:3000"
+              value: "http://api-gateway"
             - name: TICK_INTERVAL_MS
               value: "8000"
             - name: EVENT_LIFESPAN_SEC
