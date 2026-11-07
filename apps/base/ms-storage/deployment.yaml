@@ -34,7 +34,7 @@ spec:
               type: RuntimeDefault
           resources:
             limits:
-              cpu: 50m
+              cpu: 200m
               memory: 64Mi
             requests:
               cpu: 10m
@@ -69,7 +69,7 @@ spec:
                   key: ms-storage-password
           resources:
             limits:
-              cpu: 100m
+              cpu: 400m
               memory: 128Mi
             requests:
               cpu: 50m
@@ -90,7 +90,7 @@ spec:
               type: RuntimeDefault
           resources:
             limits:
-              cpu: 50m
+              cpu: 200m
               memory: 64Mi
             requests:
               cpu: 10m
@@ -189,7 +189,7 @@ spec:
               cpu: 50m
               memory: 192Mi
             limits:
-              cpu: 300m
+              cpu: 1200m
               memory: 512Mi
           volumeMounts:
             - name: tmp-volume

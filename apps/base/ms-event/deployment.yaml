@@ -34,7 +34,7 @@ spec:
               type: RuntimeDefault
           resources:
             limits:
-              cpu: 50m
+              cpu: 200m
               memory: 64Mi
             requests:
               cpu: 10m
@@ -76,7 +76,7 @@ spec:
               value: "PENDING_KEY" # TODO: Create a secret and use secretKeyRef when the API key is available
           resources:
             limits:
-              cpu: 100m
+              cpu: 400m
               memory: 128Mi
             requests:
               cpu: 50m
@@ -150,7 +150,7 @@ spec:
               cpu: 50m
               memory: 128Mi
             limits:
-              cpu: 200m
+              cpu: 800m
               memory: 256Mi
           volumeMounts:
             - name: tmp-volume
