@@ -10,3 +10,4 @@ resources:
   - ms-ranking/
   - api-gateway/
   - ws-service/
+  - traffic-simulator/

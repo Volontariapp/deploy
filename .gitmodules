@@ -43,3 +43,6 @@
 [submodule "submodules/ms-ranking"]
 	path = submodules/ms-ranking
 	url = ../ms-ranking.git
+[submodule "submodules/traffic-simulator"]
+	path = submodules/traffic-simulator
+	url = ../traffic-simulator.git
