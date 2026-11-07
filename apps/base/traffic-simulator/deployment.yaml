@@ -41,18 +41,22 @@ spec:
             - name: EVENT_LIFESPAN_SEC
               value: "180"
             - name: TARGET_ACTORS
-              value: "40"
+              value: "120"
+            - name: EVENTS_PER_DISTRICT
+              value: "3"
+            - name: PARALLEL_DISTRICT_BATCH
+              value: "4"
             - name: INITIAL_MASS_SEED
               value: "false"
             - name: MASS_EVENTS_COUNT
               value: "100"
           resources:
             requests:
-              cpu: 50m
+              cpu: 100m
               memory: 128Mi
             limits:
               cpu: 1000m
-              memory: 256Mi
+              memory: 512Mi
           volumeMounts:
             - name: tmp
               mountPath: /tmp
