@@ -45,7 +45,7 @@
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.hits{service:outbox-*, $kube_namespace}.as_rate()",
+                  "q": "sum:trace.Producer.hits{service:outbox-*, $env}.as_rate()",
                   "aggregator": "avg"
                 }
               ],
@@ -80,11 +80,11 @@
           },
           {
             "definition": {
-              "title": "Erreurs Workers et Post-Processors (Total)",
+              "title": "Erreurs Asynchrones Globales (Total)",
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:trace.Consumer.errors{service:worker-*, $env}.as_count() + sum:trace.Consumer.errors{service:post-processor-*, $env}.as_count()",
+                  "q": "sum:trace.Producer.errors{service:outbox-*, $env}.as_count() + sum:trace.Consumer.errors{service:worker-*, $env}.as_count() + sum:trace.Consumer.errors{service:post-processor-*, $env}.as_count()",
                   "aggregator": "sum"
                 }
               ],
@@ -106,7 +106,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.hits{service:outbox-*, $kube_namespace} by {service}.as_rate()",
+                  "q": "sum:trace.Producer.hits{service:outbox-*, $env} by {service}.as_rate()",
                   "display_type": "line",
                   "style": {
                     "palette": "dog_classic",
@@ -123,7 +123,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.errors{service:outbox-*, $kube_namespace} by {service}.as_rate()",
+                  "q": "sum:trace.Producer.errors{service:outbox-*, $env} by {service}.as_rate()",
                   "display_type": "bars",
                   "style": {
                     "palette": "warm",
@@ -140,7 +140,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "p50:trace.grpc.server.request.duration{service:outbox-*, $kube_namespace} by {service} * 1000",
+                  "q": "p50:trace.Producer{service:outbox-*, $env} by {service} * 1000",
                   "display_type": "line",
                   "style": {
                     "palette": "cool",
@@ -149,7 +149,7 @@
                   }
                 },
                 {
-                  "q": "p95:trace.grpc.server.request.duration{service:outbox-*, $kube_namespace} by {service} * 1000",
+                  "q": "p95:trace.Producer{service:outbox-*, $env} by {service} * 1000",
                   "display_type": "line",
                   "style": {
                     "palette": "warm",
@@ -166,7 +166,7 @@
               "type": "toplist",
               "requests": [
                 {
-                  "q": "top(sum:trace.grpc.server.request.hits{service:outbox-*, $kube_namespace} by {resource_name}, 10, 'sum', 'desc')"
+                  "q": "top(sum:trace.Producer.hits{service:outbox-*, $env} by {resource_name}, 10, 'sum', 'desc')"
                 }
               ]
             }
