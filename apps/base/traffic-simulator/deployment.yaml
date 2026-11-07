@@ -43,7 +43,7 @@ spec:
             - name: TARGET_ACTORS
               value: "40"
             - name: INITIAL_MASS_SEED
-              value: "true"
+              value: "false"
             - name: MASS_EVENTS_COUNT
               value: "100"
           resources:
