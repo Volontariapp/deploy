@@ -3,7 +3,13 @@ kind: Deployment
 metadata:
   name: api-gateway
 spec:
-  replicas: 1
+  # replicas absent : piloté par l'HPA (hpa.yaml, minReplicas 3). Le fixer ici ferait
+  # entrer ArgoCD en conflit avec l'autoscaler à chaque sync.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -18,6 +24,14 @@ spec:
         fsGroup: 1001
         seccompProfile:
           type: RuntimeDefault
+      terminationGracePeriodSeconds: 30
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: api-gateway
       imagePullSecrets:
         - name: ghcr-login
       containers:
@@ -68,6 +82,16 @@ spec:
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "10"]
           resources:
             requests:
               cpu: 100m
