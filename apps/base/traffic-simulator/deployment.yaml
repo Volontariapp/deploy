@@ -46,7 +46,7 @@ spec:
             - name: EVENT_LIFESPAN_SEC
               value: "180"
             - name: TARGET_ACTORS
-              value: "120"
+              value: "300"
             - name: EVENTS_PER_DISTRICT
               value: "3"
             - name: PARALLEL_DISTRICT_BATCH
@@ -55,6 +55,31 @@ spec:
               value: "false"
             - name: MASS_EVENTS_COUNT
               value: "100"
+            - name: ACTOR_BATCH_PAUSE_MS
+              value: "1000"
+            - name: POST_SCAN_INTERVAL_MS
+              value: "4000"
+            - name: REACTION_TICK_MS
+              value: "1000"
+            - name: POST_LIKES_MIN
+              value: "12"
+            - name: POST_LIKES_MAX
+              value: "25"
+            - name: POST_COMMENTS_MIN
+              value: "4"
+            - name: POST_COMMENTS_MAX
+              value: "8"
+            # Fenetre de sommeil : aucun trafic entre minuit et 8h (heure de Paris)
+            - name: SLEEP_ENABLED
+              value: "true"
+            - name: SLEEP_START_HOUR
+              value: "0"
+            - name: SLEEP_END_HOUR
+              value: "8"
+            - name: SLEEP_TIMEZONE
+              value: "Europe/Paris"
+            - name: SLEEP_DRAIN_SEC
+              value: "300"
           resources:
             requests:
               cpu: 50m
