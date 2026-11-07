@@ -34,7 +34,7 @@ spec:
               type: RuntimeDefault
           resources:
             limits:
-              cpu: 50m
+              cpu: 200m
               memory: 64Mi
             requests:
               cpu: 10m
@@ -52,7 +52,7 @@ spec:
               type: RuntimeDefault
           resources:
             limits:
-              cpu: 50m
+              cpu: 200m
               memory: 64Mi
             requests:
               cpu: 10m
@@ -117,7 +117,7 @@ spec:
                   key: neo4j-password
           resources:
             limits:
-              cpu: 50m
+              cpu: 200m
               memory: 320Mi
             requests:
               cpu: 10m
