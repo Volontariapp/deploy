@@ -32,6 +32,8 @@ spec:
               app: api-gateway
       ports:
         - protocol: TCP
+          port: 80
+        - protocol: TCP
           port: 3000
     # 3. Sortie HTTPS pour le téléchargement éventuel de photos HD Unsplash
     - to:
