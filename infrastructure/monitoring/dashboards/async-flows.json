@@ -454,7 +454,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.http.server.request.hits{service:ws-service, $kube_namespace} by {resource_name}.as_rate()",
+                  "q": "sum:trace.Consumer.hits{service:ws-service, $env} by {resource_name}.as_rate()",
                   "display_type": "line",
                   "style": {
                     "palette": "purple",
