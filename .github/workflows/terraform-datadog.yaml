@@ -1,15 +1,11 @@
 name: 'Terraform Datadog'
 
-# plan sur chaque PR qui touche infrastructure/monitoring, apply au merge sur main.
-# L'apply reste coupe tant que la variable de repo TF_APPLY_ENABLED n'est pas "true" :
-# on l'active apres avoir verifie qu'un plan ne propose aucun doublon.
+# plan : appele par ci-lint.yaml (job terraform-plan) sur les PRs qui touchent
+# infrastructure/monitoring, pour que la notification "PR prete" l'attende.
+# apply : au merge sur main, si la variable de repo TF_APPLY_ENABLED vaut "true".
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'infrastructure/monitoring/**'
-      - '.github/workflows/terraform-datadog.yaml'
+  workflow_call:
   push:
     branches: [main]
     paths:

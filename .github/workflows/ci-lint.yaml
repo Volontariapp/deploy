@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -42,3 +43,54 @@ jobs:
             --ignore-test container-security-context-readonlyrootfilesystem \
             --ignore-test pod-probes-identical \
             --ignore-test statefulset-has-servicename
+
+  # Ancien security.yml, rapatrie ici pour que notify-ready puisse l'attendre (needs:
+  # ne traverse pas les fichiers). Le nom de job est conserve : le check reste
+  # "security / Trivy (...)".
+  security:
+    permissions:
+      contents: read
+    uses: Volontariapp/ci-tools/.github/workflows/security-scan.yml@main
+
+  # Le plan Terraform ne tourne que si la PR touche infrastructure/monitoring (les PRs
+  # Dependabot n'ont pas les secrets Datadog et ne touchent jamais ces fichiers).
+  changes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      monitoring: ${{ steps.diff.outputs.monitoring }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: diff
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if git diff --name-only "origin/${BASE_REF}...HEAD" | grep -qE '^(infrastructure/monitoring/|\.github/workflows/terraform-datadog\.yaml)'; then
+            echo "monitoring=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "monitoring=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  terraform-plan:
+    needs: changes
+    if: needs.changes.outputs.monitoring == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/terraform-datadog.yaml
+    secrets: inherit
+
+  notify-ready:
+    needs: [validate, security, terraform-plan]
+    # `needs:` implies success(): without !failure() a skipped job would skip the notification.
+    if: ${{ !failure() && !cancelled() && github.event_name == 'pull_request' }}
+    # A reusable workflow cannot raise the permissions of its caller.
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    uses: Volontariapp/ci-tools/.github/workflows/pr-ready-notify.yml@main
+    with:
+      channel: backend
+    secrets: inherit
