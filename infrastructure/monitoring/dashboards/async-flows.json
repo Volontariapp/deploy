@@ -9,6 +9,11 @@
       "default": "*"
     },
     {
+      "name": "env",
+      "prefix": "env",
+      "default": "prod"
+    },
+    {
       "name": "kube_namespace",
       "prefix": "kube_namespace",
       "default": "prod"
@@ -23,12 +28,12 @@
         "widgets": [
           {
             "definition": {
-              "title": "Messages en Dead Letter Queue (DLQ)",
+              "title": "Messages dans la plus grosse DLQ",
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:trace.redis.command.hits{resource_name:*dlq*, $kube_namespace}.as_count()",
-                  "aggregator": "sum"
+                  "q": "max:volontariapp.redis_streams.dlq_length{*}",
+                  "aggregator": "last"
                 }
               ],
               "precision": 0
@@ -53,7 +58,7 @@
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.hits{service:worker-*, $kube_namespace}.as_rate()",
+                  "q": "sum:trace.Consumer.hits{service:worker-*, $env}.as_rate()",
                   "aggregator": "avg"
                 }
               ],
@@ -66,7 +71,7 @@
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.hits{service:post-processor-*, $kube_namespace}.as_rate()",
+                  "q": "sum:trace.Consumer.hits{service:post-processor-*, $env}.as_rate()",
                   "aggregator": "avg"
                 }
               ],
@@ -75,11 +80,11 @@
           },
           {
             "definition": {
-              "title": "Erreurs Asynchrones Globales (Total)",
+              "title": "Erreurs Workers et Post-Processors (Total)",
               "type": "query_value",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.errors{service:outbox-*, $kube_namespace}.as_count() + sum:trace.grpc.server.request.errors{service:worker-*, $kube_namespace}.as_count() + sum:trace.grpc.server.request.errors{service:post-processor-*, $kube_namespace}.as_count()",
+                  "q": "sum:trace.Consumer.errors{service:worker-*, $env}.as_count() + sum:trace.Consumer.errors{service:post-processor-*, $env}.as_count()",
                   "aggregator": "sum"
                 }
               ],
@@ -181,7 +186,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.hits{service:worker-*, $kube_namespace} by {service}.as_rate()",
+                  "q": "sum:trace.Consumer.hits{service:worker-*, $env} by {service}.as_rate()",
                   "display_type": "line",
                   "style": {
                     "palette": "dog_classic",
@@ -198,7 +203,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.errors{service:worker-*, $kube_namespace} by {service}.as_rate()",
+                  "q": "sum:trace.Consumer.errors{service:worker-*, $env} by {service}.as_rate()",
                   "display_type": "bars",
                   "style": {
                     "palette": "warm",
@@ -215,7 +220,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "p95:trace.grpc.server.request.duration{service:worker-*, $kube_namespace} by {service}",
+                  "q": "p95:trace.Consumer{service:worker-*, $env} by {service}",
                   "display_type": "line",
                   "style": {
                     "palette": "purple",
@@ -232,7 +237,7 @@
               "type": "toplist",
               "requests": [
                 {
-                  "q": "top(sum:trace.grpc.server.request.hits{service:worker-*, $kube_namespace} by {resource_name}, 10, 'sum', 'desc')"
+                  "q": "top(sum:trace.Consumer.hits{service:worker-*, $env} by {resource_name}, 10, 'sum', 'desc')"
                 }
               ]
             }
@@ -265,14 +270,74 @@
           },
           {
             "definition": {
-              "title": "Activité des Dead Letter Queues (Poison Pills)",
+              "title": "Messages en DLQ par Stream",
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.redis.command.hits{resource_name:*dlq*, $kube_namespace} by {resource_name}.as_rate()",
+                  "q": "max:volontariapp.redis_streams.dlq_length{*} by {stream}",
                   "display_type": "bars",
                   "style": {
                     "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Messages en Attente par Stream et Groupe (non acquittés)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "max:volontariapp.redis_streams.pending{*} by {stream,group}",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "dog_classic",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Envois en DLQ et Tentatives en Échec par Stream",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:volontariapp.redis_streams.dlq_sent{*} by {stream}.as_count()",
+                  "display_type": "bars",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                },
+                {
+                  "q": "sum:volontariapp.redis_streams.retry_attempts{*} by {stream}.as_count()",
+                  "display_type": "bars",
+                  "style": {
+                    "palette": "warm",
+                    "line_type": "solid",
+                    "line_width": "normal"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "title": "Messages Traités par Stream (msg/s)",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:volontariapp.redis_streams.processed{*} by {stream}.as_rate()",
+                  "display_type": "line",
+                  "style": {
+                    "palette": "cool",
                     "line_type": "solid",
                     "line_width": "normal"
                   }
@@ -329,7 +394,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.hits{service:post-processor-*, $kube_namespace} by {service}.as_rate()",
+                  "q": "sum:trace.Consumer.hits{service:post-processor-*, $env} by {service}.as_rate()",
                   "display_type": "line",
                   "style": {
                     "palette": "dog_classic",
@@ -346,7 +411,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "sum:trace.grpc.server.request.errors{service:post-processor-*, $kube_namespace} by {service}.as_rate()",
+                  "q": "sum:trace.Consumer.errors{service:post-processor-*, $env} by {service}.as_rate()",
                   "display_type": "bars",
                   "style": {
                     "palette": "warm",
@@ -363,7 +428,7 @@
               "type": "timeseries",
               "requests": [
                 {
-                  "q": "p50:trace.grpc.server.request.duration{service:post-processor-*, $kube_namespace} by {service} * 1000",
+                  "q": "p50:trace.Consumer{service:post-processor-*, $env} by {service} * 1000",
                   "display_type": "line",
                   "style": {
                     "palette": "cool",
@@ -372,7 +437,7 @@
                   }
                 },
                 {
-                  "q": "p95:trace.grpc.server.request.duration{service:post-processor-*, $kube_namespace} by {service} * 1000",
+                  "q": "p95:trace.Consumer{service:post-processor-*, $env} by {service} * 1000",
                   "display_type": "line",
                   "style": {
                     "palette": "warm",
@@ -405,4 +470,3 @@
     }
   ]
 }
-
