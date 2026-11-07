@@ -110,6 +110,8 @@ spec:
               value: "ms-social:80"
             - name: MS_POST_URL
               value: "ms-post:80"
+            - name: BADGE_POINTS_ENABLED
+              value: "true"
             - name: AUTH_INTERNAL_PRIVATE_KEY_PATH
               value: "certs/internal.key"
           resources:
