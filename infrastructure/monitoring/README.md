@@ -130,12 +130,16 @@ Tous les tableaux de bord sont versionnés dans ce dépôt Git dans le répertoi
 
 ### 4. Monitors (Monitor-as-Code)
 
-Les monitors sont versionnés comme les dashboards, dans `infrastructure/monitoring/monitors/`. Même procédure qu'en section 3 : valider le JSON (`python3 -m json.tool`), PR, puis après merge créer ou mettre à jour le monitor dans Datadog (**Monitors > New Monitor > Import from JSON**). La synchronisation automatique passe par Terraform (voir [`terraform/README.md`](terraform/README.md)) : elle n'est active que lorsque `TF_APPLY_ENABLED` vaut `true`. L'ajout du canal de notification Discord (`#monitoring-alerts`, Ticket 5.1) se fait dans Datadog : aucun handle n'est écrit dans les JSON.
+Les monitors sont versionnés comme les dashboards, dans `infrastructure/monitoring/monitors/`. Même procédure qu'en section 3 : valider le JSON (`python3 -m json.tool`), PR, puis après merge créer ou mettre à jour le monitor dans Datadog (**Monitors > New Monitor > Import from JSON**). La synchronisation automatique passe par Terraform (voir [`terraform/README.md`](terraform/README.md)) : elle n'est active que lorsque `TF_APPLY_ENABLED` vaut `true`. Le canal de notification Discord (`#monitoring-alerts`, Ticket 5.1) est le webhook Datadog `discord-alerts` : les monitors le mentionnent avec `@webhook-discord-alerts` en fin de champ `message` dans le JSON (un handle ajouté à la main dans l'interface serait écrasé par l'`apply`).
 
 | Monitor | Source | Condition | Pourquoi |
 | :--- | :--- | :--- | :--- |
 | **DLQ Redis Streams non vide** | [`monitors/redis-streams-dlq.json`](monitors/redis-streams-dlq.json) | `max(last_5m)` de `volontariapp.redis_streams.dlq_length` par `stream` supérieur à 0 | Un message en DLQ a épuisé ses tentatives et a été acquitté : l'événement n'a pas eu son effet. La DLQ n'est jamais purgée automatiquement : l'alerte dure jusqu'à un `XDEL` manuel (voir le runbook) et est renotifiée toutes les 4 h. |
 | **Messages en attente Redis Streams** | [`monitors/redis-streams-pending.json`](monitors/redis-streams-pending.json) | `min(last_15m)` de `volontariapp.redis_streams.pending` par `stream` et `group` supérieur à 100 (warning) ou 500 (critical) | Un groupe qui garde des messages non acquittés pendant 15 minutes entières est bloqué ou trop lent ; le `min` ignore les pics courts. |
+| **Taux d'erreur APM, serveurs gRPC** | [`monitors/apm-error-rate-grpc.json`](monitors/apm-error-rate-grpc.json) | `sum(last_10m)` de `trace.grpc.server.request.errors` divisé par `trace.grpc.server.request.hits` + 100, par `service`, supérieur à 5 % | Couvre les `ms-*`. Une alerte par service. |
+| **Taux d'erreur APM, serveurs HTTP** | [`monitors/apm-error-rate-http.json`](monitors/apm-error-rate-http.json) | même requête sur `trace.http.server.request.*` | Couvre `api-gateway` et `ws-service`. |
+| **Taux d'erreur APM, consommateurs asynchrones** | [`monitors/apm-error-rate-consumer.json`](monitors/apm-error-rate-consumer.json) | même requête sur `trace.Consumer.*` | Couvre les workers, les post-processors et tout service qui consomme des messages. |
+| **Taux d'erreur APM, runners outbox** | [`monitors/apm-error-rate-producer.json`](monitors/apm-error-rate-producer.json) | même requête sur `trace.Producer.*` | Couvre les runners outbox. |
 
 Ces métriques viennent de `@volontariapp/post-processors` 3.5.0 (ticket 6.3) et n'existent dans Datadog qu'une fois les runners mis à jour. Chaque instance d'un runner publie les mêmes jauges : agréger en `max by {stream, group}`, jamais en `sum` (sinon la valeur est multipliée par le nombre de pods). Une jauge absente signifie que la lecture Redis a échoué, pas que la file est vide ; `notify_no_data` est donc désactivé.
 
@@ -150,3 +154,23 @@ Ces métriques viennent de `@volontariapp/post-processors` 3.5.0 (ticket 6.3) et
 5. **Rejouer** avec `XADD`, vérifier le traitement dans les logs, puis supprimer l'entrée de la DLQ et nettoyer les clés `retry:post-processor:<groupe>:<messageId>*`, et réconcilier la ligne `event_queue` ou `jobs_outbox` du service émetteur.
 
 Le détail pas à pas, avec les commandes complètes, est dans la skill `volontariapp-async-remediation` du dépôt `meta`. Les responsables des alertes seront définis au ticket 5.11.
+
+#### Monitors du taux d'erreur APM (ticket 5.2)
+
+Quatre monitors, un par famille de spans, car chaque famille a ses propres métriques `hits` et `errors`. Chacun est un monitor multi-alerte (`by {service}`) : le nom du service est dans le titre de l'alerte. Condition commune : `sum(last_10m):` erreurs `.as_count()` divisées par (hits `.as_count()` + 100), supérieur à 0,05, sur `env:prod`.
+
+- **Garde-fou de trafic** : le `+ 100` au dénominateur évite qu'un service quasi inactif sonne pour 1 erreur sur 2 requêtes. Avec ce terme, une alerte exige au moins 6 erreurs en 10 minutes, même sans autre trafic ; pour un service très sollicité, le seuil reste proche de 5 %.
+- **Pourquoi un monitor par famille** : un seul monitor devrait additionner des métriques de noms différents groupées par `service`. La documentation Datadog ne décrit pas ce cas (groupe absent d'un terme). Quatre requêtes simples évitent de le deviner.
+- **Pas d'alerte sur absence de données** (`notify_no_data: false`) : un service arrêté est un autre sujet (monitor de disponibilité). Un service sans erreur n'a pas de série `errors` et n'apparaît donc pas dans le résultat : c'est le comportement voulu, mais il n'est pas documenté explicitement.
+- **Famille et services couverts** : `trace.grpc.server.request.*` pour les `ms-*`, `trace.http.server.request.*` pour `api-gateway` et `ws-service`, `trace.Consumer.*` pour les workers, les post-processors et tout service qui consomme des messages, `trace.Producer.*` pour les runners outbox (noms issus de `dashboards/request-flow.json` et des opérations lues dans l'APM).
+
+> À vérifier, non confirmé : `trace.Producer.errors` est supposé par analogie avec `trace.Consumer.errors` (seul `trace.Producer.hits` a été vu dans l'Explorer). Le seuil de 5 %, la fenêtre de 10 minutes et le terme `+ 100` sont des valeurs de départ : le ticket 5.10, qui devait les fixer, est introuvable. L'ordre d'évaluation est documenté par Datadog pour `sum` avec `.as_count()` (agrégation avant la division, voir [as_count() in Monitor Evaluations](https://docs.datadoghq.com/monitors/guide/as-count-in-monitor-evaluations/)), mais pas combiné à un terme constant et à `by {service}` : à tester sur un service en erreur.
+
+#### Runbook erreurs APM
+
+1. **Lire le titre de l'alerte** : famille (gRPC, HTTP, consommateurs, outbox) et `service`.
+2. **Ouvrir l'APM** : Datadog, APM, Services, puis le service concerné. Regarder la courbe d'erreurs et le tableau des ressources triées par taux d'erreur pour trouver la route, le RPC ou le type de message en cause.
+3. **Lire une trace en erreur** : ouvrir une trace depuis cette ressource, repérer le span en rouge et son message d'exception.
+4. **Corréler avec les logs** : les logs portent `dd.trace_id` (voir « Corrélation Logs-Traces ») ; ouvrir les logs de la trace depuis le panneau de la trace.
+5. **Vérifier ce qui a changé** : dernier déploiement du service (ArgoCD), incident sur une dépendance (base de données, Redis, autre service).
+6. **Consommateurs et outbox** : si les erreurs viennent d'un post-processor, regarder aussi la DLQ (runbook Redis Streams ci-dessus) ; les erreurs d'infrastructure sont retentées et ne vont pas en DLQ.
