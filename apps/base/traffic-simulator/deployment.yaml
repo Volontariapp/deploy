@@ -69,6 +69,24 @@ spec:
               value: "4"
             - name: POST_COMMENTS_MAX
               value: "8"
+            # Evenements autour des vrais utilisateurs : le simulateur lit leurs positions (cellules de 1 km,
+            # anonymes) avec ce compte ADMIN dedie, secret scelle traffic-simulator-admin
+            - name: SIMULATOR_ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: traffic-simulator-admin
+                  key: email
+            - name: SIMULATOR_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: traffic-simulator-admin
+                  key: password
+            - name: LOCAL_ACTORS
+              value: "40"
+            - name: LOCAL_RADIUS_METERS
+              value: "2000"
+            - name: LOCAL_EVENTS_INTERVAL_SEC
+              value: "300"
             # Fenetre de sommeil : aucun trafic entre minuit et 8h (heure de Paris)
             - name: SLEEP_ENABLED
               value: "true"
