@@ -14,8 +14,10 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 70
+          # Valeur absolue : un pourcentage de la requete (100m) se declenchait a 70m, soit des
+          # pods quasi inactifs (limite 2000m) et un HPA colle au maximum sous toute charge.
+          type: AverageValue
+          averageValue: 500m
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 0
