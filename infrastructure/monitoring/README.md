@@ -145,6 +145,33 @@ Ces métriques viennent de `@volontariapp/post-processors` 3.5.0 (ticket 6.3) et
 
 > Seuils de départ, non calibrés : le seuil de 500 messages en attente et la fenêtre de 15 minutes sont des valeurs prudentes choisies sans données de production. À ajuster après une semaine de métriques réelles. Le filtre `{*}` n'est pas restreint à un environnement : le tag `env` n'a pas été confirmé dans Datadog.
 
+#### Payload du webhook Discord
+
+Le payload n'est pas dans le dépôt : il se règle dans Datadog, **Integrations > Webhooks > Configuration > `discord-alerts` > Payload**. L'URL du webhook Discord (secret) est un autre champ de la même fiche et ne se copie jamais ici. Payload en place depuis le 2026-11-08 :
+
+```json
+{
+  "embeds": [
+    {
+      "title": "$EVENT_TITLE",
+      "url": "https://app.datadoghq.com/monitors/$ALERT_ID",
+      "color": 15158332,
+      "description": "$TEXT_ONLY_MSG",
+      "image": {
+        "url": "$SNAPSHOT"
+      }
+    }
+  ]
+}
+```
+
+- **Description** : `$TEXT_ONLY_MSG` reprend le champ `message` du monitor (explication et runbook). Datadog y ajoute à la suite ses propres liens (graphe, statut, édition, logs liés) et la mention `@webhook-discord-alerts` apparaît en clair.
+- **Lien du titre** : mène au monitor (`$ALERT_ID`) et non à la page d'événement (`$LINK`), qui n'indique pas d'où vient l'alerte.
+- **Pas de champ Date** : `$DATE` est un timestamp en millisecondes, non formatable ; Discord affiche déjà l'heure du message.
+- **Couleur** : fixe (rouge), y compris à la résolution (aucune variable Datadog connue pour la faire varier, non vérifié).
+- **Graphe** : l'image vient de `$SNAPSHOT`. Elle n'apparaissait pas sur la notification de test du 2026-11-08 ; à confirmer sur une vraie alerte.
+- **Tester** : dans un monitor, **Test Notifications** poste un vrai message dans `#monitoring-alerts`.
+
 #### Runbook Redis Streams
 
 1. **Identifier le stream et le groupe** dans le titre de l'alerte (`stream`, `group`).
