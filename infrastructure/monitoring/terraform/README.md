@@ -109,13 +109,9 @@ Une modification faite dans l'interface sur ces objets depuis leur import est pe
 
 `dashboard-list.tf` déclare la liste (`datadog_dashboard_list.status_page`) et y met **tous les dashboards** de `dashboards/`. Ajouter un fichier l'ajoute à la liste, en supprimer un l'en retire, et un dashboard recréé (nouvel identifiant) y reste. Le type de chaque élément est lu dans le champ `layout_type` du JSON (`free` donne `custom_screenboard`, `ordered` donne `custom_timeboard`).
 
-La liste existe déjà dans Datadog (créée à la main, identifiant `43089`). **Avant de merger la PR qui introduit `dashboard-list.tf`**, l'importer, sinon l'`apply` crée une seconde liste avec une autre URL :
+La liste a été créée par Terraform le 2026-11-08 (identifiant `43251`, lu dans les logs de l'`apply`). Elle remplace l'ancienne liste faite à la main (`43089`), qui était vide : ses dashboards manuels avaient été supprimés quand Terraform a recréé les dashboards. L'ancienne liste n'est pas gérée par Terraform et ne se supprime pas toute seule : la supprimer dans l'interface (Dashboards, Dashboard Lists).
 
-```bash
-terraform import datadog_dashboard_list.status_page 43089
-```
-
-Critère de réussite : `terraform plan` n'annonce plus `1 to add` pour la liste, mais au plus `1 to change` (son contenu devient celui du dépôt : un dashboard ajouté à la main dans cette liste en sera retiré). Le type `custom_screenboard` / `custom_timeboard` et le nom de la liste (`Volontariapp`) n'ont pas été vérifiés contre l'API : lire le `plan` avant de merger.
+Le contenu de la liste est celui du dépôt : un dashboard ajouté à la main dans cette liste en sera retiré au prochain `apply`. Si la liste sort un jour du state, la rattacher plutôt que de la recréer, sinon l'adresse change : `terraform import datadog_dashboard_list.status_page <id>`.
 
 ## Brancher une notification Discord sur un monitor
 
