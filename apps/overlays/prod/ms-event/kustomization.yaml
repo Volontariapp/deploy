@@ -6,3 +6,9 @@ resources:
   - ./db-postgres
 
 namespace: prod
+
+# 2 replicas : le deuxieme ne recoit du trafic gRPC que sur de nouvelles connexions (service
+# ClusterIP), il faut donc redemarrer la gateway apres le deploiement pour repartir la charge.
+replicas:
+  - name: ms-event
+    count: 2

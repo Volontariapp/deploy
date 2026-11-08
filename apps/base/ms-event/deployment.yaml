@@ -150,7 +150,7 @@ spec:
               cpu: 50m
               memory: 128Mi
             limits:
-              cpu: 800m
+              cpu: 1500m
               memory: 256Mi
           volumeMounts:
             - name: tmp-volume
