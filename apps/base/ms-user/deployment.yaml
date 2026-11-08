@@ -112,6 +112,12 @@ spec:
           env:
             - name: OTEL_SDK_DISABLED
               value: "false"
+            - name: OTEL_TRACES_SAMPLER
+              value: "parentbased_traceidratio"
+            - name: OTEL_TRACES_SAMPLER_ARG
+              value: "0.1"
+            - name: LOGGER_LEVEL
+              value: "info"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://datadog-agent-install.datadog.svc.cluster.local:4317"
             - name: DD_ENV

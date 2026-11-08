@@ -7,7 +7,9 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: api-gateway
-  minReplicas: 3
+  # 5 pods chauds au repos : un pod neuf ajoute en plein palier recoit sa part du trafic
+  # avant d'etre optimise (JIT, connexions gRPC), voir docs montee-en-charge 02 section 4.
+  minReplicas: 5
   maxReplicas: 6
   metrics:
     - type: Resource
@@ -22,8 +24,9 @@ spec:
     scaleUp:
       stabilizationWindowSeconds: 0
       policies:
+        # Un pod par minute : jamais deux pods froids en meme temps.
         - type: Pods
-          value: 2
+          value: 1
           periodSeconds: 60
     scaleDown:
       stabilizationWindowSeconds: 300
