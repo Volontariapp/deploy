@@ -174,7 +174,7 @@ spec:
               memory: 128Mi
             limits:
               cpu: 800m
-              memory: 256Mi
+              memory: 512Mi
           volumeMounts:
             - name: tmp-volume
               mountPath: /tmp

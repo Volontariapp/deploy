@@ -8,3 +8,10 @@ resources:
   - ./db-neo4j
 
 namespace: prod
+
+# 2 replicas : OOMKilled a 256Mi pendant la rampe de charge du 2026-11-08 (events-list-app : 6 appels
+# ms-social par requete). Le deuxieme ne recoit du trafic gRPC que sur de nouvelles connexions
+# (service ClusterIP) : redemarrer la gateway apres le deploiement pour repartir la charge.
+replicas:
+  - name: ms-social
+    count: 2
