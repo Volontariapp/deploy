@@ -27,8 +27,8 @@ helmCharts:
           storageClass: local-path
         resources:
           limits:
-            cpu: 800m
-            memory: 256Mi
+            cpu: 1500m
+            memory: 512Mi
           requests:
             cpu: 100m
             memory: 128Mi
