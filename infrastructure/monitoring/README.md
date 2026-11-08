@@ -79,7 +79,7 @@ Le dossier `dashboards/` contient les définitions JSON de nos tableaux de bord 
 
 Conformément aux décisions d'architecture d'observabilité, la « status page » de la plateforme Volontariapp est centralisée en interne directement sous Datadog sous forme d'une **Dashboard List** épinglée, évitant la dépendance et les coûts d'un service tiers externe.
 
-> 🔗 **Accès direct à la Status Page de l'équipe** : [**Datadog — Dashboard List Volontariapp**](https://us5.datadoghq.com/dashboard/lists/manual/43089)
+> 🔗 **Accès direct à la Status Page de l'équipe** : [**Datadog — Dashboard List Volontariapp**](https://us5.datadoghq.com/dashboard/lists/manual/43251)
 
 ### 1. Tableau Récapitulatif des Dashboards de la Status Page
 
