@@ -89,7 +89,7 @@ terraform import 'datadog_monitor_json.all["redis-streams-dlq.json"]' <id-du-mon
 
 Les guillemets simples protègent les crochets et les guillemets de la clé dans le shell. Critère de réussite : `terraform plan` affiche `0 to add` (les modifications éventuelles sont à lire une à une : un écart de format entre le JSON du dépôt et celui de Datadog peut apparaître).
 
-Alternative sans import : supprimer l'objet dans Datadog et laisser Terraform le recréer. Il reçoit alors un nouvel identifiant : l'URL du dashboard change, il disparaît de la Dashboard List de la status page (à ré-ajouter) et un monitor perd son historique.
+Alternative sans import : supprimer l'objet dans Datadog et laisser Terraform le recréer. Il reçoit alors un nouvel identifiant : l'URL du dashboard change et un monitor perd son historique. Le dashboard reste dans la Dashboard List de la status page : elle est gérée par `dashboard-list.tf` (section suivante).
 
 Objets à supprimer dans Datadog avant le premier `apply`, un par fichier du dépôt (chercher par titre, ne toucher à aucun autre objet, ne garder aucun doublon) :
 
@@ -104,6 +104,18 @@ Objets à supprimer dans Datadog avant le premier `apply`, un par fichier du dé
 | `monitors/redis-streams-pending.json` | [Volontariapp] Messages en attente Redis Streams ({{stream.name}} / {{group.name}}) |
 
 Une modification faite dans l'interface sur ces objets depuis leur import est perdue : le JSON du dépôt fait foi.
+
+## Dashboard List de la status page
+
+`dashboard-list.tf` déclare la liste (`datadog_dashboard_list.status_page`) et y met **tous les dashboards** de `dashboards/`. Ajouter un fichier l'ajoute à la liste, en supprimer un l'en retire, et un dashboard recréé (nouvel identifiant) y reste. Le type de chaque élément est lu dans le champ `layout_type` du JSON (`free` donne `custom_screenboard`, `ordered` donne `custom_timeboard`).
+
+La liste existe déjà dans Datadog (créée à la main, identifiant `43089`). **Avant de merger la PR qui introduit `dashboard-list.tf`**, l'importer, sinon l'`apply` crée une seconde liste avec une autre URL :
+
+```bash
+terraform import datadog_dashboard_list.status_page 43089
+```
+
+Critère de réussite : `terraform plan` n'annonce plus `1 to add` pour la liste, mais au plus `1 to change` (son contenu devient celui du dépôt : un dashboard ajouté à la main dans cette liste en sera retiré). Le type `custom_screenboard` / `custom_timeboard` et le nom de la liste (`Volontariapp`) n'ont pas été vérifiés contre l'API : lire le `plan` avant de merger.
 
 ## Brancher une notification Discord sur un monitor
 
