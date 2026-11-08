@@ -134,7 +134,7 @@ Les monitors sont versionnés comme les dashboards, dans `infrastructure/monitor
 
 | Monitor | Source | Condition | Pourquoi |
 | :--- | :--- | :--- | :--- |
-| **DLQ Redis Streams non vide** | [`monitors/redis-streams-dlq.json`](monitors/redis-streams-dlq.json) | `max(last_5m)` de `volontariapp.redis_streams.dlq_length` par `stream` supérieur à 0 | Un message en DLQ a épuisé ses tentatives et a été acquitté : l'événement n'a pas eu son effet. La DLQ n'est jamais purgée automatiquement : l'alerte dure jusqu'à un `XDEL` manuel (voir le runbook) et est renotifiée toutes les 4 h. |
+| **DLQ Redis Streams non vide** | [`monitors/redis-streams-dlq.json`](monitors/redis-streams-dlq.json) | `max(last_5m)` de `volontariapp.redis_streams.dlq_length` par `stream` supérieur à 0 | Un message en DLQ a épuisé ses tentatives et a été acquitté : l'événement n'a pas eu son effet. La DLQ n'est jamais purgée automatiquement : l'alerte dure jusqu'à un `XDEL` manuel (voir le runbook) et est renotifiée une fois par jour (24 h). Les messages sont gardés volontairement pour analyser l'échec : une DLQ peut rester non vide plusieurs jours sans urgence. |
 | **Messages en attente Redis Streams** | [`monitors/redis-streams-pending.json`](monitors/redis-streams-pending.json) | `min(last_15m)` de `volontariapp.redis_streams.pending` par `stream` et `group` supérieur à 100 (warning) ou 500 (critical) | Un groupe qui garde des messages non acquittés pendant 15 minutes entières est bloqué ou trop lent ; le `min` ignore les pics courts. |
 | **Taux d'erreur APM, serveurs gRPC** | [`monitors/apm-error-rate-grpc.json`](monitors/apm-error-rate-grpc.json) | `sum(last_10m)` de `trace.grpc.server.request.errors` divisé par `trace.grpc.server.request.hits` + 100, par `service`, supérieur à 5 % | Couvre les `ms-*`. Une alerte par service. |
 | **Taux d'erreur APM, serveurs HTTP** | [`monitors/apm-error-rate-http.json`](monitors/apm-error-rate-http.json) | même requête sur `trace.http.server.request.*` | Couvre `api-gateway` et `ws-service`. |
@@ -144,6 +144,33 @@ Les monitors sont versionnés comme les dashboards, dans `infrastructure/monitor
 Ces métriques viennent de `@volontariapp/post-processors` 3.5.0 (ticket 6.3) et n'existent dans Datadog qu'une fois les runners mis à jour. Chaque instance d'un runner publie les mêmes jauges : agréger en `max by {stream, group}`, jamais en `sum` (sinon la valeur est multipliée par le nombre de pods). Une jauge absente signifie que la lecture Redis a échoué, pas que la file est vide ; `notify_no_data` est donc désactivé.
 
 > Seuils de départ, non calibrés : le seuil de 500 messages en attente et la fenêtre de 15 minutes sont des valeurs prudentes choisies sans données de production. À ajuster après une semaine de métriques réelles. Le filtre `{*}` n'est pas restreint à un environnement : le tag `env` n'a pas été confirmé dans Datadog.
+
+#### Payload du webhook Discord
+
+Le payload n'est pas dans le dépôt : il se règle dans Datadog, **Integrations > Webhooks > Configuration > `discord-alerts` > Payload**. L'URL du webhook Discord (secret) est un autre champ de la même fiche et ne se copie jamais ici. Payload en place depuis le 2026-11-08 :
+
+```json
+{
+  "embeds": [
+    {
+      "title": "$EVENT_TITLE",
+      "url": "https://app.datadoghq.com/monitors/$ALERT_ID",
+      "color": 15158332,
+      "description": "$TEXT_ONLY_MSG",
+      "image": {
+        "url": "$SNAPSHOT"
+      }
+    }
+  ]
+}
+```
+
+- **Description** : `$TEXT_ONLY_MSG` reprend le champ `message` du monitor (explication et runbook). Datadog y ajoute à la suite ses propres liens (graphe, statut, édition, logs liés) et la mention `@webhook-discord-alerts` apparaît en clair.
+- **Lien du titre** : mène au monitor (`$ALERT_ID`) et non à la page d'événement (`$LINK`), qui n'indique pas d'où vient l'alerte.
+- **Pas de champ Date** : `$DATE` est un timestamp en millisecondes, non formatable ; Discord affiche déjà l'heure du message.
+- **Couleur** : fixe (rouge), y compris à la résolution (aucune variable Datadog connue pour la faire varier, non vérifié).
+- **Graphe** : l'image vient de `$SNAPSHOT`. Elle n'apparaissait pas sur la notification de test du 2026-11-08 ; à confirmer sur une vraie alerte.
+- **Tester** : dans un monitor, **Test Notifications** poste un vrai message dans `#monitoring-alerts`.
 
 #### Runbook Redis Streams
 
