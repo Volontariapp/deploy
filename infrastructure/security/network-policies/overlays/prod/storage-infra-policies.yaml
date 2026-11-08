@@ -20,6 +20,7 @@ spec:
                 values:
                   - ms-storage
                   - minio-init
+                  - worker-storage
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: kube-system
@@ -43,8 +44,12 @@ spec:
   ingress:
     - from:
         - podSelector:
-            matchLabels:
-              app: ms-storage
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - ms-storage
+                  - worker-storage
       ports:
         - protocol: TCP
           port: 3310
@@ -74,6 +79,7 @@ spec:
         values:
           - ms-storage
           - minio-init
+          - worker-storage
   policyTypes:
     - Egress
   egress:
