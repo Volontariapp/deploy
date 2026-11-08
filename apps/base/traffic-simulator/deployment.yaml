@@ -45,8 +45,10 @@ spec:
               value: "8000"
             - name: EVENT_LIFESPAN_SEC
               value: "180"
+            # Cible : environ 1000 utilisateurs simultanes. 1500 comptes dont un millier actifs en continu,
+            # 200 acteurs locaux, graphe de follow, activite de fond et rafales (voir README du simulateur)
             - name: TARGET_ACTORS
-              value: "300"
+              value: "1500"
             - name: EVENTS_PER_DISTRICT
               value: "3"
             - name: PARALLEL_DISTRICT_BATCH
@@ -62,13 +64,39 @@ spec:
             - name: REACTION_TICK_MS
               value: "1000"
             - name: POST_LIKES_MIN
-              value: "12"
-            - name: POST_LIKES_MAX
               value: "25"
+            - name: POST_LIKES_MAX
+              value: "80"
             - name: POST_COMMENTS_MIN
-              value: "4"
+              value: "6"
             - name: POST_COMMENTS_MAX
-              value: "8"
+              value: "15"
+            # Graphe de follow entre acteurs (environ 34 000 liens, ecrits en arriere-plan au premier demarrage)
+            - name: SOCIAL_FOLLOWS_MIN
+              value: "5"
+            - name: SOCIAL_FOLLOWS_MAX
+              value: "30"
+            - name: SOCIAL_FOLLOW_CONCURRENCY
+              value: "10"
+            - name: SOCIAL_FOLLOW_PAUSE_MS
+              value: "500"
+            # Activite de fond sur les posts des simulateurs, plus une rafale de 1000 actions toutes les 30 min
+            # (appels simultanes plafonnes a 250). Retirer AMBIENT_BURST_SIZE pour couper les pics.
+            - name: AMBIENT_ACTIONS_PER_SEC
+              value: "20"
+            - name: AMBIENT_COMMENT_PERCENT
+              value: "15"
+            - name: AMBIENT_BURST_SIZE
+              value: "1000"
+            - name: AMBIENT_BURST_INTERVAL_MIN
+              value: "30"
+            - name: AMBIENT_MAX_CONCURRENCY
+              value: "250"
+            # Quelques acteurs suivent chaque vrai compte (liste admin, comptes existants inclus)
+            - name: REAL_FOLLOWERS_MIN
+              value: "6"
+            - name: REAL_FOLLOWERS_MAX
+              value: "15"
             # Evenements autour des vrais utilisateurs : le simulateur lit leurs positions (cellules de 1 km,
             # anonymes) avec ce compte ADMIN dedie, secret scelle traffic-simulator-admin
             - name: SIMULATOR_ADMIN_EMAIL
@@ -82,7 +110,7 @@ spec:
                   name: traffic-simulator-admin
                   key: password
             - name: LOCAL_ACTORS
-              value: "40"
+              value: "200"
             - name: LOCAL_RADIUS_METERS
               value: "2000"
             - name: LOCAL_EVENTS_INTERVAL_SEC
@@ -100,11 +128,11 @@ spec:
               value: "300"
           resources:
             requests:
-              cpu: 50m
-              memory: 128Mi
+              cpu: 100m
+              memory: 256Mi
             limits:
-              cpu: 250m
-              memory: 384Mi
+              cpu: 1000m
+              memory: 768Mi
           volumeMounts:
             - name: tmp
               mountPath: /tmp
