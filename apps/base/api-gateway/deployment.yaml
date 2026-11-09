@@ -64,13 +64,13 @@ spec:
             - name: NODE_ENV
               value: "production"
             - name: MS_USER_URL
-              value: "ms-user:80"
+              value: "ms-user-headless:3000"
             - name: MS_POST_URL
-              value: "ms-post:80"
+              value: "ms-post-headless:3000"
             - name: MS_SOCIAL_URL
-              value: "ms-social:80"
+              value: "ms-social-headless:3000"
             - name: MS_EVENT_URL
-              value: "ms-event:80"
+              value: "ms-event-headless:3000"
             - name: MS_STORAGE_URL
               value: "ms-storage:80"
             - name: S3_PUBLIC_BASE_URL

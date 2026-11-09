@@ -122,13 +122,13 @@ spec:
                   name: db-secrets
                   key: ms-post-password
             - name: MS_USER_URL
-              value: "ms-user:80"
+              value: "ms-user-headless:3000"
             - name: MS_POST_URL
               value: "0.0.0.0:3000"
             - name: MS_EVENT_URL
-              value: "ms-event:80"
+              value: "ms-event-headless:3000"
             - name: MS_SOCIAL_URL
-              value: "ms-social:80"
+              value: "ms-social-headless:3000"
             # Rattachement des images d'un post : ms-post confirme les fichiers aupres de ms-storage
             - name: MS_STORAGE_URL
               value: "ms-storage:80"
