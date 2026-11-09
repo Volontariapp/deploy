@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - service.yaml
+  - service-headless.yaml
   - deployment-outbox.yaml
   - deployment-post-processor.yaml
   - deployment-worker.yaml
