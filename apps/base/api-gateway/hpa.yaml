@@ -7,10 +7,12 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: api-gateway
-  # 5 pods chauds au repos : un pod neuf ajoute en plein palier recoit sa part du trafic
+  # Pods chauds au repos : un pod neuf ajoute en plein palier recoit sa part du trafic
   # avant d'etre optimise (JIT, connexions gRPC), voir docs montee-en-charge 02 section 4.
-  minReplicas: 5
-  maxReplicas: 6
+  # 6 depuis la vague 1 : a 300 req/s l'HPA etait a 493m pour une cible de 500m et creait un
+  # 6e pod froid en plein palier (docs montee-en-charge 06).
+  minReplicas: 6
+  maxReplicas: 7
   metrics:
     - type: Resource
       resource:

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: api-gateway
 spec:
-  # replicas absent : piloté par l'HPA (hpa.yaml, minReplicas 3). Le fixer ici ferait
+  # replicas absent : piloté par l'HPA (hpa.yaml). Le fixer ici ferait
   # entrer ArgoCD en conflit avec l'autoscaler à chaque sync.
   strategy:
     type: RollingUpdate
@@ -97,8 +97,11 @@ spec:
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
+          # HTTP plutot que TCP : le pod ne recoit du trafic qu'une fois Nest pret a router.
+          # /api/v1/health est public et ne fait aucun appel en aval.
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /api/v1/health
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
