@@ -116,6 +116,11 @@ spec:
               value: "parentbased_traceidratio"
             - name: OTEL_TRACES_SAMPLER_ARG
               value: "0.1"
+            # Instrumentations sans valeur de diagnostic coupees : environ 15 des 20 spans par requete
+            # (express, router), et un cout CPU de 11 a 14 % au profil du 2026-11-09. Les spans HTTP,
+            # gRPC, pg, Redis et Neo4j restent. Docs montee-en-charge, analyses-services, vague 1.
+            - name: OTEL_NODE_DISABLED_INSTRUMENTATIONS
+              value: "express,router,nestjs-core,net,undici,generic-pool"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://datadog-agent-install.datadog.svc.cluster.local:4317"
             - name: DD_ENV
