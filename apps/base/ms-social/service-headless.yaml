@@ -1,0 +1,17 @@
+# Service headless : le DNS renvoie l'adresse de chaque pod pret, pour que les clients gRPC
+# (round_robin dans @volontariapp/contracts-nest) repartissent les appels entre les replicas.
+# Le Service ClusterIP "ms-social" reste en place : kube-proxy fixe un replica par connexion HTTP/2.
+# Pas de traduction de port : les clients visent directement le port du conteneur (3000).
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-social-headless
+spec:
+  clusterIP: None
+  selector:
+    app: ms-social
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      name: grpc
