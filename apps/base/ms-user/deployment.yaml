@@ -116,6 +116,10 @@ spec:
               value: "parentbased_traceidratio"
             - name: OTEL_TRACES_SAMPLER_ARG
               value: "0.1"
+            # Zone des objets de courte duree agrandie : moins de passages du ramasse-miettes
+            # (13 a 15 % du temps occupe au profil du 2026-11-09). Docs montee-en-charge, chapitre 05, phase B.
+            - name: NODE_OPTIONS
+              value: "--max-semi-space-size=16"
             - name: LOGGER_LEVEL
               value: "info"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
