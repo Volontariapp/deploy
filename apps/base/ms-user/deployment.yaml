@@ -116,6 +116,11 @@ spec:
               value: "parentbased_traceidratio"
             - name: OTEL_TRACES_SAMPLER_ARG
               value: "0.1"
+            # Instrumentations sans valeur de diagnostic coupees : environ 15 des 20 spans par requete
+            # (express, router), et un cout CPU de 11 a 14 % au profil du 2026-11-09. Les spans HTTP,
+            # gRPC, pg, Redis et Neo4j restent. Docs montee-en-charge, analyses-services, vague 1.
+            - name: OTEL_NODE_DISABLED_INSTRUMENTATIONS
+              value: "express,router,nestjs-core,net,undici,generic-pool"
             # Zone des objets de courte duree agrandie : moins de passages du ramasse-miettes
             # (13 a 15 % du temps occupe au profil du 2026-11-09). Docs montee-en-charge, chapitre 05, phase B.
             - name: NODE_OPTIONS
