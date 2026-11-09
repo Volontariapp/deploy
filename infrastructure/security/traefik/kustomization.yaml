@@ -5,3 +5,4 @@ resources:
   - security-headers.yaml
   - tls-options.yaml
   - rate-limit.yaml
+  - helm-chart-config.yaml

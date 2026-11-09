@@ -1,0 +1,25 @@
+# Overrides of the Traefik bundled with k3s (HelmChart kube-system/traefik), applied by the
+# k3s helm controller. Only the keys below change; the rest stays as k3s ships it.
+#
+# Why: Traefik had no request nor limit. On 2026-11-09 it grew from 134 to 598 Mi during a
+# collapsed ramp (requests piling up behind 2 s gateway deadlines) on a VM short of memory.
+# - GOMEMLIMIT makes the Go GC work harder before the heap passes 400 MiB.
+# - The memory limit is a safety cap above the observed peak, so a normal ramp is not killed.
+# - No CPU limit: Traefik is on every request, throttling would add latency.
+# Rollout: maxUnavailable 0 and maxSurge 1 (live deployment), no downtime.
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 768Mi
+    env:
+      - name: GOMEMLIMIT
+        value: 400MiB
