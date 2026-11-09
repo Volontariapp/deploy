@@ -123,13 +123,13 @@ spec:
                   name: db-secrets
                   key: ms-event-password
             - name: MS_USER_URL
-              value: "ms-user:80"
+              value: "ms-user-headless:3000"
             - name: MS_POST_URL
-              value: "ms-post:80"
+              value: "ms-post-headless:3000"
             - name: MS_EVENT_URL
               value: "0.0.0.0:3000"
             - name: MS_SOCIAL_URL
-              value: "ms-social:80"
+              value: "ms-social-headless:3000"
             # Photo d'un evenement : ms-event confirme le fichier aupres de ms-storage
             - name: MS_STORAGE_URL
               value: "ms-storage:80"

@@ -123,13 +123,13 @@ spec:
                   key: ms-ranking-password
             # Les clients gRPC vers les autres domaines : sans ces variables la config retombe sur localhost
             - name: MS_USER_URL
-              value: "ms-user:80"
+              value: "ms-user-headless:3000"
             - name: MS_POST_URL
-              value: "ms-post:80"
+              value: "ms-post-headless:3000"
             - name: MS_EVENT_URL
-              value: "ms-event:80"
+              value: "ms-event-headless:3000"
             - name: MS_SOCIAL_URL
-              value: "ms-social:80"
+              value: "ms-social-headless:3000"
             - name: MS_WS_URL
               value: "ws-service:80"
             # Adresse d'ecoute gRPC de ms-ranking (le Service redirige le port 80 vers 3000)

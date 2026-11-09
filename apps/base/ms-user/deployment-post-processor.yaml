@@ -107,9 +107,9 @@ spec:
                   name: db-secrets
                   key: redis-password
             - name: MS_SOCIAL_URL
-              value: "ms-social:80"
+              value: "ms-social-headless:3000"
             - name: MS_POST_URL
-              value: "ms-post:80"
+              value: "ms-post-headless:3000"
             - name: BADGE_POINTS_ENABLED
               value: "true"
             - name: AUTH_INTERNAL_PRIVATE_KEY_PATH
