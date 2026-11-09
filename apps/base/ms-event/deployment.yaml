@@ -162,7 +162,9 @@ spec:
             periodSeconds: 10
           resources:
             requests:
-              cpu: 50m
+              # Requete proche de l'usage sous charge (mesure a 400 req/s : 460m par pod) : sous contention
+              # du noeud, la part de CPU de chaque conteneur suit sa requete. Docs montee-en-charge.
+              cpu: 300m
               memory: 128Mi
             limits:
               cpu: 1500m

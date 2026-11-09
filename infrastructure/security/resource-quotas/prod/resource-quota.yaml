@@ -5,7 +5,13 @@ metadata:
   namespace: prod
 spec:
   hard:
+    # requests.memory : deja au-dessus de la memoire allouable du noeud (11,8 Gi), on ne le monte pas.
     requests.memory: "12Gi"
     limits.memory: "28Gi"
-    requests.cpu: "6"
-    limits.cpu: "56"
+    # requests.cpu : 3575m utilises le 2026-11-09, plus 3650m (Neo4j 1000m -> 2000m, gateway 7 x 250m,
+    # ms-social 2 x 300m, ms-event 2 x 300m, ms-user 250m, ms-post 2 x 200m), soit 7225m, plus environ
+    # 1550m de pods en surplus pendant les deploiements (maxSurge 25 %). 10 reste sous les 14 vCPU.
+    requests.cpu: "10"
+    # limits.cpu : 42500m utilises, plus Neo4j +1000m et le 7e pod de la gateway (2000m), plus le surplus
+    # des deploiements (environ 7900m) : 53400m. 64 pour la marge.
+    limits.cpu: "64"

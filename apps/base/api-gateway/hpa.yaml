@@ -11,7 +11,10 @@ spec:
   # avant d'etre optimise (JIT, connexions gRPC), voir docs montee-en-charge 02 section 4.
   # 6 depuis la vague 1 : a 300 req/s l'HPA etait a 493m pour une cible de 500m et creait un
   # 6e pod froid en plein palier (docs montee-en-charge 06).
-  minReplicas: 6
+  # 7 et 7 depuis le 2026-11-09 : l'HPA ajoute un pod en plus de 60 s, et ce pod arrive froid ;
+  # il ne protege pas d'une rafale. Taille fixe tant que la gateway n'attend pas ses backends
+  # avant d'etre prete.
+  minReplicas: 7
   maxReplicas: 7
   metrics:
     - type: Resource
