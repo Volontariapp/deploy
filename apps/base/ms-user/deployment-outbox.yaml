@@ -87,7 +87,7 @@ spec:
             - name: OUTBOX_BATCH_INTERVAL_MS
               value: "500"
             - name: OUTBOX_MAX_IDLE_INTERVAL_MS
-              value: "5000"
+              value: "1000"
             - name: OUTBOX_BATCH_SIZE
               value: "50"
             - name: PORT
