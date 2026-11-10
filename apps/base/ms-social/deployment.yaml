@@ -187,14 +187,19 @@ spec:
           # si Neo4j ne repond pas : un pod dont la connexion a echoue au demarrage (le provider
           # journalise l'erreur sans arreter le pod) ne recoit pas de trafic. Neo4j reste hors de la
           # liveness : un Neo4j lent ne doit pas faire redemarrer les pods.
+          # Apres un redemarrage de Neo4j, /health repond 503 pendant le prechauffage (30 s au plus,
+          # ms-social#77) : periode 5 s et un seul echec pour sortir le pod du service en 5 s au plus,
+          # un seul succes pour y revenir. /health repond en 0,11 a 0,18 s sur un Neo4j chaud
+          # (mesure 2026-11-10, proxy de l'API compris), loin du timeout de 2 s.
           readinessProbe:
             httpGet:
               path: /health
               port: http
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 5
             timeoutSeconds: 2
-            failureThreshold: 3
+            successThreshold: 1
+            failureThreshold: 1
           resources:
             requests:
               # Requete proche de l'usage sous charge (mesure a 400 req/s : 345m par pod) : sous contention
