@@ -112,7 +112,9 @@ spec:
                 command: ["sleep", "10"]
           resources:
             requests:
-              cpu: 100m
+              # Requete proche de l'usage sous charge (environ 410m par pod a 400 req/s) : sous contention
+              # du noeud, la part de CPU suit la requete. L'HPA vise une valeur absolue, pas un pourcentage.
+              cpu: 250m
               memory: 128Mi
             limits:
               cpu: 2000m

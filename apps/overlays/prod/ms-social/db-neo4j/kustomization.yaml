@@ -24,6 +24,13 @@ helmCharts:
           runAsUser: 7474
           seccompProfile:
             type: RuntimeDefault
+        # The chart reads neo4j.resources (not a top-level resources key, which it ignores) and
+        # uses the same values for requests and limits. 2000m: at 100 req/s after 4 h without
+        # traffic Neo4j averaged 742m on its former 1000m limit while every request timed out
+        # (2026-11-09 21:01Z); warm, 400 req/s take 400m.
+        resources:
+          cpu: "2000m"
+          memory: "2Gi"
       volumes:
         data:
           mode: defaultStorageClass
@@ -34,13 +41,6 @@ helmCharts:
         neo4j:
           enabled: true
           type: ClusterIP
-      resources:
-        limits:
-          cpu: 2000m
-          memory: 1Gi
-        requests:
-          cpu: 200m
-          memory: 512Mi
 
 patches:
   - target:

@@ -183,9 +183,23 @@ spec:
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
+          # GET /health (health-check-nest) appelle verifyConnectivity du driver Neo4j et repond 503
+          # si Neo4j ne repond pas : un pod dont la connexion a echoue au demarrage (le provider
+          # journalise l'erreur sans arreter le pod) ne recoit pas de trafic. Neo4j reste hors de la
+          # liveness : un Neo4j lent ne doit pas faire redemarrer les pods.
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
           resources:
             requests:
-              cpu: 50m
+              # Requete proche de l'usage sous charge (mesure a 400 req/s : 345m par pod) : sous contention
+              # du noeud, la part de CPU de chaque conteneur suit sa requete. Docs montee-en-charge.
+              cpu: 300m
               memory: 128Mi
             limits:
               cpu: 800m

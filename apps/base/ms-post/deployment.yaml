@@ -148,7 +148,9 @@ spec:
             periodSeconds: 10
           resources:
             requests:
-              cpu: 50m
+              # Requete proche de l'usage sous charge (ms-post n'a pas ete releve a 400 req/s, valeur prudente) : sous contention
+              # du noeud, la part de CPU de chaque conteneur suit sa requete. Docs montee-en-charge.
+              cpu: 200m
               memory: 128Mi
             limits:
               cpu: 800m
