@@ -27,7 +27,7 @@ spec:
         - name: ghcr-login
       containers:
         - name: traffic-simulator
-          image: ghcr.io/volontariapp/traffic-simulator:sha-c6bf3da
+          image: ghcr.io/volontariapp/traffic-simulator:sha-999da73
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
