@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: outbox-user
-          image: ghcr.io/volontariapp/outbox-user:sha-2028223
+          image: ghcr.io/volontariapp/outbox-user:sha-4874e18
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
