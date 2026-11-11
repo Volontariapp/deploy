@@ -2,7 +2,7 @@
   "name": "[Volontariapp] Taux d'erreur APM élevé, serveurs HTTP ({{service.name}})",
   "type": "query alert",
   "query": "sum(last_10m):sum:trace.http.server.request.errors{env:prod} by {service}.as_count() / (sum:trace.http.server.request.hits{env:prod} by {service}.as_count() + 100) > 0.05",
-  "message": "{{#is_alert}}Le service `{{service.name}}` renvoie plus de 5 % d'erreurs HTTP (serveur) sur les 10 dernières minutes. Un service peu sollicité ne déclenche l'alerte qu'après au moins 6 erreurs.\n\nRunbook : https://github.com/Volontariapp/deploy/blob/main/infrastructure/monitoring/README.md#runbook-erreurs-apm{{/is_alert}}\n{{#is_recovery}}Le taux d'erreur HTTP de `{{service.name}}` est repassé sous 5 %.{{/is_recovery}}\n\n@webhook-discord-alerts",
+  "message": "{{#is_alert}}Le service `{{service.name}}` renvoie plus de 5 % d'erreurs HTTP (serveur) sur les 10 dernières minutes. Un service peu sollicité ne déclenche l'alerte qu'après au moins 6 erreurs.\n\nRunbook : https://github.com/Volontariapp/deploy/blob/main/infrastructure/monitoring/README.md#runbook-erreurs-apm @webhook-discord-alert{{/is_alert}}\n{{#is_recovery}}Le taux d'erreur HTTP de `{{service.name}}` est repassé sous 5 %. @webhook-discord-recovery{{/is_recovery}}",
   "tags": ["team:backend", "area:apm", "managed-by:deploy-repo"],
   "priority": 2,
   "options": {

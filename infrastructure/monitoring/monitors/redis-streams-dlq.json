@@ -2,7 +2,7 @@
   "name": "[Volontariapp] DLQ Redis Streams non vide ({{stream.name}})",
   "type": "query alert",
   "query": "max(last_5m):max:volontariapp.redis_streams.dlq_length{*} by {stream} > 0",
-  "message": "{{#is_alert}}Des messages sont en dead-letter queue sur le stream `{{stream.name}}` : ils ont épuisé leurs tentatives et ont été acquittés, donc l'événement n'a pas eu son effet. La DLQ n'est jamais purgée automatiquement : cette alerte dure jusqu'à ce que les messages soient rejoués puis supprimés (`XDEL`) et se rappelle une fois par jour. Les messages restent en place pour analyser l'échec.\n\nRunbook : https://github.com/Volontariapp/deploy/blob/main/infrastructure/monitoring/README.md#runbook-redis-streams{{/is_alert}}\n{{#is_recovery}}La DLQ de `{{stream.name}}` est vide.{{/is_recovery}}\n\n@webhook-discord-alerts",
+  "message": "{{#is_alert}}Des messages sont en dead-letter queue sur le stream `{{stream.name}}` : ils ont épuisé leurs tentatives et ont été acquittés, donc l'événement n'a pas eu son effet. La DLQ n'est jamais purgée automatiquement : cette alerte dure jusqu'à ce que les messages soient rejoués puis supprimés (`XDEL`) et se rappelle une fois par jour. Les messages restent en place pour analyser l'échec.\n\nRunbook : https://github.com/Volontariapp/deploy/blob/main/infrastructure/monitoring/README.md#runbook-redis-streams @webhook-discord-warn{{/is_alert}}\n{{#is_recovery}}La DLQ de `{{stream.name}}` est vide. @webhook-discord-recovery{{/is_recovery}}",
   "tags": ["team:backend", "area:redis-streams", "managed-by:deploy-repo"],
   "priority": 2,
   "options": {

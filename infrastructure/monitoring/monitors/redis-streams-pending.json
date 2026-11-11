@@ -2,7 +2,7 @@
   "name": "[Volontariapp] Messages en attente Redis Streams ({{stream.name}} / {{group.name}})",
   "type": "query alert",
   "query": "min(last_15m):max:volontariapp.redis_streams.pending{*} by {stream,group} > 500",
-  "message": "{{#is_warning}}Le groupe `{{group.name}}` du stream `{{stream.name}}` garde plus de 100 messages non acquittés depuis 15 minutes.{{/is_warning}}\n{{#is_alert}}Le groupe `{{group.name}}` du stream `{{stream.name}}` garde plus de 500 messages non acquittés depuis 15 minutes : consommateur bloqué, crashé ou trop lent.\n\nRunbook : https://github.com/Volontariapp/deploy/blob/main/infrastructure/monitoring/README.md#runbook-redis-streams{{/is_alert}}\n{{#is_recovery}}Le groupe `{{group.name}}` de `{{stream.name}}` est revenu sous le seuil.{{/is_recovery}}\n\n@webhook-discord-alerts",
+  "message": "{{#is_warning}}Le groupe `{{group.name}}` du stream `{{stream.name}}` garde plus de 100 messages non acquittés depuis 15 minutes. @webhook-discord-warn{{/is_warning}}\n{{#is_alert}}Le groupe `{{group.name}}` du stream `{{stream.name}}` garde plus de 500 messages non acquittés depuis 15 minutes : consommateur bloqué, crashé ou trop lent.\n\nRunbook : https://github.com/Volontariapp/deploy/blob/main/infrastructure/monitoring/README.md#runbook-redis-streams @webhook-discord-alert{{/is_alert}}\n{{#is_recovery}}Le groupe `{{group.name}}` de `{{stream.name}}` est revenu sous le seuil. @webhook-discord-recovery{{/is_recovery}}",
   "tags": ["team:backend", "area:redis-streams", "managed-by:deploy-repo"],
   "priority": 3,
   "options": {
