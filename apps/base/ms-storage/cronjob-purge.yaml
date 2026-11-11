@@ -31,7 +31,7 @@ spec:
             - name: ghcr-login
           containers:
             - name: request-file-purge
-              image: ghcr.io/volontariapp/ms-storage:sha-20b93ad
+              image: ghcr.io/volontariapp/ms-storage:sha-e0c87e8
               imagePullPolicy: IfNotPresent
               command: ['node', 'dist/commands/request-file-purge.js']
               securityContext:
