@@ -147,7 +147,17 @@ Ces métriques viennent de `@volontariapp/post-processors` 3.5.0 (ticket 6.3) et
 
 #### Payload du webhook Discord
 
-Le payload n'est pas dans le dépôt : il se règle dans Datadog, **Integrations > Webhooks > Configuration > `discord-alerts` > Payload**. L'URL du webhook Discord (secret) est un autre champ de la même fiche et ne se copie jamais ici. Payload en place depuis le 2026-11-08 :
+Trois webhooks Datadog, un par niveau de gravité et un canal Discord chacun. Le handle d'un monitor est `@webhook-` suivi du nom du webhook ; il est écrit dans le bloc de l'état concerné du champ `message` (`{{#is_alert}}`, `{{#is_warning}}`, `{{#is_recovery}}`), car un handle placé dans un bloc ne part que pour cet état ([Datadog, variables](https://docs.datadoghq.com/monitors/notify/variables/)).
+
+| Webhook Datadog | Handle | État du monitor | Couleur |
+| :--- | :--- | :--- | :--- |
+| `discord-alert` | `@webhook-discord-alert` | `is_alert` (critique) | rouge, `15158332` |
+| `discord-warn` | `@webhook-discord-warn` | `is_warning`, et `is_alert` du monitor DLQ | orange, `15105570` |
+| `discord-recovery` | `@webhook-discord-recovery` | `is_recovery` (tous les monitors) | vert, `3066993` |
+
+La DLQ non vide part sur `discord-warn` : elle peut rester non vide plusieurs jours sans urgence.
+
+Les payloads ne sont pas dans le dépôt : ils se règlent dans Datadog, **Integrations > Webhooks > Configuration > (nom du webhook) > Payload**. L'URL du webhook Discord (secret) est un autre champ de la même fiche et ne se copie jamais ici. Les trois payloads sont identiques, seule la valeur de `color` change. Payload de `discord-alert`, en place depuis le 2026-11-08 :
 
 ```json
 {
@@ -165,12 +175,12 @@ Le payload n'est pas dans le dépôt : il se règle dans Datadog, **Integrations
 }
 ```
 
-- **Description** : `$TEXT_ONLY_MSG` reprend le champ `message` du monitor (explication et runbook). Datadog y ajoute à la suite ses propres liens (graphe, statut, édition, logs liés) et la mention `@webhook-discord-alerts` apparaît en clair.
+- **Description** : `$TEXT_ONLY_MSG` reprend le champ `message` du monitor (explication et runbook). Datadog y ajoute à la suite ses propres liens (graphe, statut, édition, logs liés) et la mention du handle (`@webhook-discord-alert`, `-warn` ou `-recovery`) apparaît en clair.
 - **Lien du titre** : mène au monitor (`$ALERT_ID`) et non à la page d'événement (`$LINK`), qui n'indique pas d'où vient l'alerte. Le site Datadog de l'organisation est `us5` : un lien vers `app.datadoghq.com` (site US1) ne trouverait pas le monitor.
 - **Pas de champ Date** : `$DATE` est un timestamp en millisecondes, non formatable ; Discord affiche déjà l'heure du message.
-- **Couleur** : fixe (rouge), y compris à la résolution (aucune variable Datadog connue pour la faire varier, non vérifié).
+- **Couleur** : fixe par webhook (aucune variable Datadog connue pour la faire varier, non vérifié). C'est pourquoi il y a un webhook par gravité : la résolution passe par `discord-recovery` et s'affiche en vert au lieu de rester rouge.
 - **Graphe** : l'image vient de `$SNAPSHOT`. Elle n'apparaissait pas sur la notification de test du 2026-11-08 ; à confirmer sur une vraie alerte.
-- **Tester** : dans un monitor, **Test Notifications** poste un vrai message dans `#monitoring-alerts`.
+- **Tester** : dans un monitor, **Test Notifications** poste un vrai message dans les canaux Discord (prévenir l'équipe avant). Vérifier un message par canal, avec la bonne couleur.
 
 #### Runbook Redis Streams
 

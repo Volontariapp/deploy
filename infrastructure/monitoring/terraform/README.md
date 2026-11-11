@@ -115,7 +115,7 @@ Le contenu de la liste est celui du dépôt : un dashboard ajouté à la main da
 
 ## Brancher une notification Discord sur un monitor
 
-Un monitor prévient par des mentions `@...` écrites dans son champ `message`. Sans mention, l'alerte se déclenche dans Datadog mais personne n'est notifié. Les deux monitors actuels n'en ont aucune.
+Un monitor prévient par des mentions `@...` écrites dans son champ `message`. Sans mention, l'alerte se déclenche dans Datadog mais personne n'est notifié. Les monitors actuels portent un handle par état : `@webhook-discord-alert` dans `{{#is_alert}}`, `@webhook-discord-warn` dans `{{#is_warning}}` et `@webhook-discord-recovery` dans `{{#is_recovery}}` (détail dans `../README.md`, section Payload du webhook Discord).
 
 1. Dans Datadog, créer l'intégration (webhook Discord) une seule fois. L'URL du webhook est un secret : elle reste dans Datadog et n'entre jamais dans le dépôt.
 2. Relever le handle que Datadog donne à cette intégration (de la forme `@...`, à lire dans l'interface).
