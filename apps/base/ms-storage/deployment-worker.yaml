@@ -59,7 +59,7 @@ spec:
               memory: 32Mi
       containers:
         - name: worker-storage
-          image: ghcr.io/volontariapp/worker-storage:sha-538881d
+          image: ghcr.io/volontariapp/worker-storage:sha-d9c362d
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
