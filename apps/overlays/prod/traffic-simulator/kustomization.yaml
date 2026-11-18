@@ -6,3 +6,10 @@ resources:
   - simulator-admin-sealed-secret.yaml
 
 namespace: prod
+
+# PAUSE TEMPORAIRE pour la rampe de charge (traffic-simulator, yarn load) : l'activite de fond
+# (20 actions/s, rafales de 1000) fausserait la mesure. ArgoCD a selfHeal : seul Git coupe vraiment.
+# A retirer apres la mesure (revert de ce commit).
+replicas:
+  - name: traffic-simulator
+    count: 0
